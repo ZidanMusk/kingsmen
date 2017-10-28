@@ -5,6 +5,6 @@ set(CMAKE_CXX_STANDARD 11)
 
 set(SOURCE_FILES
         src/Board.cpp
-        src/main.cpp src/d5rtfyuhi.cpp)
+        src/main.cpp)
 
 add_executable(kingsmen ${SOURCE_FILES})
