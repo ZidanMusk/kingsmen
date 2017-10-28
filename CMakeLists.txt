@@ -1,7 +1,10 @@
 cmake_minimum_required(VERSION 3.8)
-project(KingsMen)
+project(kingsmen)
 
 set(CMAKE_CXX_STANDARD 11)
 
-set(SOURCE_FILES src/main.cpp src/Board.cpp)
-add_executable(KingsMen ${SOURCE_FILES})
+set(SOURCE_FILES
+        src/Board.cpp
+        src/main.cpp src/d5rtfyuhi.cpp)
+
+add_executable(kingsmen ${SOURCE_FILES})
