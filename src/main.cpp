@@ -1,6 +1,8 @@
 #include <iostream>
+#include "Board.cpp"
 
 int main() {
-    std::cout << "_|_" << std::endl;
+    Board b;
+
     return 0;
 }
