@@ -23,6 +23,14 @@ public:
 
     unsigned long long key; // zobrist key
 
+    void pass(){}
+    void doo(){}
+    void undoo(){}
+    void isEndGame(){}
+    void isDraw(){}
+    void isMate(){}
+    void check(){}
+
 
 
 
