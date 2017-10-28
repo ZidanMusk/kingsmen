@@ -1,6 +1,6 @@
 #include <iostream>
 
 int main() {
-    std::cout << "A7A" << std::endl;
+    std::cout << "_|_" << std::endl;
     return 0;
 }
