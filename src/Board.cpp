@@ -179,19 +179,19 @@ public:
     unsigned long long whiteToMove;
 
     char getPieceAt(int loc){
-        if(allPieces&(1<<loc)) {
-            if (whitePawns & (1 << loc)) return 'P';
-            else if (whiteBishops & (1 << loc)) return 'B';
-            else if (whiteKing & (1 << loc)) return 'K';
-            else if (whiteKnights & (1 << loc)) return 'N';
-            else if (whiteQueens & (1 << loc)) return 'Q';
-            else if (whiteRooks & (1 << loc)) return 'R';
-            else if (blackPawns & (1 << loc)) return 'p';
-            else if (blackBishops & (1 << loc)) return 'b';
-            else if (blackKing & (1 << loc)) return 'k';
-            else if (blackKnights & (1 << loc)) return 'n';
-            else if (blackQueens & (1 << loc)) return 'q';
-            else if (blackRooks & (1 << loc)) return 'r';
+        if(allPieces&(1ULL<<loc)) {
+            if (whitePawns & (1ULL << loc)) return 'P';
+            else if (whiteBishops & (1ULL << loc)) return 'B';
+            else if (whiteKing & (1ULL << loc)) return 'K';
+            else if (whiteKnights & (1ULL << loc)) return 'N';
+            else if (whiteQueens & (1ULL << loc)) return 'Q';
+            else if (whiteRooks & (1ULL << loc)) return 'R';
+            else if (blackPawns & (1ULL << loc)) return 'p';
+            else if (blackBishops & (1ULL << loc)) return 'b';
+            else if (blackKing & (1ULL << loc)) return 'k';
+            else if (blackKnights & (1ULL << loc)) return 'n';
+            else if (blackQueens & (1ULL << loc)) return 'q';
+            else if (blackRooks & (1ULL << loc)) return 'r';
             else return '';
         }else return '';
 
@@ -266,13 +266,13 @@ public:
 
     void undoo() {}
 
-    void isEndGame() {}
+    bool isEndOfGame() {return (isMate() || isDraw());}
 
-    void isDraw() {}
+    bool isDraw() {}
 
-    void isMate() {}
+    bool isMate() {}
 
-    void check() {}
+    bool ischeck() {}
 
 
 };
