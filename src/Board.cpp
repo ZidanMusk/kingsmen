@@ -118,8 +118,7 @@ public:
     unsigned long long passantColumn[8] = { 0x70cc73d90bc26e24L, 0xe21a6b35df0c3ad7L, 0x3a93d8b2806962L, 0x1c99ded33cb890a1L, 0xcf3145de0add4289L, 0xd0e4427a5514fb72L, 0x77c621cc9fb3a483L, 0x67a34dac4356550bL };
     unsigned long long whiteMove = 0xf8d626aaaf278509L;
 
-    // board representation
-
+    // board representation bit masks
     unsigned long long whitePawns;
     unsigned long long whiteKnights;
     unsigned long long whiteBishops;
@@ -140,13 +139,44 @@ public:
 
     unsigned long long key; // zobrist key
 
+    unsigned long long white_pawn_history[];
+    unsigned long long white_knight_history[];
+    unsigned long long white_bishop_history[];
+    unsigned long long white_rook_history[];
+    unsigned long long white_queen_history[];
+    unsigned long long white_king_history[];
+
+    unsigned long long black_pawn_history[];
+    unsigned long long black_knight_history[];
+    unsigned long long black_bishop_history[];
+    unsigned long long black_rook_history[];
+    unsigned long long black_queen_history[];
+    unsigned long long black_king_history[];
+
+    unsigned long long white_pieces_history[];
+    unsigned long long black_pieces_history[];
+    unsigned long long all_pieces_history[];
+
+    //bool[] white_to_move_history;
+    //int[] fiftyMoveRule_history;
+    int enPassantLoc_history[];
+    int move_history[];
+    //char pieceArray_history[][];
+    bool white_castle_k_history[];
+    bool white_castle_q_history[];
+    bool black_castle_k_history[];
+    bool black_castle_q_history[];
+    bool white_has_castled_history[];
+    bool black_has_castled_history[];
+    unsigned long long key_history[];
+
     //should be considered at implementation
-    unsigned long long white_castle_k;
-    unsigned long long white_castle_q;
-    unsigned long long black_castle_k;
-    unsigned long long black_castle_q;
+    unsigned long long whiteCastleK;
+    unsigned long long whiteCastleQ;
+    unsigned long long blackCastleK;
+    unsigned long long blackCastleQ;
     unsigned long long enPassantLoc;
-    unsigned long long white_to_move;
+    unsigned long long whiteToMove;
 
     char getPieceAt(int loc);
 
@@ -193,19 +223,19 @@ public:
             key ^= squareZKey(loc, getPieceAt(loc));
         }
 
-        if (white_castle_k)
+        if (whiteCastleK)
             key ^= whiteKingSideCastling;
-        if (white_castle_q)
+        if (whiteCastleQ)
             key ^= whiteQueenSideCastling;
-        if (black_castle_k)
+        if (blackCastleK)
             key ^= blackKingSideCastling;
-        if (black_castle_q)
+        if (blackCastleQ)
             key ^= blackQueenSideCastling;
 
         if (enPassantLoc != -1)
             key ^= passantColumn[enPassantLoc % 8];
 
-        if (white_to_move)
+        if (whiteToMove)
             key ^= whiteMove;
 
         return key;
