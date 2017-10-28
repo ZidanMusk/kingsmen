@@ -3,5 +3,5 @@ project(KingsMen)
 
 set(CMAKE_CXX_STANDARD 11)
 
-set(SOURCE_FILES src/main.cpp)
+set(SOURCE_FILES src/main.cpp src/Board.cpp.cpp)
 add_executable(KingsMen ${SOURCE_FILES})
