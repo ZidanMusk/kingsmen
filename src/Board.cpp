@@ -141,14 +141,31 @@ public:
     unsigned long long key; // zobrist key
 
     //should be considered at implementation
-    unsigned long long white_castle_k;
-    unsigned long long white_castle_q;
-    unsigned long long black_castle_k;
-    unsigned long long black_castle_q;
+    unsigned long long whiteCastleK;
+    unsigned long long whiteCastleQ;
+    unsigned long long blackCastleK;
+    unsigned long long blackCastleQ;
     unsigned long long enPassantLoc;
-    unsigned long long white_to_move;
+    unsigned long long whiteToMove;
 
-    char getPieceAt(int loc);
+    char getPieceAt(int loc){
+        if(allPieces&(1<<loc)) {
+            if (whitePawns & (1 << loc)) return 'P';
+            else if (whiteBishops & (1 << loc)) return 'B';
+            else if (whiteKing & (1 << loc)) return 'K';
+            else if (whiteKnights & (1 << loc)) return 'N';
+            else if (whiteQueens & (1 << loc)) return 'Q';
+            else if (whiteRooks & (1 << loc)) return 'R';
+            else if (blackPawns & (1 << loc)) return 'p';
+            else if (blackBishops & (1 << loc)) return 'b';
+            else if (blackKing & (1 << loc)) return 'k';
+            else if (blackKnights & (1 << loc)) return 'n';
+            else if (blackQueens & (1 << loc)) return 'q';
+            else if (blackRooks & (1 << loc)) return 'r';
+            else return '';
+        }else return '';
+
+    };
 
 
 
@@ -193,19 +210,19 @@ public:
             key ^= squareZKey(loc, getPieceAt(loc));
         }
 
-        if (white_castle_k)
+        if (whiteCastleK)
             key ^= whiteKingSideCastling;
-        if (white_castle_q)
+        if (whiteCastleQ)
             key ^= whiteQueenSideCastling;
-        if (black_castle_k)
+        if (blackCastleK)
             key ^= blackKingSideCastling;
-        if (black_castle_q)
+        if (blackCastleQ)
             key ^= blackQueenSideCastling;
 
         if (enPassantLoc != -1)
             key ^= passantColumn[enPassantLoc % 8];
 
-        if (white_to_move)
+        if (whiteToMove)
             key ^= whiteMove;
 
         return key;
