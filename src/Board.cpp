@@ -573,7 +573,6 @@ public:
         else
             fiftyMoveRule = 0;
 
-        //fiftyMoveRuleHistory[moveNumber] = fiftyMoveRule;
         //saving all of our history
         saveHistory();
 
