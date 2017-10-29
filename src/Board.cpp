@@ -8,7 +8,7 @@ public:
     const int ENPASSANT = 3;
     const int PROMOTEKNIGHT = 4;
     const int PROMOTEBISHOP = 5;
-    const int PROMOTEROOK = 6
+    const int PROMOTEROOK = 6;
     const int PROMOTEQUEEN = 7;
 
 
