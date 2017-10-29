@@ -335,6 +335,7 @@ public:
     bool whiteToMove = true;
 
     vector<int> allValidMoves;
+    vector<int> kingCheckers;
 
     int moveNumber = 0;
     int fiftyMoveRule = 0;
@@ -792,15 +793,18 @@ public:
 
     bool isCheck() {
         //if the destination of any valid moves is at king`s position
+        bool threat = false;
         for(int i= 0; i< allValidMoves.size();i++){
 
             int to = allValidMoves[i] & 516096;
             int x = (ull(to) & whiteKing) | (ull(to) & blackKing);
 
-            if(x)
-                return true;
+            if(x) {
+                kingCheckers.push_back(allValidMoves[i]);
+                threat = true;
+            }
         }
-        return false;
+        return threat;
     }
 
     bool isEndOfGame() { return (isMate() || isDraw()); }
