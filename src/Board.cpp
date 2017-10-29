@@ -312,17 +312,19 @@ public:
     ull blackPiecesHistory[MAX_GAME_LENGTH];
     ull allPiecesHistory[MAX_GAME_LENGTH];
 
-    //bool whiteTomoveHistory;
+    bool whiteToMoveHistory[MAX_GAME_LENGTH];
     int fiftyMoveRuleHistory[MAX_GAME_LENGTH];
     int enPassantLocHistory[MAX_GAME_LENGTH];
-    int moveHistory[MAX_GAME_LENGTH];
+
     //char pieceArray_history[MAX_GAME_LENGTH][MAX_GAME_LENGTH];
+
     bool whiteCastleKHistory[MAX_GAME_LENGTH];
     bool whiteCastleQHistory[MAX_GAME_LENGTH];
     bool blackCastleKHistory[MAX_GAME_LENGTH];
     bool blackCastleQHistory[MAX_GAME_LENGTH];
-    bool whiteHasCastledHistory[MAX_GAME_LENGTH];
-    bool blackHasCastledHistory[MAX_GAME_LENGTH];
+
+    //bool whiteHasCastledHistory[MAX_GAME_LENGTH];
+    //bool blackHasCastledHistory[MAX_GAME_LENGTH];
 
 
 
@@ -334,6 +336,7 @@ public:
     ull enPassantLoc;
     bool whiteToMove = true;
 
+    vector < vector <int> > validMovesHistory;
     vector<int> allValidMoves;
     vector<int> kingCheckers;
 
@@ -343,8 +346,12 @@ public:
 /**********************************************************************************************************************
 *                                               Optmization functions                                                 *
 **********************************************************************************************************************/
-    void disp(){
 
+    void init(){
+        validMovesHistory.resize(MAX_GAME_LENGTH);
+    }
+
+    void disp(){
         char arr[8][8];
         memset(arr,0,sizeof(arr));
         int Cnt = __builtin_popcountll(allPieces);
@@ -691,6 +698,9 @@ public:
         //switch turns
         whiteToMove = !whiteToMove;
 
+        //reset the valid moves
+        allValidMoves.clear();
+
     }
 
 //==================================================Saving history, Undo
@@ -701,23 +711,27 @@ public:
         whiteRookHistory[moveNumber] = whiteRooks;
         whiteQueenHistory[moveNumber] = whiteQueens;
         whiteKingHistory[moveNumber] = whiteKing;
+
         blackPawnHistory[moveNumber] = blackPawns;
         blackKnightHistory[moveNumber] = blackKnights;
         blackBishopHistory[moveNumber] = blackBishops;
         blackRookHistory[moveNumber] = blackRooks;
         blackQueenHistory[moveNumber] = blackQueens;
         blackKingHistory[moveNumber] = blackKing;
+
         whitePiecesHistory[moveNumber] = whitePieces;
         blackPiecesHistory[moveNumber] = blackPieces;
         allPiecesHistory[moveNumber] = allPieces;
-        //white_to_moveHistory[moveNumber] = white_to_move;
+
         fiftyMoveRuleHistory[moveNumber] = fiftyMoveRule;
         enPassantLocHistory[moveNumber] = enPassantLoc;
-        //moveHistory[moveNumber] = move;
-//        white_castle_k_history[moveNumber] = white_castle_k;
-//        white_castle_q_history[moveNumber] = white_castle_q;
-//        black_castle_k_history[moveNumber] = black_castle_k;
-//        black_castle_q_history[moveNumber] = black_castle_q;
+
+        whiteToMoveHistory[moveNumber] = whiteToMove;
+        validMovesHistory[moveNumber] = allValidMoves; //assigning 2 vectors
+        whiteCastleKHistory[moveNumber] = whiteCastleK;
+        whiteCastleQHistory[moveNumber] = whiteCastleQ;
+        blackCastleKHistory[moveNumber] = blackCastleK;
+        blackCastleQHistory[moveNumber] = blackCastleQ;
         keyHistory[moveNumber] = key;
     }
 
@@ -733,29 +747,35 @@ public:
 
         moveNumber--;
 
+        allValidMoves = validMovesHistory[moveNumber]; //assigning 2 vectors
+        whiteToMove = whiteToMoveHistory[moveNumber];
+
         whitePawns = whitePawnHistory[moveNumber];
         whiteKnights = whiteKnightHistory[moveNumber];
         whiteBishops = whiteBishopHistory[moveNumber];
         whiteRooks = whiteRookHistory[moveNumber];
         whiteQueens = whiteQueenHistory[moveNumber];
         whiteKing = whiteKingHistory[moveNumber];
+
         blackPawns = blackPawnHistory[moveNumber];
         blackKnights = blackKnightHistory[moveNumber];
         blackBishops = blackBishopHistory[moveNumber];
         blackRooks = blackRookHistory[moveNumber];
         blackQueens = blackQueenHistory[moveNumber];
         blackKing = blackKingHistory[moveNumber];
+
         whitePieces = whitePiecesHistory[moveNumber];
         blackPieces = blackPiecesHistory[moveNumber];
         allPieces = allPiecesHistory[moveNumber];
-        //white_to_moveHistory[moveNumber] = white_to_move;
+
         fiftyMoveRule = fiftyMoveRuleHistory[moveNumber];
         enPassantLoc = enPassantLocHistory[moveNumber];
-        //move = moveHistory[moveNumber];
-//        whiteCastleK = white_castle_k_history[moveNumber];
-//        whiteCastleQ = white_castle_q_history[moveNumber];
-//        blackCastleK = black_castle_k_history[moveNumber];
-//        blackCastleQ = black_castle_q_history[moveNumber];
+
+        whiteCastleK = whiteCastleKHistory[moveNumber];
+        whiteCastleQ = whiteCastleQHistory[moveNumber];
+        blackCastleK = blackCastleKHistory[moveNumber];
+        blackCastleQ = blackCastleQHistory[moveNumber];
+        
         key = keyHistory[moveNumber];
 
     }
