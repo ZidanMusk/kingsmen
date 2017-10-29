@@ -853,12 +853,9 @@ public:
  **********************************************************************************************************************/
 
 //==================================================WhitePawn valid Moves
-    int whitePawnVM[64];
-    int whitePawnVMCnt = 0;
-    int whitePawnCap[64];
-    int whitePawnCapCnt = 0;
 
-    void whitePawnVMGen() {
+    vector<int> whitePawnVMGen() {
+        vector<int> whitePawnVM, whitePawnCap;
         int pawnCnt = __builtin_popcountll(whitePawns);
         ull wp = whitePawns;
         while (pawnCnt--) {
@@ -871,7 +868,7 @@ public:
                     int flag = 0;
                     if((getColumn(ind + 1) != 0) && blackPawns&(newInd+1)) flag = 3;
                     if((getColumn(ind - 1) != 7) && blackPawns&(newInd-1)) flag = 3;
-                    whitePawnVM[whitePawnVMCnt++] = (ind) | (newInd << 6) | (0 << 12) | ( 0 << 15) | (flag << 16);
+                    whitePawnVM.push_back((ind) | (newInd << 6) | (0 << 12) | ( 0 << 15) | (flag << 16));
                 }
             }
             //move one square forward --> +8
@@ -879,11 +876,11 @@ public:
             if((newInd>=0 && newInd<=63) && !(allPieces&(1ull << newInd))){
                 //new valid move from ind to newInd
                 if(newInd > 55) {
-                    whitePawnVM[whitePawnVMCnt++] = (ind) | (newInd << 6) | (0 << 12) | (0 << 15) | (4 << 16);
-                    whitePawnVM[whitePawnVMCnt++] = (ind) | (newInd << 6) | (0 << 12) | (0 << 15) | (5 << 16);
-                    whitePawnVM[whitePawnVMCnt++] = (ind) | (newInd << 6) | (0 << 12) | (0 << 15) | (6 << 16);
-                    whitePawnVM[whitePawnVMCnt++] = (ind) | (newInd << 6) | (0 << 12) | (0 << 15) | (7 << 16);
-                }else whitePawnVM[whitePawnVMCnt++] = (ind) | (newInd << 6) | (0 << 12) | (0 << 15) | (0 << 16);
+                    whitePawnVM.push_back((ind) | (newInd << 6) | (0 << 12) | (0 << 15) | (4 << 16));
+                    whitePawnVM.push_back((ind) | (newInd << 6) | (0 << 12) | (0 << 15) | (5 << 16));
+                    whitePawnVM.push_back((ind) | (newInd << 6) | (0 << 12) | (0 << 15) | (6 << 16));
+                    whitePawnVM.push_back((ind) | (newInd << 6) | (0 << 12) | (0 << 15) | (7 << 16));
+                }else whitePawnVM.push_back((ind) | (newInd << 6) | (0 << 12) | (0 << 15) | (0 << 16));
             }
 
             //captures --> +7 & +9
@@ -891,33 +888,34 @@ public:
             if((newInd>=0 && newInd<=63) && (blackPieces&(1ull << newInd))){
                 //new valid capture from ind to newInd
                 if(newInd > 55) {
-                    whitePawnCap[whitePawnCapCnt++] = (ind) | (newInd << 6) | (0 << 12) | (1 << 15) | (4 << 16);
-                    whitePawnCap[whitePawnCapCnt++] = (ind) | (newInd << 6) | (0 << 12) | (1 << 15) | (5 << 16);
-                    whitePawnCap[whitePawnCapCnt++] = (ind) | (newInd << 6) | (0 << 12) | (1 << 15) | (6 << 16);
-                    whitePawnCap[whitePawnCapCnt++] = (ind) | (newInd << 6) | (0 << 12) | (1 << 15) | (7 << 16);
-                }else whitePawnCap[whitePawnCapCnt++] = (ind) | (newInd << 6) | (0 << 12) | (1 << 15) | (0 << 16);
+                    whitePawnCap.push_back((ind) | (newInd << 6) | (0 << 12) | (1 << 15) | (4 << 16));
+                    whitePawnCap.push_back((ind) | (newInd << 6) | (0 << 12) | (1 << 15) | (5 << 16));
+                    whitePawnCap.push_back((ind) | (newInd << 6) | (0 << 12) | (1 << 15) | (6 << 16));
+                    whitePawnCap.push_back((ind) | (newInd << 6) | (0 << 12) | (1 << 15) | (7 << 16));
+                }else whitePawnCap.push_back((ind) | (newInd << 6) | (0 << 12) | (1 << 15) | (0 << 16));
             }
             newInd = ind + 9;
             if((newInd>=0 && newInd<=63) && (blackPieces&(1ull << newInd))){
                 //new valid capture from ind to newInd
                 if(newInd > 55) {
-                    whitePawnCap[whitePawnCapCnt++] = (ind) | (newInd << 6) | (0 << 12) | (1 << 15) | (4 << 16);
-                    whitePawnCap[whitePawnCapCnt++] = (ind) | (newInd << 6) | (0 << 12) | (1 << 15) | (5 << 16);
-                    whitePawnCap[whitePawnCapCnt++] = (ind) | (newInd << 6) | (0 << 12) | (1 << 15) | (6 << 16);
-                    whitePawnCap[whitePawnCapCnt++] = (ind) | (newInd << 6) | (0 << 12) | (1 << 15) | (7 << 16);
-                }else whitePawnCap[whitePawnCapCnt++] = (ind) | (newInd << 6) | (0 << 12) | (1 << 15) | (0 << 16);
+                    whitePawnCap.push_back((ind) | (newInd << 6) | (0 << 12) | (1 << 15) | (4 << 16));
+                    whitePawnCap.push_back((ind) | (newInd << 6) | (0 << 12) | (1 << 15) | (5 << 16));
+                    whitePawnCap.push_back((ind) | (newInd << 6) | (0 << 12) | (1 << 15) | (6 << 16));
+                    whitePawnCap.push_back((ind) | (newInd << 6) | (0 << 12) | (1 << 15) | (7 << 16));
+                }else whitePawnCap.push_back((ind) | (newInd << 6) | (0 << 12) | (1 << 15) | (0 << 16));
 
             }
         }
+        std::vector<int> ret = whitePawnVM;
+        ret.insert(ret.end(), whitePawnCap.begin(), whitePawnCap.end());
+        return ret;
+
     }
 
 //==================================================BlackPawn valid Moves
-    int blackPawnVM[64];
-    int blackPawnVMCnt = 0;
-    int blackPawnCap[64];
-    int blackPawnCapCnt = 0;
 
-    void blackPawnVMGen() {
+    vector<int> blackPawnVMGen() {
+        vector<int> blackPawnVM, blackPawnCap;
         int pawnCnt = __builtin_popcountll(blackPawns);
         ull wp = blackPawns;
         while (pawnCnt--) {
@@ -930,7 +928,7 @@ public:
                     int flag = 0;
                     if((getColumn(ind + 1) != 0) && whitePawns&(newInd+1)) flag = 3;
                     if((getColumn(ind - 1) != 7) && whitePawns&(newInd-1)) flag = 3;
-                    blackPawnVM[blackPawnVMCnt++] = (ind) | (newInd << 6) | (0 << 12) | ( 0 << 15) | (flag << 16) | (1 << 20);
+                    blackPawnVM.push_back((ind) | (newInd << 6) | (0 << 12) | ( 0 << 15) | (flag << 16) | (1 << 20));
                 }
             }
             //move one square forward --> +8
@@ -938,11 +936,11 @@ public:
             if((newInd>=0 && newInd<=63) && !(allPieces&(1ull << newInd))){
                 //new valid move from ind to newInd
                 if(newInd < 8) {
-                    blackPawnVM[blackPawnVMCnt++] = (ind) | (newInd << 6) | (0 << 12) | (0 << 15) | (4 << 16) | (1 << 20);
-                    blackPawnVM[blackPawnVMCnt++] = (ind) | (newInd << 6) | (0 << 12) | (0 << 15) | (5 << 16) | (1 << 20);
-                    blackPawnVM[blackPawnVMCnt++] = (ind) | (newInd << 6) | (0 << 12) | (0 << 15) | (6 << 16) | (1 << 20);
-                    blackPawnVM[blackPawnVMCnt++] = (ind) | (newInd << 6) | (0 << 12) | (0 << 15) | (7 << 16) | (1 << 20);
-                }else blackPawnVM[blackPawnVMCnt++] = (ind) | (newInd << 6) | (0 << 12) | (0 << 15) | (0 << 16) | (1 << 20);
+                    blackPawnVM.push_back((ind) | (newInd << 6) | (0 << 12) | (0 << 15) | (4 << 16) | (1 << 20));
+                    blackPawnVM.push_back((ind) | (newInd << 6) | (0 << 12) | (0 << 15) | (5 << 16) | (1 << 20));
+                    blackPawnVM.push_back((ind) | (newInd << 6) | (0 << 12) | (0 << 15) | (6 << 16) | (1 << 20));
+                    blackPawnVM.push_back((ind) | (newInd << 6) | (0 << 12) | (0 << 15) | (7 << 16) | (1 << 20));
+                }else blackPawnVM.push_back((ind) | (newInd << 6) | (0 << 12) | (0 << 15) | (0 << 16) | (1 << 20));
             }
 
             //captures --> +7 & +9
@@ -950,32 +948,34 @@ public:
             if((newInd>=0 && newInd<=63) && (blackPieces&(1ull << newInd))){
                 //new valid capture from ind to newInd
                 if(newInd < 8) {
-                    blackPawnCap[blackPawnCapCnt++] = (ind) | (newInd << 6) | (0 << 12) | (1 << 15) | (4 << 16) | (1 << 20);
-                    blackPawnCap[blackPawnCapCnt++] = (ind) | (newInd << 6) | (0 << 12) | (1 << 15) | (5 << 16) | (1 << 20);
-                    blackPawnCap[blackPawnCapCnt++] = (ind) | (newInd << 6) | (0 << 12) | (1 << 15) | (6 << 16) | (1 << 20);
-                    blackPawnCap[blackPawnCapCnt++] = (ind) | (newInd << 6) | (0 << 12) | (1 << 15) | (7 << 16) | (1 << 20);
-                }else blackPawnCap[blackPawnCapCnt++] = (ind) | (newInd << 6) | (0 << 12) | (1 << 15) | (0 << 16) | (1 << 20);
+                    blackPawnCap.push_back((ind) | (newInd << 6) | (0 << 12) | (1 << 15) | (4 << 16) | (1 << 20));
+                    blackPawnCap.push_back((ind) | (newInd << 6) | (0 << 12) | (1 << 15) | (5 << 16) | (1 << 20));
+                    blackPawnCap.push_back((ind) | (newInd << 6) | (0 << 12) | (1 << 15) | (6 << 16) | (1 << 20));
+                    blackPawnCap.push_back((ind) | (newInd << 6) | (0 << 12) | (1 << 15) | (7 << 16) | (1 << 20));
+                }else blackPawnCap.push_back((ind) | (newInd << 6) | (0 << 12) | (1 << 15) | (0 << 16) | (1 << 20));
             }
             newInd = ind - 9;
             if((newInd>=0 && newInd<=63) && (blackPieces&(1ull << newInd))){
                 //new valid capture from ind to newInd
                 if(newInd < 8) {
-                    blackPawnCap[blackPawnCapCnt++] = (ind) | (newInd << 6) | (0 << 12) | (1 << 15) | (4 << 16) | (1 << 20);
-                    blackPawnCap[blackPawnCapCnt++] = (ind) | (newInd << 6) | (0 << 12) | (1 << 15) | (5 << 16) | (1 << 20);
-                    blackPawnCap[blackPawnCapCnt++] = (ind) | (newInd << 6) | (0 << 12) | (1 << 15) | (6 << 16) | (1 << 20);
-                    blackPawnCap[blackPawnCapCnt++] = (ind) | (newInd << 6) | (0 << 12) | (1 << 15) | (7 << 16) | (1 << 20);
-                }else blackPawnCap[blackPawnCapCnt++] = (ind) | (newInd << 6) | (0 << 12) | (1 << 15) | (0 << 16) | (1 << 20);
+                    blackPawnCap.push_back((ind) | (newInd << 6) | (0 << 12) | (1 << 15) | (4 << 16) | (1 << 20));
+                    blackPawnCap.push_back((ind) | (newInd << 6) | (0 << 12) | (1 << 15) | (5 << 16) | (1 << 20));
+                    blackPawnCap.push_back((ind) | (newInd << 6) | (0 << 12) | (1 << 15) | (6 << 16) | (1 << 20));
+                    blackPawnCap.push_back((ind) | (newInd << 6) | (0 << 12) | (1 << 15) | (7 << 16) | (1 << 20));
+                }else blackPawnCap.push_back((ind) | (newInd << 6) | (0 << 12) | (1 << 15) | (0 << 16) | (1 << 20));
 
             }
         }
+        std::vector<int> ret = blackPawnVM;
+        ret.insert(ret.end(), blackPawnCap.begin(), blackPawnCap.end());
+        return ret;
+
     }
 
 //==================================================WhiteKnight valid Moves
-    int whiteKnightVM[32];
-    int whiteKnightVMCnt = 0;
-    int whiteKnightCap[32];
-    int whiteKnightCapCnt = 0;
-    void whiteKnightVMGen(){
+    vector<int> whiteKnightVMGen(){
+        vector<int> whiteKnightVM;
+        vector<int> whiteKnightCap;
         int knightCnt = __builtin_popcountll(whiteKnights);
         ull wp = whiteKnights;
         while(knightCnt--){
@@ -983,27 +983,27 @@ public:
             wp-=(wp&-wp);
             int newInd = ind + 6;
             if((newInd>=0 && newInd<=63) && !(allPieces&(1ull << newInd))){
-                whiteKnightVM[whiteKnightVMCnt++] = (ind) | (newInd << 6) | (1 << 12) | (0 << 15) | (0 << 16);
+                whiteKnightVM.push_back((ind) | (newInd << 6) | (1 << 12) | (0 << 15) | (0 << 16));
             }else if((newInd>=0 && newInd<=63) && (blackPieces&(1ull << newInd))){
-                whiteKnightCap[whiteKnightCapCnt++] = (ind) | (newInd << 6) | (1 << 12) | (1 << 15) | (0 << 16);
+                whiteKnightCap.push_back((ind) | (newInd << 6) | (1 << 12) | (1 << 15) | (0 << 16));
             }
             newInd = ind + 10;
             if((newInd>=0 && newInd<=63) && !(allPieces&(1ull << newInd))){
-                whiteKnightVM[whiteKnightVMCnt++] = (ind) | (newInd << 6) | (1 << 12) | (0 << 15) | (0 << 16);
+                whiteKnightVM.push_back((ind) | (newInd << 6) | (1 << 12) | (0 << 15) | (0 << 16));
             }else if((newInd>=0 && newInd<=63) && (blackPieces&(1ull << newInd))){
-                whiteKnightCap[whiteKnightCapCnt++] = (ind) | (newInd << 6) | (1 << 12) | (1 << 15) | (0 << 16);
+                whiteKnightCap.push_back((ind) | (newInd << 6) | (1 << 12) | (1 << 15) | (0 << 16));
             }
             newInd = ind + 15;
             if((newInd>=0 && newInd<=63) && !(allPieces&(1ull << newInd))){
-                whiteKnightVM[whiteKnightVMCnt++] = (ind) | (newInd << 6) | (1 << 12) | (0 << 15) | (0 << 16);
+                whiteKnightVM.push_back((ind) | (newInd << 6) | (1 << 12) | (0 << 15) | (0 << 16));
             }else if((newInd>=0 && newInd<=63) && (blackPieces&(1ull << newInd))){
-                whiteKnightCap[whiteKnightCapCnt++] = (ind) | (newInd << 6) | (1 << 12) | (1 << 15) | (0 << 16);
+                whiteKnightCap.push_back((ind) | (newInd << 6) | (1 << 12) | (1 << 15) | (0 << 16));
             }
             newInd = ind + 17;
             if((newInd>=0 && newInd<=63) && !(allPieces&(1ull << newInd))){
-                whiteKnightVM[whiteKnightVMCnt++] = (ind) | (newInd << 6) | (1 << 12) | (0 << 15) | (0 << 16);
+                whiteKnightVM.push_back((ind) | (newInd << 6) | (1 << 12) | (0 << 15) | (0 << 16));
             }else if((newInd>=0 && newInd<=63) && (blackPieces&(1ull << newInd))){
-                whiteKnightCap[whiteKnightCapCnt++] = (ind) | (newInd << 6) | (1 << 12) | (1 << 15) | (0 << 16);
+                whiteKnightCap.push_back((ind) | (newInd << 6) | (1 << 12) | (1 << 15) | (0 << 16));
             }
 
 
@@ -1011,39 +1011,40 @@ public:
 
             newInd = ind - 6;
             if((newInd>=0 && newInd<=63) && !(allPieces&(1ull << newInd))){
-                whiteKnightVM[whiteKnightVMCnt++] = (ind) | (newInd << 6) | (1 << 12) | (0 << 15) | (0 << 16);
+                whiteKnightVM.push_back((ind) | (newInd << 6) | (1 << 12) | (0 << 15) | (0 << 16));
             }else if((newInd>=0 && newInd<=63) && (blackPieces&(1ull << newInd))){
-                whiteKnightCap[whiteKnightCapCnt++] = (ind) | (newInd << 6) | (1 << 12) | (1 << 15) | (0 << 16);
+                whiteKnightCap.push_back((ind) | (newInd << 6) | (1 << 12) | (1 << 15) | (0 << 16));
             }
             newInd = ind - 10;
             if((newInd>=0 && newInd<=63) && !(allPieces&(1ull << newInd))){
-                whiteKnightVM[whiteKnightVMCnt++] = (ind) | (newInd << 6) | (1 << 12) | (0 << 15) | (0 << 16);
+                whiteKnightVM.push_back((ind) | (newInd << 6) | (1 << 12) | (0 << 15) | (0 << 16));
             }else if((newInd>=0 && newInd<=63) && (blackPieces&(1ull << newInd))){
-                whiteKnightCap[whiteKnightCapCnt++] = (ind) | (newInd << 6) | (1 << 12) | (1 << 15) | (0 << 16);
+                whiteKnightCap.push_back((ind) | (newInd << 6) | (1 << 12) | (1 << 15) | (0 << 16));
             }
             newInd = ind - 15;
             if((newInd>=0 && newInd<=63) && !(allPieces&(1ull << newInd))){
-                whiteKnightVM[whiteKnightVMCnt++] = (ind) | (newInd << 6) | (1 << 12) | (0 << 15) | (0 << 16);
+                whiteKnightVM.push_back((ind) | (newInd << 6) | (1 << 12) | (0 << 15) | (0 << 16));
             }else if((newInd>=0 && newInd<=63) && (blackPieces&(1ull << newInd))){
-                whiteKnightCap[whiteKnightCapCnt++] = (ind) | (newInd << 6) | (1 << 12) | (1 << 15) | (0 << 16);
+                whiteKnightCap.push_back((ind) | (newInd << 6) | (1 << 12) | (1 << 15) | (0 << 16));
             }
             newInd = ind - 17;
             if((newInd>=0 && newInd<=63) && !(allPieces&(1ull << newInd))){
-                whiteKnightVM[whiteKnightVMCnt++] = (ind) | (newInd << 6) | (1 << 12) | (0 << 15) | (0 << 16);
+                whiteKnightVM.push_back((ind) | (newInd << 6) | (1 << 12) | (0 << 15) | (0 << 16));
             }else if((newInd>=0 && newInd<=63) && (blackPieces&(1ull << newInd))){
-                whiteKnightCap[whiteKnightCapCnt++] = (ind) | (newInd << 6) | (1 << 12) | (1 << 15) | (0 << 16);
+                whiteKnightCap.push_back((ind) | (newInd << 6) | (1 << 12) | (1 << 15) | (0 << 16));
             }
 
         }
+        std::vector<int> ret = whiteKnightVM;
+        ret.insert(ret.end(), whiteKnightCap.begin(), whiteKnightCap.end());
+        return ret;
+
 
     }
 
 //==================================================BlackKnight valid Moves
-    int blackKnightVM[32];
-    int blackKnightVMCnt = 0;
-    int blackKnightCap[32];
-    int blackKnightCapCnt = 0;
-    void blackKnightVMGen(){
+    vector <int> blackKnightVMGen(){
+        vector<int> blackKnightVM, blackKnightCap;
         int knightCnt = __builtin_popcountll(blackKnights);
         ull wp = blackKnights;
         while(knightCnt--){
@@ -1051,27 +1052,27 @@ public:
             wp-=(wp&-wp);
             int newInd = ind + 6;
             if((newInd>=0 && newInd<=63) && !(allPieces&(1ull << newInd))){
-                blackKnightVM[blackKnightVMCnt++] = (ind) | (newInd << 6) | (1 << 12) | (0 << 15) | (0 << 16) | (1 << 20);
+                blackKnightVM.push_back((ind) | (newInd << 6) | (1 << 12) | (0 << 15) | (0 << 16) | (1 << 20));
             }else if((newInd>=0 && newInd<=63) && (whitePieces&(1ull << newInd))){
-                blackKnightCap[blackKnightCapCnt++] = (ind) | (newInd << 6) | (1 << 12) | (1 << 15) | (0 << 16) | (1 << 20);
+                blackKnightCap.push_back((ind) | (newInd << 6) | (1 << 12) | (1 << 15) | (0 << 16) | (1 << 20));
             }
             newInd = ind + 10;
             if((newInd>=0 && newInd<=63) && !(allPieces&(1ull << newInd))){
-                blackKnightVM[blackKnightVMCnt++] = (ind) | (newInd << 6) | (1 << 12) | (0 << 15) | (0 << 16) | (1 << 20);
+                blackKnightVM.push_back((ind) | (newInd << 6) | (1 << 12) | (0 << 15) | (0 << 16) | (1 << 20));
             }else if((newInd>=0 && newInd<=63) && (whitePieces&(1ull << newInd))){
-                blackKnightCap[blackKnightCapCnt++] = (ind) | (newInd << 6) | (1 << 12) | (1 << 15) | (0 << 16) | (1 << 20);
+                blackKnightCap.push_back((ind) | (newInd << 6) | (1 << 12) | (1 << 15) | (0 << 16) | (1 << 20));
             }
             newInd = ind + 15;
             if((newInd>=0 && newInd<=63) && !(allPieces&(1ull << newInd))){
-                blackKnightVM[blackKnightVMCnt++] = (ind) | (newInd << 6) | (1 << 12) | (0 << 15) | (0 << 16) | (1 << 20);
+                blackKnightVM.push_back((ind) | (newInd << 6) | (1 << 12) | (0 << 15) | (0 << 16) | (1 << 20));
             }else if((newInd>=0 && newInd<=63) && (whitePieces&(1ull << newInd))){
-                blackKnightCap[blackKnightCapCnt++] = (ind) | (newInd << 6) | (1 << 12) | (1 << 15) | (0 << 16) | (1 << 20);
+                blackKnightCap.push_back((ind) | (newInd << 6) | (1 << 12) | (1 << 15) | (0 << 16) | (1 << 20));
             }
             newInd = ind + 17;
             if((newInd>=0 && newInd<=63) && !(allPieces&(1ull << newInd))){
-                blackKnightVM[blackKnightVMCnt++] = (ind) | (newInd << 6) | (1 << 12) | (0 << 15) | (0 << 16) | (1 << 20);
+                blackKnightVM.push_back((ind) | (newInd << 6) | (1 << 12) | (0 << 15) | (0 << 16) | (1 << 20));
             }else if((newInd>=0 && newInd<=63) && (whitePieces&(1ull << newInd))){
-                blackKnightCap[blackKnightCapCnt++] = (ind) | (newInd << 6) | (1 << 12) | (1 << 15) | (0 << 16) | (1 << 20);
+                blackKnightCap.push_back((ind) | (newInd << 6) | (1 << 12) | (1 << 15) | (0 << 16) | (1 << 20));
             }
 
 
@@ -1079,31 +1080,33 @@ public:
 
             newInd = ind - 6;
             if((newInd>=0 && newInd<=63) && !(allPieces&(1ull << newInd))){
-                blackKnightVM[blackKnightVMCnt++] = (ind) | (newInd << 6) | (1 << 12) | (0 << 15) | (0 << 16) | (1 << 20);
+                blackKnightVM.push_back((ind) | (newInd << 6) | (1 << 12) | (0 << 15) | (0 << 16) | (1 << 20));
             }else if((newInd>=0 && newInd<=63) && (whitePieces&(1ull << newInd))){
-                blackKnightCap[blackKnightCapCnt++] = (ind) | (newInd << 6) | (1 << 12) | (1 << 15) | (0 << 16) | (1 << 20);
+                blackKnightCap.push_back((ind) | (newInd << 6) | (1 << 12) | (1 << 15) | (0 << 16) | (1 << 20));
             }
             newInd = ind - 10;
             if((newInd>=0 && newInd<=63) && !(allPieces&(1ull << newInd))){
-                blackKnightVM[blackKnightVMCnt++] = (ind) | (newInd << 6) | (1 << 12) | (0 << 15) | (0 << 16) | (1 << 20);
+                blackKnightVM.push_back((ind) | (newInd << 6) | (1 << 12) | (0 << 15) | (0 << 16) | (1 << 20));
             }else if((newInd>=0 && newInd<=63) && (whitePieces&(1ull << newInd))){
-                blackKnightCap[blackKnightCapCnt++] = (ind) | (newInd << 6) | (1 << 12) | (1 << 15) | (0 << 16) | (1 << 20);
+                blackKnightCap.push_back((ind) | (newInd << 6) | (1 << 12) | (1 << 15) | (0 << 16) | (1 << 20));
             }
             newInd = ind - 15;
             if((newInd>=0 && newInd<=63) && !(allPieces&(1ull << newInd))){
-                blackKnightVM[blackKnightVMCnt++] = (ind) | (newInd << 6) | (1 << 12) | (0 << 15) | (0 << 16) | (1 << 20);
+                blackKnightVM.push_back((ind) | (newInd << 6) | (1 << 12) | (0 << 15) | (0 << 16) | (1 << 20));
             }else if((newInd>=0 && newInd<=63) && (whitePieces&(1ull << newInd))){
-                blackKnightCap[blackKnightCapCnt++] = (ind) | (newInd << 6) | (1 << 12) | (1 << 15) | (0 << 16) | (1 << 20);
+                blackKnightCap.push_back((ind) | (newInd << 6) | (1 << 12) | (1 << 15) | (0 << 16) | (1 << 20));
             }
             newInd = ind - 17;
             if((newInd>=0 && newInd<=63) && !(allPieces&(1ull << newInd))){
-                blackKnightVM[blackKnightVMCnt++] = (ind) | (newInd << 6) | (1 << 12) | (0 << 15) | (0 << 16) | (1 << 20);
+                blackKnightVM.push_back((ind) | (newInd << 6) | (1 << 12) | (0 << 15) | (0 << 16) | (1 << 20));
             }else if((newInd>=0 && newInd<=63) && (whitePieces&(1ull << newInd))){
-                blackKnightCap[blackKnightCapCnt++] = (ind) | (newInd << 6) | (1 << 12) | (1 << 15) | (0 << 16) | (1 << 20);
+                blackKnightCap.push_back((ind) | (newInd << 6) | (1 << 12) | (1 << 15) | (0 << 16) | (1 << 20));
             }
 
         }
-
+        std::vector<int> ret = blackKnightVM;
+        ret.insert(ret.end(), blackKnightCap.begin(), blackKnightCap.end());
+        return ret;
     }
 
 //==================================================Rook valid Moves
