@@ -579,7 +579,7 @@ public:
     int whitePawnCapCnt = 0;
 
     void whitePawnVMGen() {
-        int pawnCnt = __builtin_popcountull(whitePawns);
+        int pawnCnt = __builtin_popcountll(whitePawns);
         ull wp = whitePawns;
         while (pawnCnt--) {
             int ind = (log2(wp&-wp) + EPS);
@@ -636,7 +636,7 @@ public:
     int blackPawnCapCnt = 0;
 
     void blackPawnVMGen() {
-        int pawnCnt = __builtin_popcountull(blackPawns);
+        int pawnCnt = __builtin_popcountll(blackPawns);
         ull wp = blackPawns;
         while (pawnCnt--) {
             int ind = (log2(wp&-wp) + EPS);
@@ -693,7 +693,7 @@ public:
     int whiteKnightCap[32];
     int whiteKnightCapCnt = 0;
     void whiteKnightVMGen(){
-        int knightCnt = __builtin_popcountull(whiteKnights);
+        int knightCnt = __builtin_popcountll(whiteKnights);
         ull wp = whiteKnights;
         while(knightCnt--){
             int ind = (log2(wp&-wp) + EPS);
@@ -766,7 +766,7 @@ public:
     int blackKnightCap[32];
     int blackKnightCapCnt = 0;
     void blackKnightVMGen(){
-        int knightCnt = __builtin_popcountull(blackKnights);
+        int knightCnt = __builtin_popcountll(blackKnights);
         ull wp = blackKnights;
         while(knightCnt--){
             int ind = (log2(wp&-wp) + EPS);
