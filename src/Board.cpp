@@ -1,4 +1,5 @@
 #include <bits/stdc++.h>
+
 typedef unsigned long long ull;
 using namespace std;
 
@@ -261,13 +262,27 @@ public:
                                  {0,                   9223372036854775808,  18085043209519168, 4539628424389459968},
                                  {0,                   0,                    36170086419038336, 9151314442816847872}
     };
+
+    ull kingZoneAttack[64] = {770, 1797, 3594, 7188, 14376, 28752, 57504, 49216, 197123, 460039, 920078, 1840156,
+                              3680312, 7360624, 14721248, 12599488, 50463488, 117769984, 235539968, 471079936,
+                              942159872, 1884319744, 3768639488, 3225468928, 12918652928, 30149115904, 60298231808,
+                              120596463616, 241192927232, 482385854464, 964771708928, 825720045568, 3307175149568,
+                              7718173671424, 15436347342848, 30872694685696, 61745389371392, 123490778742784,
+                              246981557485568, 211384331665408, 846636838289408, 1975852459884544, 3951704919769088,
+                              7903409839538176, 15806819679076352, 31613639358152704, 63227278716305408,
+                              54114388906344448, 216739030602088448, 505818229730443264, 1011636459460886528,
+                              2023272918921773056, 4046545837843546112, 8093091675687092224, 16186183351374184448,
+                              13853283560024178688, 144959613005987840, 362258295026614272, 724516590053228544,
+                              1449033180106457088, 2898066360212914176, 5796132720425828352, 11592265440851656704,
+                              4665729213955833856};
     ull whiteKingSideCastling = 0x31d71dce64b2c310L;
     ull whiteQueenSideCastling = 0xf165b587df898190L;
     ull blackKingSideCastling = 0xa57e6339dd2cf3a0L;
     ull blackQueenSideCastling = 0x1ef6e6dbb1961ec9L;
     ull passantColumn[8] = {0x70cc73d90bc26e24L, 0xe21a6b35df0c3ad7L, 0x3a93d8b2806962L,
-                                           0x1c99ded33cb890a1L, 0xcf3145de0add4289L, 0xd0e4427a5514fb72L,
-                                           0x77c621cc9fb3a483L, 0x67a34dac4356550bL};
+                            0x1c99ded33cb890a1L, 0xcf3145de0add4289L, 0xd0e4427a5514fb72L,
+                            0x77c621cc9fb3a483L, 0x67a34dac4356550bL};
+    ull threat[64];
     ull whiteMove = 0xf8d626aaaf278509L;
 
     // board representation
@@ -329,10 +344,10 @@ public:
 
 
     //should be considered at implementation
-    ull whiteCastleK;
-    ull whiteCastleQ;
-    ull blackCastleK;
-    ull blackCastleQ;
+    bool whiteCastleK = 1;
+    bool whiteCastleQ = 1;
+    bool blackCastleK = 1;
+    bool blackCastleQ = 1;
     ull enPassantLoc;
     bool whiteToMove = true;
 
@@ -343,8 +358,11 @@ public:
     int moveNumber = 0;
     int fiftyMoveRule = 0;
 
+    int whiteKingMoves = 0;     //move counters
+    int blackKingMoves = 0;
+
 /**********************************************************************************************************************
-*                                               Optmization functions                                                 *
+*                                               Optimization functions                                                 *
 **********************************************************************************************************************/
 
     void init(){
@@ -548,8 +566,52 @@ public:
         return cellNum % 8;
     }
 
+    int getRow(int cellNum) {
+        return cellNum / 8;
+    }
+
     ull getLSB(ull x) {
         return x & -x;
+    }
+
+    ull getMSB(ull x) {
+        return __builtin_clzll(x);
+    }
+
+    int pawnTypeNum() {
+        return 0;
+    }
+
+    int knightTypeNum() {
+        return 1;
+    }
+
+    int bishopTypeNum() {
+        return 2;
+    }
+
+    int rookTypeNum() {
+        return 3;
+    }
+
+    int queenTypeNum() {
+        return 4;
+    }
+
+    int kingTypeNum() {
+        return 5;
+    }
+
+    bool inBoundaries(int x, int y) {
+        return x >= 0 && x < 8 && y >= 0 && y < 8;
+    }
+
+    int makeMoveMask(int specialEvent, int capture, int type, int from, int to, int turn) {
+        return specialEvent | capture << 3 | type << 4 | from << 7 | to << 13 | turn << 19;
+    }
+
+    bool cellInBoard(int x) {
+        return x >= 0 && x < 64;
     }
 
 
@@ -559,14 +621,6 @@ public:
 
 //==================================================Make Move(doo)
     void doo(int move) {
-        if (whiteCastleK)
-            key ^= whiteKingSideCastling;
-        if (whiteCastleQ)
-            key ^= whiteQueenSideCastling;
-        if (blackCastleK)
-            key ^= blackKingSideCastling;
-        if (blackCastleQ)
-            key ^= blackQueenSideCastling;
 
         if (enPassantLoc != -1)
             key ^= passantColumn[getColumn(enPassantLoc)];
@@ -613,6 +667,8 @@ public:
                 key ^= ZMove(from, to, 'b');
                 break;
             case 3:
+                if (whiteCastleK && from == 1 << 7)whiteCastleK = 0;
+                if (whiteCastleQ && from == 1 << 0)whiteCastleQ = 0;
                 whiteRooks ^= moveXor;
                 key ^= ZMove(from, to, 'r');
                 break;
@@ -621,18 +677,20 @@ public:
                 key ^= ZMove(from, to, 'q');
                 break;
             case 5:
+                whiteKingMoves++;
+                whiteCastleK = whiteCastleQ = 0;
                 whiteKing ^= moveXor;
                 if (specialEvent == CASTLEKINGSIDE)
-                    whiteRooks ^= 160, whiteCastleK = 1;
+                    whiteRooks ^= 160, key ^= whiteKingSideCastling;
                 else if (specialEvent == CASTLEQUEENSIDE)
-                    whiteRooks ^= 9, whiteCastleQ = 1;
+                    whiteRooks ^= 9, key ^= whiteQueenSideCastling;
                 key ^= ZMove(from, to, 'k');
                 break;
             default:
                 break;
         }
 
-        whitePieces = whitePawns | whiteKnights | whiteBishops | whiteQueens | whiteKing | whiteRooks;
+        whitePieces = whitePawns | whiteKnights | whiteBishops | whiteQueens | whiteKing;
 
         if (capture) {
             if (locExist(blackPawns, 1ull << to)) {
@@ -654,7 +712,7 @@ public:
                 key ^= squareZKey(to, 'Q');
             }
 
-            blackPieces = blackPawns | blackKnights | blackBishops | blackQueens | blackKing | blackRooks;
+            blackPieces = blackPawns | blackKnights | blackBishops | blackQueens | blackKing;
         }
 
         allPieces = whitePieces | blackPieces;
@@ -663,15 +721,6 @@ public:
             enPassantLoc = 3;
 
         else enPassantLoc = -1;
-
-        if (whiteCastleK)
-            key ^= whiteKingSideCastling;
-        if (whiteCastleQ)
-            key ^= whiteQueenSideCastling;
-        if (blackCastleK)
-            key ^= blackKingSideCastling;
-        if (blackCastleQ)
-            key ^= blackQueenSideCastling;
 
         if (enPassantLoc != -1)
             key ^= passantColumn[getColumn(enPassantLoc)];
@@ -689,8 +738,6 @@ public:
         //saving all of our history
         saveHistory();
         moveNumber++;
-
-        //three same moves
         zobristTable[key]++;
         if (zobristTable[key] >= 3)
             drawState = true;
@@ -775,7 +822,7 @@ public:
         whiteCastleQ = whiteCastleQHistory[moveNumber];
         blackCastleK = blackCastleKHistory[moveNumber];
         blackCastleQ = blackCastleQHistory[moveNumber];
-        
+
         key = keyHistory[moveNumber];
 
     }
@@ -941,50 +988,70 @@ public:
         int pawnCnt = __builtin_popcountll(blackPawns);
         ull wp = blackPawns;
         while (pawnCnt--) {
-            int ind = (log2(wp&-wp) + EPS);
-            wp-=(wp&-wp);
-            if(ind >= 48 && ind <= 55){//move two squares forward --> +16
+            int ind = (log2(wp & -wp) + EPS);
+            wp -= (wp & -wp);
+            if (ind >= 48 && ind <= 55) {//move two squares forward --> +16
                 int newInd = ind - 16;
-                if((newInd>=0 && newInd<=63) && !(allPieces&(1ull << newInd)) && !(allPieces&(1ull << (newInd+8)))){
+                if ((newInd >= 0 && newInd <= 63) && !(allPieces & (1ull << newInd)) &&
+                    !(allPieces & (1ull << (newInd + 8)))) {
                     //new valid move from ind to newInd
                     int flag = 0;
-                    if((getColumn(ind + 1) != 0) && whitePawns&(newInd+1)) flag = 3;
-                    if((getColumn(ind - 1) != 7) && whitePawns&(newInd-1)) flag = 3;
-                    blackPawnVM[blackPawnVMCnt++] = (ind) | (newInd << 6) | (0 << 12) | ( 0 << 15) | (flag << 16) | (1 << 20);
+                    if ((getColumn(ind + 1) != 0) && whitePawns & (newInd + 1)) flag = 3;
+                    if ((getColumn(ind - 1) != 7) && whitePawns & (newInd - 1)) flag = 3;
+                    blackPawnVM[blackPawnVMCnt++] =
+                            (ind) | (newInd << 6) | (0 << 12) | (0 << 15) | (flag << 16) | (1 << 20);
                 }
             }
             //move one square forward --> +8
             int newInd = ind - 8;
-            if((newInd>=0 && newInd<=63) && !(allPieces&(1ull << newInd))){
+            if ((newInd >= 0 && newInd <= 63) && !(allPieces & (1ull << newInd))) {
                 //new valid move from ind to newInd
-                if(newInd < 8) {
-                    blackPawnVM[blackPawnVMCnt++] = (ind) | (newInd << 6) | (0 << 12) | (0 << 15) | (4 << 16) | (1 << 20);
-                    blackPawnVM[blackPawnVMCnt++] = (ind) | (newInd << 6) | (0 << 12) | (0 << 15) | (5 << 16) | (1 << 20);
-                    blackPawnVM[blackPawnVMCnt++] = (ind) | (newInd << 6) | (0 << 12) | (0 << 15) | (6 << 16) | (1 << 20);
-                    blackPawnVM[blackPawnVMCnt++] = (ind) | (newInd << 6) | (0 << 12) | (0 << 15) | (7 << 16) | (1 << 20);
-                }else blackPawnVM[blackPawnVMCnt++] = (ind) | (newInd << 6) | (0 << 12) | (0 << 15) | (0 << 16) | (1 << 20);
+                if (newInd < 8) {
+                    blackPawnVM[blackPawnVMCnt++] =
+                            (ind) | (newInd << 6) | (0 << 12) | (0 << 15) | (4 << 16) | (1 << 20);
+                    blackPawnVM[blackPawnVMCnt++] =
+                            (ind) | (newInd << 6) | (0 << 12) | (0 << 15) | (5 << 16) | (1 << 20);
+                    blackPawnVM[blackPawnVMCnt++] =
+                            (ind) | (newInd << 6) | (0 << 12) | (0 << 15) | (6 << 16) | (1 << 20);
+                    blackPawnVM[blackPawnVMCnt++] =
+                            (ind) | (newInd << 6) | (0 << 12) | (0 << 15) | (7 << 16) | (1 << 20);
+                } else
+                    blackPawnVM[blackPawnVMCnt++] =
+                            (ind) | (newInd << 6) | (0 << 12) | (0 << 15) | (0 << 16) | (1 << 20);
             }
 
             //captures --> +7 & +9
             newInd = ind - 7;
-            if((newInd>=0 && newInd<=63) && (blackPieces&(1ull << newInd))){
+            if ((newInd >= 0 && newInd <= 63) && (blackPieces & (1ull << newInd))) {
                 //new valid capture from ind to newInd
-                if(newInd < 8) {
-                    blackPawnCap[blackPawnCapCnt++] = (ind) | (newInd << 6) | (0 << 12) | (1 << 15) | (4 << 16) | (1 << 20);
-                    blackPawnCap[blackPawnCapCnt++] = (ind) | (newInd << 6) | (0 << 12) | (1 << 15) | (5 << 16) | (1 << 20);
-                    blackPawnCap[blackPawnCapCnt++] = (ind) | (newInd << 6) | (0 << 12) | (1 << 15) | (6 << 16) | (1 << 20);
-                    blackPawnCap[blackPawnCapCnt++] = (ind) | (newInd << 6) | (0 << 12) | (1 << 15) | (7 << 16) | (1 << 20);
-                }else blackPawnCap[blackPawnCapCnt++] = (ind) | (newInd << 6) | (0 << 12) | (1 << 15) | (0 << 16) | (1 << 20);
+                if (newInd < 8) {
+                    blackPawnCap[blackPawnCapCnt++] =
+                            (ind) | (newInd << 6) | (0 << 12) | (1 << 15) | (4 << 16) | (1 << 20);
+                    blackPawnCap[blackPawnCapCnt++] =
+                            (ind) | (newInd << 6) | (0 << 12) | (1 << 15) | (5 << 16) | (1 << 20);
+                    blackPawnCap[blackPawnCapCnt++] =
+                            (ind) | (newInd << 6) | (0 << 12) | (1 << 15) | (6 << 16) | (1 << 20);
+                    blackPawnCap[blackPawnCapCnt++] =
+                            (ind) | (newInd << 6) | (0 << 12) | (1 << 15) | (7 << 16) | (1 << 20);
+                } else
+                    blackPawnCap[blackPawnCapCnt++] =
+                            (ind) | (newInd << 6) | (0 << 12) | (1 << 15) | (0 << 16) | (1 << 20);
             }
             newInd = ind - 9;
-            if((newInd>=0 && newInd<=63) && (blackPieces&(1ull << newInd))){
+            if ((newInd >= 0 && newInd <= 63) && (blackPieces & (1ull << newInd))) {
                 //new valid capture from ind to newInd
-                if(newInd < 8) {
-                    blackPawnCap[blackPawnCapCnt++] = (ind) | (newInd << 6) | (0 << 12) | (1 << 15) | (4 << 16) | (1 << 20);
-                    blackPawnCap[blackPawnCapCnt++] = (ind) | (newInd << 6) | (0 << 12) | (1 << 15) | (5 << 16) | (1 << 20);
-                    blackPawnCap[blackPawnCapCnt++] = (ind) | (newInd << 6) | (0 << 12) | (1 << 15) | (6 << 16) | (1 << 20);
-                    blackPawnCap[blackPawnCapCnt++] = (ind) | (newInd << 6) | (0 << 12) | (1 << 15) | (7 << 16) | (1 << 20);
-                }else blackPawnCap[blackPawnCapCnt++] = (ind) | (newInd << 6) | (0 << 12) | (1 << 15) | (0 << 16) | (1 << 20);
+                if (newInd < 8) {
+                    blackPawnCap[blackPawnCapCnt++] =
+                            (ind) | (newInd << 6) | (0 << 12) | (1 << 15) | (4 << 16) | (1 << 20);
+                    blackPawnCap[blackPawnCapCnt++] =
+                            (ind) | (newInd << 6) | (0 << 12) | (1 << 15) | (5 << 16) | (1 << 20);
+                    blackPawnCap[blackPawnCapCnt++] =
+                            (ind) | (newInd << 6) | (0 << 12) | (1 << 15) | (6 << 16) | (1 << 20);
+                    blackPawnCap[blackPawnCapCnt++] =
+                            (ind) | (newInd << 6) | (0 << 12) | (1 << 15) | (7 << 16) | (1 << 20);
+                } else
+                    blackPawnCap[blackPawnCapCnt++] =
+                            (ind) | (newInd << 6) | (0 << 12) | (1 << 15) | (0 << 16) | (1 << 20);
 
             }
         }
@@ -1128,27 +1195,173 @@ public:
 
 //==================================================Rook valid Moves
 
-    vector<int> rookMoves() {
+    vector<int> rookMoves(ull mask, int type) {
         vector<int> ret;
-        ull tmpWhiteRooks = whiteRooks;
+        ull tmpWhiteRooks = mask;
+
         while (tmpWhiteRooks) {
             ull locRaisedPow = getLSB(tmpWhiteRooks);
             tmpWhiteRooks -= locRaisedPow;
             int loc = log2(locRaisedPow) + EPS;
             int lim[] = {64, (loc / 8 + 1) * 8, -1, loc / 8 * 8};
             int dx[] = {8, 1, -8, -1};
+
             for (int i = 0; i < 2; ++i) {
                 ull mask = rookZoneAttack[loc][i];
                 ull res = allPieces & mask;
                 ull firstCollision = getLSB(res);
+
                 bool noCollision = firstCollision == 0;
                 int firstCollisionCell = log2(firstCollision) + EPS;
-                for (int j = loc + dx[i]; j < lim[i] && (j < firstCollisionCell || noCollision); j += dx[i]) {
 
+                for (int j = loc + dx[i]; j < lim[i] && (j < firstCollisionCell || noCollision); j += dx[i])
+                    ret.push_back(makeMoveMask(0, 0, type, loc, j, 0)), threat[j] = key;
+                if (!noCollision) {
+                    threat[firstCollisionCell] = key;
+                    if (locExist(blackPieces, firstCollision))
+                        ret.push_back(makeMoveMask(0, 1, type, loc, firstCollisionCell, 0));
+                }
+            }
+
+            for (int i = 2; i < 4; ++i) {
+                ull mask = rookZoneAttack[loc][i];
+                ull res = allPieces & mask;
+                ull firstCollision = getMSB(res);
+
+                bool noCollision = firstCollision == 0;
+                int firstCollisionCell = log2(firstCollision) + EPS;
+
+                for (int j = loc + dx[i]; j > lim[i] && (j > firstCollisionCell || noCollision); j += dx[i])
+                    ret.push_back(makeMoveMask(0, 0, type, loc, j, 0)), threat[j] = key;
+                if (!noCollision) {
+                    threat[firstCollisionCell] = key;
+                    if (locExist(blackPieces, firstCollision))
+                        ret.push_back(makeMoveMask(0, 1, type, loc, firstCollisionCell, 0));
                 }
             }
         }
+        return ret;
     }
 
+//==================================================Bishop valid Moves
 
+    vector<int> bishopMoves(ull mask, int type) {
+        vector<int> ret;
+        ull tmpWhiteBishops = mask;
+
+        while (tmpWhiteBishops) {
+            ull locRaisedPow = getLSB(tmpWhiteBishops);
+            tmpWhiteBishops -= locRaisedPow;
+            int loc = log2(locRaisedPow) + EPS;
+            int x = getRow(loc), y = getColumn(loc);
+
+            int di[] = {9, -7, -9, 7};
+            int dx[] = {1, -1, -1, 1};
+            int dy[] = {1, 1, -1, -1};
+
+            for (int i = 3; i != 1; i = (i + 1) % 4) {
+                ull mask = bishopZoneAttack[loc][i];
+                ull res = allPieces & mask;
+
+                ull firstCollision = getLSB(res);
+                int firstCollisionCell = log2(firstCollision) + EPS;
+                bool noCollision = firstCollision == 0;
+
+                for (int j = loc + di[i], x2 = x + dx[i], y2 = y + dy[i];
+                     (j < firstCollisionCell || noCollision) && inBoundaries(x2,
+                                                                             y2); j += di[i], x2 += dx[i], y2 += dy[i])
+                    ret.push_back(makeMoveMask(0, 0, type, loc, j, 0)), threat[j] = key;
+                if (!noCollision) {
+                    threat[firstCollisionCell] = key;
+                    if (locExist(blackPieces, firstCollision))
+                        ret.push_back(makeMoveMask(0, 1, type, loc, firstCollisionCell, 0));
+                }
+            }
+
+            for (int i = 1; i < 3; ++i) {
+                ull mask = bishopZoneAttack[loc][i];
+                ull res = allPieces & mask;
+
+                ull firstCollision = getMSB(res);
+                int firstCollisionCell = log2(firstCollision) + EPS;
+                bool noCollision = firstCollision == 0;
+
+                for (int j = loc + di[i], x2 = x + dx[i], y2 = y + dy[i];
+                     (j > firstCollisionCell || noCollision) && inBoundaries(x2,
+                                                                             y2); j += di[i], x2 += dx[i], y2 += dy[i])
+                    ret.push_back(makeMoveMask(0, 0, type, loc, j, 0)), threat[j] = key;
+                if (!noCollision) {
+                    threat[firstCollisionCell] = key;
+                    if (locExist(blackPieces, firstCollision))
+                        ret.push_back(makeMoveMask(0, 1, type, loc, firstCollisionCell, 0));
+                }
+            }
+        }
+        return ret;
+    }
+
+    vector<int> kingMoves() {
+        vector<int> ret;
+
+        ull tmpWhiteKing = whiteKing;
+        ull locRaisedPowW = getLSB(tmpWhiteKing);
+
+        int locW = log2(locRaisedPowW) + EPS;
+
+        ull maskW = kingZoneAttack[locW];
+        ull resW = maskW & allPieces;
+
+        ull tmpBlackKing = blackKing;
+        ull locRaisedPowB = getLSB(tmpBlackKing);
+
+        int locB = log2(locRaisedPowB) + EPS;
+
+        ull maskB = kingZoneAttack[locB];
+        ull resB = maskB & allPieces;
+
+        ull intersection = maskW & maskB;
+
+        int di[] = {-9, -8, -7, -1, 1, 7, 8, 9};
+
+        if (whiteToMove) {
+            for (int i = 0; i < 8; ++i) {
+                if (cellInBoard(locW + di[i]) && locExist(intersection, 1 << (locW + di[i])))continue;
+                if (cellInBoard(locW + di[i]) && threat[locW + di[i]] != key)
+                    if (!((resW >> (locW + di[i])) & 1))
+                        ret.push_back(makeMoveMask(0, 0, kingTypeNum(), locW, locW + di[i], 0));
+                    else {
+                        if (locExist(blackPieces, locW + di[i]))
+                            ret.push_back(makeMoveMask(0, 1, kingTypeNum(), locW, locW + di[i], 0));
+                    }
+            }
+            bool check = isCheck();
+            if (!check) {
+                if (threat[5] != key && threat[6] != key && !(allPieces & 96) && whiteCastleK)
+                    ret.push_back(makeMoveMask(CASTLEKINGSIDE, 0, kingTypeNum(), 4, 7, 0));
+                if (threat[1] != key && threat[2] != key && threat[3] != key && !(allPieces & 14) && whiteCastleQ)
+                    ret.push_back(makeMoveMask(CASTLEQUEENSIDE, 0, kingTypeNum(), 4, 0, 0));
+            }
+
+        } else {
+            for (int i = 0; i < 8; ++i) {
+                if (cellInBoard(locB + di[i]) && locExist(intersection, 1 << (locB + di[i])))continue;
+                if (cellInBoard(locB + di[i]) && threat[locB + di[i]] != key)
+                    if (!((resW >> (locB + di[i])) & 1))
+                        ret.push_back(makeMoveMask(0, 0, kingTypeNum(), locB, locB + di[i], 1));
+                    else {
+                        if (locExist(whitePieces, locB + di[i]))
+                            ret.push_back(makeMoveMask(0, 1, kingTypeNum(), locB, locB + di[i], 1));
+                    }
+            }
+            bool check = isCheck();
+            if (!check) {
+                if (threat[61] != key && threat[62] != key && !(allPieces & (1ull << 61 + 1ull << 62)) && blackCastleK)
+                    ret.push_back(makeMoveMask(CASTLEKINGSIDE, 0, kingTypeNum(), 60, 63, 1));
+                if (threat[57] != key && threat[58] != key && threat[59] != key &&
+                    !(allPieces & (1ull << 57 + 1ull << 58 + 1ull << 59)) && blackCastleQ)
+                    ret.push_back(makeMoveMask(CASTLEQUEENSIDE, 0, kingTypeNum(), 60, 56, 1));
+            }
+        }
+        return ret;
+    }
 };
