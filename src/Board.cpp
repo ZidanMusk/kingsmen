@@ -300,7 +300,7 @@ public:
             key ^= blackQueenSideCastling;
 
         if (enPassantLoc != -1)
-            key ^= passantColumn[enPassantLoc % 8];
+            key ^= passantColumn[getColumn(enPassantLoc)];
 
         if (whiteToMove)
             key ^= whiteMove;
@@ -405,7 +405,7 @@ public:
             key ^= blackQueenSideCastling;
 
         if (enPassantLoc != -1)
-            key ^= passantColumn[enPassantLoc % 8];
+            key ^= passantColumn[getColumn(enPassantLoc)];
 
         if (whiteToMove)
             key ^= whiteMove;
