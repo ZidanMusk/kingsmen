@@ -334,6 +334,8 @@ public:
     ull enPassantLoc;
     bool whiteToMove = true;
 
+    vector<int> allValidMoves;
+
     int moveNumber = 0;
     int fiftyMoveRule = 0;
 
@@ -679,20 +681,26 @@ public:
     }
 
     bool isMate() {
-
-//        if(!validMovesKing && isCheck())
+//        if(kingMoves.size() == 0 && isCheck())
 //            return true;
 //        else
 //            return false;
     }
 
-    bool isEndOfGame() { return (isMate() || isDraw()); }
-
     bool isCheck() {
-
         //if the destination of any valid moves is at king`s position
+        for(int i= 0; i< allValidMoves.size();i++){
 
+            int to = allValidMoves[i] & 516096;
+            int x = (ull(to) & whiteKing) | (ull(to) & blackKing);
+
+            if(x)
+                return true;
+        }
+        return false;
     }
+
+    bool isEndOfGame() { return (isMate() || isDraw()); }
 
     bool isEndGame() {
         // q == 0 ||
