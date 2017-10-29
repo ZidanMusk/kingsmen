@@ -17,6 +17,9 @@ public:
     const int PROMOTEROOK = 6;
     const int PROMOTEQUEEN = 7;
 
+    static const int MAX_GAME_LENGTH = 1024;
+    static const int MAX_MOVES = 1024;
+
 
     // Zobrist tables
     ull pawn[2][64] = {{0x79ad695501e7d1e8L, 0x8249a47aee0e41f7L, 0x637a7780decfc0d9L, 0x19fc8a768cf4b6d4L, 0x7bcbc38da25a7f3cL, 0x5093417aa8a7ed5eL, 0x7fb9f855a997142L,  0x5355f900c2a82dc7L,
@@ -135,7 +138,6 @@ public:
     ull whiteMove = 0xf8d626aaaf278509L;
 
     // board representation
-
     ull whitePawns;
     ull whiteKnights;
     ull whiteBishops;
@@ -154,38 +156,41 @@ public:
     ull blackPieces;
     ull allPieces;
 
+    bool drawState = false;
     ull key; // zobrist key
 
-    ull white_pawn_history[];
-    ull white_knight_history[];
-    ull white_bishop_history[];
-    ull white_rook_history[];
-    ull white_queen_history[];
-    ull white_king_history[];
+    ull keyHistory[MAX_GAME_LENGTH];
+    ull whitePawnHistory[MAX_GAME_LENGTH];
+    ull whiteKnightHistory[MAX_GAME_LENGTH];
+    ull whiteBishopHistory[MAX_GAME_LENGTH];
+    ull whiteRookHistory[MAX_GAME_LENGTH];
+    ull whiteQueenHistory[MAX_GAME_LENGTH];
+    ull whiteKingHistory[MAX_GAME_LENGTH];
 
-    ull black_pawn_history[];
-    ull black_knight_history[];
-    ull black_bishop_history[];
-    ull black_rook_history[];
-    ull black_queen_history[];
-    ull black_king_history[];
+    ull blackPawnHistory[MAX_GAME_LENGTH];
+    ull blackKnightHistory[MAX_GAME_LENGTH];
+    ull blackBishopHistory[MAX_GAME_LENGTH];
+    ull blackRookHistory[MAX_GAME_LENGTH];
+    ull blackQueenHistory[MAX_GAME_LENGTH];
+    ull blackKingHistory[MAX_GAME_LENGTH];
 
-    ull white_pieces_history[];
-    ull black_pieces_history[];
-    ull all_pieces_history[];
+    ull whitePiecesHistory[MAX_GAME_LENGTH];
+    ull blackPiecesHistory[MAX_GAME_LENGTH];
+    ull allPiecesHistory[MAX_GAME_LENGTH];
 
-    //bool[] whiteToMove_history;
-    //int[] fiftyMoveRule_history;
-    int enPassantLoc_history[];
-    int move_history[];
-    //char pieceArray_history[][];
-    bool whiteCastleK_history[];
-    bool whiteCastleQ_history[];
-    bool blackCastleK_history[];
-    bool blackCastleQ_history[];
-    bool white_has_castled_history[];
-    bool black_has_castled_history[];
-    ull key_history[];
+    //bool whiteTomoveHistory;
+    int fiftyMoveRuleHistory[MAX_GAME_LENGTH];
+    int enPassantLocHistory[MAX_GAME_LENGTH];
+    int moveHistory[MAX_GAME_LENGTH];
+    //char pieceArray_history[MAX_GAME_LENGTH][MAX_GAME_LENGTH];
+    bool whiteCastleKHistory[MAX_GAME_LENGTH];
+    bool whiteCastleQHistory[MAX_GAME_LENGTH];
+    bool blackCastleKHistory[MAX_GAME_LENGTH];
+    bool blackCastleQHistory[MAX_GAME_LENGTH];
+    bool whiteHasCastledHistory[MAX_GAME_LENGTH];
+    bool blackHasCastledHistory[MAX_GAME_LENGTH];
+
+
 
     //should be considered at implementation
     ull whiteCastleK;
@@ -196,6 +201,8 @@ public:
     ull whiteToMove;
 
     int moveNumber = 0;
+    int fiftyMoveRule = 0;
+
 
     char getPieceAt(int loc) {
         if (allPieces & (1ULL << loc)) {
@@ -416,19 +423,116 @@ public:
 
         if (whiteToMove)
             key ^= whiteMove;
+
+
+        //handling fiftyMoveRule
+        if(type != 0 && capture == 0)
+            fiftyMoveRule++;
+        else
+            fiftyMoveRule = 0;
+
+        //fiftyMoveRuleHistory[moveNumber] = fiftyMoveRule;
+        //saving all of our history
+        saveHistory();
+
+        moveNumber++;
+        zobristTable[key]++;
+        if(zobristTable[key] >=3)
+            drawState = true;
+
     }
 
-    void undoo() {}
+    void saveHistory() {
+        whitePawnHistory[moveNumber] = whitePawns;
+        whiteKnightHistory[moveNumber] = whiteKnights;
+        whiteBishopHistory[moveNumber] = whiteBishops;
+        whiteRookHistory[moveNumber] = whiteRooks;
+        whiteQueenHistory[moveNumber] = whiteQueens;
+        whiteKingHistory[moveNumber] = whiteKing;
+        blackPawnHistory[moveNumber] = blackPawns;
+        blackKnightHistory[moveNumber] = blackKnights;
+        blackBishopHistory[moveNumber] = blackBishops;
+        blackRookHistory[moveNumber] = blackRooks;
+        blackQueenHistory[moveNumber] = blackQueens;
+        blackKingHistory[moveNumber] = blackKing;
+        whitePiecesHistory[moveNumber] = whitePieces;
+        blackPiecesHistory[moveNumber] = blackPieces;
+        allPiecesHistory[moveNumber] = allPieces;
+        //white_to_moveHistory[moveNumber] = white_to_move;
+        fiftyMoveRuleHistory[moveNumber] = fiftyMoveRule;
+        enPassantLocHistory[moveNumber] = enPassantLoc;
+        //moveHistory[moveNumber] = move;
+//        white_castle_k_history[moveNumber] = white_castle_k;
+//        white_castle_q_history[moveNumber] = white_castle_q;
+//        black_castle_k_history[moveNumber] = black_castle_k;
+//        black_castle_q_history[moveNumber] = black_castle_q;
+        keyHistory[moveNumber] = key;
+    }
+
+    void undoo() {
+
+        if(fiftyMoveRule != 0)
+            fiftyMoveRule--;
+
+        if(zobristTable[key] == 3) {
+            drawState = false;
+            zobristTable[key]--;
+        }
+
+        moveNumber--;
+
+        whitePawns = whitePawnHistory[moveNumber] ;
+        whiteKnights = whiteKnightHistory[moveNumber];
+        whiteBishops = whiteBishopHistory[moveNumber];
+        whiteRooks = whiteRookHistory[moveNumber];
+        whiteQueens = whiteQueenHistory[moveNumber];
+        whiteKing = whiteKingHistory[moveNumber];
+        blackPawns = blackPawnHistory[moveNumber];
+        blackKnights = blackKnightHistory[moveNumber];
+        blackBishops = blackBishopHistory[moveNumber];
+        blackRooks = blackRookHistory[moveNumber];
+        blackQueens = blackQueenHistory[moveNumber];
+        blackKing = blackKingHistory[moveNumber];
+        whitePieces = whitePiecesHistory[moveNumber];
+        blackPieces = blackPiecesHistory[moveNumber];
+        allPieces = allPiecesHistory[moveNumber];
+        //white_to_moveHistory[moveNumber] = white_to_move;
+        fiftyMoveRule = fiftyMoveRuleHistory[moveNumber];
+        enPassantLoc = enPassantLocHistory[moveNumber];
+        //move = moveHistory[moveNumber];
+//        whiteCastleK = white_castle_k_history[moveNumber];
+//        whiteCastleQ = white_castle_q_history[moveNumber];
+//        blackCastleK = black_castle_k_history[moveNumber];
+//        blackCastleQ = black_castle_q_history[moveNumber];
+        key = keyHistory[moveNumber];
+
+    }
 
     bool isDraw() {
 
+        // stale
+//        int current_moves[] = new int current_moves[MAX_MOVES];
+//        if (MoveGenerator.getAllLegalMoves(this, current_moves) == 0 && !isCheck())
+//            return true;
 
+        // 50mr
+        if (fiftyMoveRule >= 50)
+            return true;
 
+        // threefold rep
+        if(drawState)
+            return true;
+
+        // insufficient material -- so far only Kk, but need to add:
+        if ( (whitePieces & ~whiteKing) == 0 && (blackPieces & ~blackKing) == 0)
+            return true;
+
+        return false;
     }
 
     bool isMate() {
 
-//        if(!validMovesKing)
+//        if(!validMovesKing && isCheck())
 //            return true;
 //        else
 //            return false;
@@ -436,25 +540,29 @@ public:
 
     bool isEndOfGame() { return (isMate() || isDraw()); }
 
-    bool ischeck() {}
+    bool isCheck() {
+
+        //if the destination of any valid moves is at king`s position
+
+    }
 
     bool isEndGame() {
         // q == 0 ||
         // .... ((q == 1 && n == 1 && b == 0 && r == 0)
         // .... || (q == 1 && n == 0 && b == 1 && r == 0))
-        int q = __builtin_popcountull(whiteQueens);
-        int n = __builtin_popcountull(whiteKnights);
-        int b = __builtin_popcountull(whiteBishops);
-        int r = __builtin_popcountull(whiteRooks);
+        int q = __builtin_popcountll(whiteQueens);
+        int n = __builtin_popcountll(whiteKnights);
+        int b = __builtin_popcountll(whiteBishops);
+        int r = __builtin_popcountll(whiteRooks);
         bool white_endgame =
                 (q == 0 && r <= 1)
                 || ((q == 1 && n == 1 && b == 0 && r == 0) || (q == 1 && n == 0
                                                                && b == 1 && r == 0));
 
-        q = __builtin_popcountull(blackQueens);
-        n = __builtin_popcountull(blackKnights);
-        b = __builtin_popcountull(blackBishops);
-        r = __builtin_popcountull(blackRooks);
+        q = __builtin_popcountll(blackQueens);
+        n = __builtin_popcountll(blackKnights);
+        b = __builtin_popcountll(blackBishops);
+        r = __builtin_popcountll(blackRooks);
 
         bool black_endgame =
                 (q == 0 && r <= 1)
