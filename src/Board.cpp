@@ -229,7 +229,7 @@ public:
         }
         return 0;
     }
-    unsigned long long ZMove(int from, int to, char piece) {
+    unsigned long long ZMove(int from, int to, char piece) {a
         return squareZKey(from, piece) ^ squareZKey(to, piece);
     }
 
@@ -267,6 +267,32 @@ public:
     void undoo() {}
 
     void isEndGame() {}
+
+    bool isEndGame() {
+            // q == 0 ||
+            // .... ((q == 1 && n == 1 && b == 0 && r == 0)
+            // .... || (q == 1 && n == 0 && b == 1 && r == 0))
+            int q = __builtin_popcountull(whiteQueens);
+            int n = __builtin_popcountull(whiteKnights);
+            int b = __builtin_popcountull(whiteBishops);
+            int r = __builtin_popcountull(whiteRooks);
+            bool white_endgame =
+                    (q == 0 && r <= 1)
+                    || ( (q == 1 && n == 1 && b == 0 && r == 0) || (q == 1 && n == 0
+                                                                    && b == 1 && r == 0));
+
+            q = __builtin_popcountull(blackQueens);
+            n = __builtin_popcountull(blackKnights);
+            b = __builtin_popcountull(blackBishops);
+            r = __builtin_popcountull(blackRooks);
+
+            bool black_endgame =
+                    (q == 0 && r <= 1)
+                    || ( (q == 1 && n == 1 && b == 0 && r == 0) || (q == 1 && n == 0
+                                                                    && b == 1 && r == 0));
+
+            return white_endgame && black_endgame;
+        }
 
     void isDraw() {}
 
