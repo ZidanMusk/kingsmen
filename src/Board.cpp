@@ -179,22 +179,21 @@ public:
     unsigned long long whiteToMove;
 
     char getPieceAt(int loc){
-        if(allPieces&(1<<loc)) {
-            if (whitePawns & (1 << loc)) return 'P';
-            else if (whiteBishops & (1 << loc)) return 'B';
-            else if (whiteKing & (1 << loc)) return 'K';
-            else if (whiteKnights & (1 << loc)) return 'N';
-            else if (whiteQueens & (1 << loc)) return 'Q';
-            else if (whiteRooks & (1 << loc)) return 'R';
-            else if (blackPawns & (1 << loc)) return 'p';
-            else if (blackBishops & (1 << loc)) return 'b';
-            else if (blackKing & (1 << loc)) return 'k';
-            else if (blackKnights & (1 << loc)) return 'n';
-            else if (blackQueens & (1 << loc)) return 'q';
-            else if (blackRooks & (1 << loc)) return 'r';
-            else return '';
-        }else return '';
-
+        if(allPieces&(1ULL<<loc)) {
+            if (whitePawns & (1ULL << loc)) return 'P';
+            else if (whiteBishops & (1ULL << loc)) return 'B';
+            else if (whiteKing & (1ULL << loc)) return 'K';
+            else if (whiteKnights & (1ULL << loc)) return 'N';
+            else if (whiteQueens & (1ULL << loc)) return 'Q';
+            else if (whiteRooks & (1ULL << loc)) return 'R';
+            else if (blackPawns & (1ULL << loc)) return 'p';
+            else if (blackBishops & (1ULL << loc)) return 'b';
+            else if (blackKing & (1ULL << loc)) return 'k';
+            else if (blackKnights & (1ULL << loc)) return 'n';
+            else if (blackQueens & (1ULL << loc)) return 'q';
+            else if (blackRooks & (1ULL << loc)) return 'r';
+        }
+        return 0;
     };
 
 
@@ -266,39 +265,40 @@ public:
 
     void undoo() {}
 
-    void isEndGame() {}
+    bool isDraw() {}
+
+    bool isMate() {}
+
+    bool isEndOfGame() {return (isMate() || isDraw());}
+
+    bool ischeck() {}
 
     bool isEndGame() {
-            // q == 0 ||
-            // .... ((q == 1 && n == 1 && b == 0 && r == 0)
-            // .... || (q == 1 && n == 0 && b == 1 && r == 0))
-            int q = __builtin_popcountull(whiteQueens);
-            int n = __builtin_popcountull(whiteKnights);
-            int b = __builtin_popcountull(whiteBishops);
-            int r = __builtin_popcountull(whiteRooks);
-            bool white_endgame =
-                    (q == 0 && r <= 1)
-                    || ( (q == 1 && n == 1 && b == 0 && r == 0) || (q == 1 && n == 0
-                                                                    && b == 1 && r == 0));
+        // q == 0 ||
+        // .... ((q == 1 && n == 1 && b == 0 && r == 0)
+        // .... || (q == 1 && n == 0 && b == 1 && r == 0))
+        int q = __builtin_popcountull(whiteQueens);
+        int n = __builtin_popcountull(whiteKnights);
+        int b = __builtin_popcountull(whiteBishops);
+        int r = __builtin_popcountull(whiteRooks);
+        bool white_endgame =
+                (q == 0 && r <= 1)
+                || ( (q == 1 && n == 1 && b == 0 && r == 0) || (q == 1 && n == 0
+                                                                && b == 1 && r == 0));
 
-            q = __builtin_popcountull(blackQueens);
-            n = __builtin_popcountull(blackKnights);
-            b = __builtin_popcountull(blackBishops);
-            r = __builtin_popcountull(blackRooks);
+        q = __builtin_popcountull(blackQueens);
+        n = __builtin_popcountull(blackKnights);
+        b = __builtin_popcountull(blackBishops);
+        r = __builtin_popcountull(blackRooks);
 
-            bool black_endgame =
-                    (q == 0 && r <= 1)
-                    || ( (q == 1 && n == 1 && b == 0 && r == 0) || (q == 1 && n == 0
-                                                                    && b == 1 && r == 0));
+        bool black_endgame =
+                (q == 0 && r <= 1)
+                || ( (q == 1 && n == 1 && b == 0 && r == 0) || (q == 1 && n == 0
+                                                                && b == 1 && r == 0));
 
-            return white_endgame && black_endgame;
-        }
+        return white_endgame && black_endgame;
+    }
 
-    void isDraw() {}
-
-    void isMate() {}
-
-    void check() {}
 
 
 };
