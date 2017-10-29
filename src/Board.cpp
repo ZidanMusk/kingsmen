@@ -478,7 +478,7 @@ public:
             wp-=(wp&-wp);
             if(ind >= 8 && ind <= 15){//move two squares forward --> +16
                 int newInd = ind + 16;
-                if((newInd>=0 && newInd<=63) && !(allPieces&(1ull << newInd))){
+                if((newInd>=0 && newInd<=63) && !(allPieces&(1ull << newInd))&& !(allPieces&(1ull << (newInd-8)))){
                     //new valid move from ind to newInd
                     int flag = 0;
                     if((getColumn(ind + 1) != 0) && blackPawns&(newInd+1)) flag = 3;
@@ -535,7 +535,7 @@ public:
             wp-=(wp&-wp);
             if(ind >= 48 && ind <= 55){//move two squares forward --> +16
                 int newInd = ind - 16;
-                if((newInd>=0 && newInd<=63) && !(allPieces&(1ull << newInd))){
+                if((newInd>=0 && newInd<=63) && !(allPieces&(1ull << newInd)) && !(allPieces&(1ull << (newInd+8)))){
                     //new valid move from ind to newInd
                     int flag = 0;
                     if((getColumn(ind + 1) != 0) && whitePawns&(newInd+1)) flag = 3;
