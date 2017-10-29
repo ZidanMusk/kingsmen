@@ -6,7 +6,7 @@ int main() {
 
     b.disp();
     b.whitePawnVMGen();
-    b.doo(b.whiteKnightVMGen()[1]);
+//    b.doo(b.whiteKnightVMGen()[1]);
     cout<<endl<<endl;
     b.disp();
 
