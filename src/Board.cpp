@@ -203,7 +203,9 @@ public:
     int moveNumber = 0;
     int fiftyMoveRule = 0;
 
-
+/**********************************************************************************************************************
+*                                               Optmization functions                                                 *
+**********************************************************************************************************************/
     char getPieceAt(int loc) {
         if (allPieces & (1ULL << loc)) {
             if (whitePawns & (1ULL << loc)) return 'P';
@@ -299,10 +301,11 @@ public:
         return cellNum % 8;
     }
 
-    // board representation functions
+/**********************************************************************************************************************
+*                                          board representation functions                                             *
+**********************************************************************************************************************/
 
-    void pass() {}
-
+//==================================================Make Move(doo)
     void doo(int move) {
         if (whiteCastleK)
             key ^= whiteKingSideCastling;
@@ -431,7 +434,6 @@ public:
         else
             fiftyMoveRule = 0;
 
-        //fiftyMoveRuleHistory[moveNumber] = fiftyMoveRule;
         //saving all of our history
         saveHistory();
 
@@ -442,6 +444,7 @@ public:
 
     }
 
+//==================================================Saving history, Undo
     void saveHistory() {
         whitePawnHistory[moveNumber] = whitePawns;
         whiteKnightHistory[moveNumber] = whiteKnights;
@@ -505,8 +508,9 @@ public:
 //        blackCastleK = black_castle_k_history[moveNumber];
 //        blackCastleQ = black_castle_q_history[moveNumber];
         key = keyHistory[moveNumber];
-
     }
+
+//==================================================Draw, Mate, Check, EndOfGame, EndGame, Pass
 
     bool isDraw() {
 
@@ -572,14 +576,20 @@ public:
         return white_endgame && black_endgame;
     }
 
-    //valid moves
+    void pass() {}
+
+
+/**********************************************************************************************************************
+ *                                               Valid Moves                                                           *
+ **********************************************************************************************************************/
+
+//==================================================WhitePawn valid Moves
     int whitePawnVM[64];
     int whitePawnVMCnt = 0;
     int whitePawnCap[64];
     int whitePawnCapCnt = 0;
-
     void whitePawnVMGen() {
-        int pawnCnt = __builtin_popcountull(whitePawns);
+        int pawnCnt = __builtin_popcountll(whitePawns);
         ull wp = whitePawns;
         while (pawnCnt--) {
             int ind = (log2(wp&-wp) + EPS);
@@ -630,13 +640,14 @@ public:
             }
         }
     }
+
+//==================================================BlackPawn valid Moves
     int blackPawnVM[64];
     int blackPawnVMCnt = 0;
     int blackPawnCap[64];
     int blackPawnCapCnt = 0;
-
     void blackPawnVMGen() {
-        int pawnCnt = __builtin_popcountull(blackPawns);
+        int pawnCnt = __builtin_popcountll(blackPawns);
         ull wp = blackPawns;
         while (pawnCnt--) {
             int ind = (log2(wp&-wp) + EPS);
@@ -688,12 +699,13 @@ public:
         }
     }
 
+//==================================================WhiteKnight valid Moves
     int whiteKnightVM[32];
     int whiteKnightVMCnt = 0;
     int whiteKnightCap[32];
     int whiteKnightCapCnt = 0;
     void whiteKnightVMGen(){
-        int knightCnt = __builtin_popcountull(whiteKnights);
+        int knightCnt = __builtin_popcountll(whiteKnights);
         ull wp = whiteKnights;
         while(knightCnt--){
             int ind = (log2(wp&-wp) + EPS);
@@ -722,9 +734,7 @@ public:
             }else if((newInd>=0 && newInd<=63) && (blackPieces&(1ull << newInd))){
                 whitePawnCap[whitePawnCapCnt++] = (ind) | (newInd << 6) | (1 << 12) | (1 << 15) | (0 << 16);
             }
-
-
-
+            
 
             newInd = ind - 6;
             if((newInd>=0 && newInd<=63) && !(allPieces&(1ull << newInd))){
@@ -754,19 +764,14 @@ public:
         }
 
     }
-
-
-
-
-
-
-
+    
+//==================================================BlackKnight valid Moves
     int blackKnightVM[32];
     int blackKnightVMCnt = 0;
     int blackKnightCap[32];
     int blackKnightCapCnt = 0;
     void blackKnightVMGen(){
-        int knightCnt = __builtin_popcountull(blackKnights);
+        int knightCnt = __builtin_popcountll(blackKnights);
         ull wp = blackKnights;
         while(knightCnt--){
             int ind = (log2(wp&-wp) + EPS);
