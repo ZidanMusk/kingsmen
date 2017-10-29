@@ -199,9 +199,111 @@ public:
     ull blackCastleQ;
     ull enPassantLoc;
     ull whiteToMove;
-
+    double EPS = 1e-8;
     int moveNumber = 0;
     int fiftyMoveRule = 0;
+
+    void disp(){
+
+        char arr[8][8];
+        memset(arr,0,sizeof(arr));
+        int Cnt = __builtin_popcountll(allPieces);
+        ull wp = allPieces;
+        while(wp) {
+            int ind = (log2(wp & -wp) + EPS);
+            wp -= (wp & -wp);
+            if(whitePawns & (1ull<<ind)){
+                arr[ind/8][ind%8] = 'P';
+            }
+            if(whiteBishops & (1ull<<ind)){
+                arr[ind/8][ind%8] = 'B';
+            }
+            if(whiteKnights & (1ull<<ind)){
+                arr[ind/8][ind%8] = 'N';
+            }
+            if(whiteKing & (1ull<<ind)){
+                arr[ind/8][ind%8] = 'K';
+            }
+            if(whiteQueens & (1ull<<ind)){
+                arr[ind/8][ind%8] = 'Q';
+            }
+            if(whiteRooks & (1ull<<ind)){
+                arr[ind/8][ind%8] = 'R';
+            }
+            if(blackPawns & (1ull<<ind)){
+                arr[ind/8][ind%8] = 'p';
+            }
+            if(blackBishops & (1ull<<ind)){
+                arr[ind/8][ind%8] = 'b';
+            }
+            if(blackKnights & (1ull<<ind)){
+                arr[ind/8][ind%8] = 'n';
+            }
+            if(blackKing & (1ull<<ind)){
+                arr[ind/8][ind%8] = 'k';
+            }
+            if(blackQueens & (1ull<<ind)){
+                arr[ind/8][ind%8] = 'q';
+            }
+            if(blackRooks & (1ull<<ind)){
+                arr[ind/8][ind%8] = 'r';
+            }
+
+        }
+        for (int i = 0; i < 8; i++){
+            for (int j = 0; j < 8; j++){
+                cout<<arr[i][j]<<" ";
+            }
+            cout<<endl;
+        }
+    }
+
+    void fenInterpreter(string fen){
+        whiteRooks = 0;
+        whiteQueens = 0;
+        whiteKing = 0;
+        whiteKnights = 0;
+        whiteBishops = 0;
+        whitePawns = 0;
+        whitePieces = 0;
+
+        blackRooks = 0;
+        blackQueens = 0;
+        blackKing = 0;
+        blackKnights = 0;
+        blackBishops = 0;
+        blackPawns = 0;
+        blackPieces = 0;
+        allPieces = 0;
+        int file = 1;
+        int rank = 8;
+        for (int i = 0; i < fen.size(); i++){
+            if(fen[i] == ' ')break;
+            if(fen[i] == '/'){if(file != 9)rank--; file = 1;  continue;}
+            if(isdigit(fen[i])){file += (fen[i] - '0')-1;}
+            if(fen[i] == 'p'){blackPawns |= (1ull << ((rank-1)*8 + (file-1)));}
+            if(fen[i] == 'n'){blackKnights |= (1ull << ((rank-1)*8 + (file-1)));}
+            if(fen[i] == 'r'){blackRooks |= (1ull << ((rank-1)*8 + (file-1)));}
+            if(fen[i] == 'q'){blackQueens |= (1ull << ((rank-1)*8 + (file-1)));}
+            if(fen[i] == 'k'){blackKing |= (1ull << ((rank-1)*8 + (file-1)));}
+            if(fen[i] == 'b'){blackBishops |= (1ull << ((rank-1)*8 + (file-1)));}
+
+            if(fen[i] == 'P'){whitePawns |= (1ull << ((rank-1)*8 + (file-1)));  }
+            if(fen[i] == 'N'){whiteKnights |= (1ull << ((rank-1)*8 + (file-1)));}
+            if(fen[i] == 'R'){whiteRooks |= (1ull << ((rank-1)*8 + (file-1)));}
+            if(fen[i] == 'Q'){whiteQueens |= (1ull << ((rank-1)*8 + (file-1)));}
+            if(fen[i] == 'K'){whiteKing |= (1ull << ((rank-1)*8 + (file-1)));}
+            if(fen[i] == 'B'){whiteBishops |= (1ull << ((rank-1)*8 + (file-1)));}
+            file++;
+            if(file == 9){rank--;}
+        }
+
+
+        blackPieces = blackPawns | blackBishops | blackKing | blackKnights | blackQueens | blackRooks;
+        whitePieces = whitePawns | whiteBishops | whiteKing | whiteKnights | whiteQueens | whiteRooks;
+        allPieces = whitePieces | blackPieces;
+        //this function is not complete yet a7ba2i fellah
+    }
 
 
     char getPieceAt(int loc) {
@@ -377,7 +479,7 @@ public:
                 break;
         }
 
-        whitePieces = whitePawns | whiteKnights | whiteBishops | whiteQueens | whiteKing;
+        whitePieces = whitePawns | whiteKnights | whiteBishops | whiteQueens | whiteKing | whiteRooks;
 
         if (capture) {
             if (locExist(blackPawns, 1ull << to)) {
@@ -399,7 +501,7 @@ public:
                 key ^= squareZKey(to, 'Q');
             }
 
-            blackPieces = blackPawns | blackKnights | blackBishops | blackQueens | blackKing;
+            blackPieces = blackPawns | blackKnights | blackBishops | blackQueens | blackKing | blackRooks;
         }
 
         allPieces = whitePieces | blackPieces;
