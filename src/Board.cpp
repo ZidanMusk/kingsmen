@@ -686,7 +686,7 @@ public:
                 break;
         }
 
-        whitePieces = whitePawns | whiteKnights | whiteBishops | whiteQueens | whiteKing;
+        whitePieces = whitePawns | whiteKnights | whiteBishops | whiteQueens | whiteKing | whiteRooks;
 
         if (capture) {
             if (locExist(blackPawns, 1ull << to)) {
@@ -708,7 +708,7 @@ public:
                 key ^= squareZKey(to, 'Q');
             }
 
-            blackPieces = blackPawns | blackKnights | blackBishops | blackQueens | blackKing;
+            blackPieces = blackPawns | blackKnights | blackBishops | blackQueens | blackKing | blackRooks;
         }
 
         allPieces = whitePieces | blackPieces;
