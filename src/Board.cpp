@@ -363,7 +363,7 @@ public:
 *                                               Optimization functions                                                 *
 **********************************************************************************************************************/
 
-    void init(){
+    Board(){
         validMovesHistory.resize(MAX_GAME_LENGTH);
     }
 
