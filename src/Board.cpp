@@ -167,15 +167,15 @@ public:
     unsigned long long black_pieces_history[];
     unsigned long long all_pieces_history[];
 
-    //bool[] white_to_move_history;
+    //bool[] whiteToMove_history;
     //int[] fiftyMoveRule_history;
     int enPassantLoc_history[];
     int move_history[];
     //char pieceArray_history[][];
-    bool white_castle_k_history[];
-    bool white_castle_q_history[];
-    bool black_castle_k_history[];
-    bool black_castle_q_history[];
+    bool whiteCastleK_history[];
+    bool whiteCastleQ_history[];
+    bool blackCastleK_history[];
+    bool blackCastleQ_history[];
     bool white_has_castled_history[];
     bool black_has_castled_history[];
     unsigned long long key_history[];
@@ -240,7 +240,7 @@ public:
         return 0;
     }
 
-    unsigned long long ZMove(int from, int to, char piece) {a
+    unsigned long long ZMove(int from, int to, char piece) {
         return squareZKey(from, piece) ^ squareZKey(to, piece);
     }
 
@@ -251,19 +251,19 @@ public:
             key ^= squareZKey(loc, getPieceAt(loc));
         }
 
-        if (white_castle_k)
+        if (whiteCastleK)
             key ^= whiteKingSideCastling;
-        if (white_castle_q)
+        if (whiteCastleQ)
             key ^= whiteQueenSideCastling;
-        if (black_castle_k)
+        if (blackCastleK)
             key ^= blackKingSideCastling;
-        if (black_castle_q)
+        if (blackCastleQ)
             key ^= blackQueenSideCastling;
 
         if (enPassantLoc != -1)
             key ^= passantColumn[enPassantLoc % 8];
 
-        if (white_to_move)
+        if (whiteToMove)
             key ^= whiteMove;
 
         return key;
@@ -292,17 +292,17 @@ public:
     void doo(int move) {
         if (whiteCastleK)
             key ^= whiteKingSideCastling;
-        if (whiteC)
+        if (whiteCastleQ)
             key ^= whiteQueenSideCastling;
-        if (black_castle_k)
+        if (blackCastleK)
             key ^= blackKingSideCastling;
-        if (black_castle_q)
+        if (blackCastleQ)
             key ^= blackQueenSideCastling;
 
         if (enPassantLoc != -1)
             key ^= passantColumn[enPassantLoc % 8];
 
-        if (white_to_move)
+        if (whiteToMove)
             key ^= whiteMove;
 
         int specialEvent = move & 7;
@@ -354,9 +354,9 @@ public:
             case 5:
                 whiteKing ^= moveXor;
                 if (specialEvent == CASTLEKINGSIDE)
-                    whiteRooks ^= 160, white_castle_k = 1;
+                    whiteRooks ^= 160, whiteCastleK = 1;
                 else if (specialEvent == CASTLEQUEENSIDE)
-                    whiteRooks ^= 9, white_castle_q = 1;
+                    whiteRooks ^= 9, whiteCastleQ = 1;
                 key ^= squareZKey(from, 'k') ^ squareZKey(to, 'k');
                 break;
             default:
@@ -395,19 +395,19 @@ public:
 
         else enPassantLoc = -1;
 
-        if (white_castle_k)
+        if (whiteCastleK)
             key ^= whiteKingSideCastling;
-        if (white_castle_q)
+        if (whiteCastleQ)
             key ^= whiteQueenSideCastling;
-        if (black_castle_k)
+        if (blackCastleK)
             key ^= blackKingSideCastling;
-        if (black_castle_q)
+        if (blackCastleQ)
             key ^= blackQueenSideCastling;
 
         if (enPassantLoc != -1)
             key ^= passantColumn[enPassantLoc % 8];
 
-        if (white_to_move)
+        if (whiteToMove)
             key ^= whiteMove;
 
     }
