@@ -20,7 +20,6 @@ public:
     const int PROMOTEQUEEN = 7;
 
     static const int MAX_GAME_LENGTH = 1024;
-    static const int MAX_MOVES = 1024;
 
 
     // Zobrist tables
