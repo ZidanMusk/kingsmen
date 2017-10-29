@@ -6,8 +6,8 @@ int main() {
 
     b.disp();
     b.whitePawnVMGen();
-//    b.doo(b.whiteKnightVMGen()[1]);
-    cout<<endl<<endl;
+    b.doo(b.whiteKnightVMGen()[1]);
+    cout<<endl<<"xx"<<endl;
     b.disp();
 
     return 0;
