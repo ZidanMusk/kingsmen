@@ -410,7 +410,6 @@ public:
 
         if (whiteToMove)
             key ^= whiteMove;
-
     }
 
     void undoo() {}
