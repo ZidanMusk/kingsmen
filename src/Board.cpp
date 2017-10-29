@@ -20,8 +20,6 @@ public:
     const int PROMOTEQUEEN = 7;
 
     static const int MAX_GAME_LENGTH = 1024;
-    static const int MAX_MOVES = 1024;
-
 
     // Zobrist tables
     ull pawn[2][64] = {{0x79ad695501e7d1e8L, 0x8249a47aee0e41f7L, 0x637a7780decfc0d9L, 0x19fc8a768cf4b6d4L, 0x7bcbc38da25a7f3cL, 0x5093417aa8a7ed5eL, 0x7fb9f855a997142L,  0x5355f900c2a82dc7L,
