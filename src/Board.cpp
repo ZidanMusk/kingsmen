@@ -474,7 +474,7 @@ public:
         int pawnCnt = __builtin_popcountull(whitePawns);
         ull wp = whitePawns;
         while (pawnCnt--) {
-            int ind = (log2(wp&-wp) + 0.00001);
+            int ind = (log2(wp&-wp) + EPS);
             wp-=(wp&-wp);
             if(ind >= 8 && ind <= 15){//move two squares forward --> +16
                 int newInd = ind + 16;
