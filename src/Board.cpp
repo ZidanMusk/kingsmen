@@ -625,12 +625,13 @@ public:
             key ^= whiteMove;
 
         int specialEvent = move & 7;
-        int capture = move & 8;
-        int type = move & 112;
-        int from = move & 8064;
-        int to = move & 516096;
+        int capture = (move & 8)>>3;
+        int type = (move & 112)>>4;
+        int from = (move & 8064)>>7;
+        int to = (move & 516096)>>13;
 
-        int moveXor = (1ull << from) ^(1ull << to);
+        ull moveXor = (1ull << from) ^(1ull << to);
+
         // pawn 0
         // knight 1
         // bishop 2
@@ -937,7 +938,7 @@ public:
                     int flag = 0;
                     if((getColumn(ind + 1) != 0) && blackPawns&(newInd+1)) flag = 3;
                     if((getColumn(ind - 1) != 7) && blackPawns&(newInd-1)) flag = 3;
-                    whitePawnVM.push_back((ind) | (newInd << 6) | (0 << 12) | ( 0 << 15) | (flag << 16));
+                    whitePawnVM.push_back(makeMoveMask(flag, 0, pawnTypeNum(), ind, newInd, 0));
                 }
             }
             //move one square forward --> +8
@@ -945,11 +946,11 @@ public:
             if((newInd>=0 && newInd<=63) && !(allPieces&(1ull << newInd))){
                 //new valid move from ind to newInd
                 if(newInd > 55) {
-                    whitePawnVM.push_back((ind) | (newInd << 6) | (0 << 12) | (0 << 15) | (4 << 16));
-                    whitePawnVM.push_back((ind) | (newInd << 6) | (0 << 12) | (0 << 15) | (5 << 16));
-                    whitePawnVM.push_back((ind) | (newInd << 6) | (0 << 12) | (0 << 15) | (6 << 16));
-                    whitePawnVM.push_back((ind) | (newInd << 6) | (0 << 12) | (0 << 15) | (7 << 16));
-                }else whitePawnVM.push_back((ind) | (newInd << 6) | (0 << 12) | (0 << 15) | (0 << 16));
+                    whitePawnVM.push_back(makeMoveMask(PROMOTEBISHOP, 0, pawnTypeNum(), ind, newInd, 0));
+                    whitePawnVM.push_back(makeMoveMask(PROMOTEROOK, 0, pawnTypeNum(), ind, newInd, 0));
+                    whitePawnVM.push_back(makeMoveMask(PROMOTEKNIGHT, 0, pawnTypeNum(), ind, newInd, 0));
+                    whitePawnVM.push_back(makeMoveMask(PROMOTEQUEEN, 0, pawnTypeNum(), ind, newInd, 0));
+                }else whitePawnVM.push_back(makeMoveMask(0, 0, pawnTypeNum(), ind, newInd, 0));
             }
 
             //captures --> +7 & +9
@@ -957,21 +958,21 @@ public:
             if((newInd>=0 && newInd<=63) && (blackPieces&(1ull << newInd))){
                 //new valid capture from ind to newInd
                 if(newInd > 55) {
-                    whitePawnCap.push_back((ind) | (newInd << 6) | (0 << 12) | (1 << 15) | (4 << 16));
-                    whitePawnCap.push_back((ind) | (newInd << 6) | (0 << 12) | (1 << 15) | (5 << 16));
-                    whitePawnCap.push_back((ind) | (newInd << 6) | (0 << 12) | (1 << 15) | (6 << 16));
-                    whitePawnCap.push_back((ind) | (newInd << 6) | (0 << 12) | (1 << 15) | (7 << 16));
-                }else whitePawnCap.push_back((ind) | (newInd << 6) | (0 << 12) | (1 << 15) | (0 << 16));
+                    whitePawnCap.push_back(makeMoveMask(PROMOTEBISHOP, 1, pawnTypeNum(), ind, newInd, 0));
+                    whitePawnCap.push_back(makeMoveMask(PROMOTEROOK, 1, pawnTypeNum(), ind, newInd, 0));
+                    whitePawnCap.push_back(makeMoveMask(PROMOTEKNIGHT, 1, pawnTypeNum(), ind, newInd, 0));
+                    whitePawnCap.push_back(makeMoveMask(PROMOTEQUEEN, 1, pawnTypeNum(), ind, newInd, 0));
+                }else whitePawnCap.push_back(makeMoveMask(0, 1, pawnTypeNum(), ind, newInd, 0));
             }
             newInd = ind + 9;
             if ((newInd >= 0 && newInd <= 63) && (blackPieces & (1ull << newInd))) {
                 //new valid capture from ind to newInd
                 if(newInd > 55) {
-                    whitePawnCap.push_back((ind) | (newInd << 6) | (0 << 12) | (1 << 15) | (4 << 16));
-                    whitePawnCap.push_back((ind) | (newInd << 6) | (0 << 12) | (1 << 15) | (5 << 16));
-                    whitePawnCap.push_back((ind) | (newInd << 6) | (0 << 12) | (1 << 15) | (6 << 16));
-                    whitePawnCap.push_back((ind) | (newInd << 6) | (0 << 12) | (1 << 15) | (7 << 16));
-                }else whitePawnCap.push_back((ind) | (newInd << 6) | (0 << 12) | (1 << 15) | (0 << 16));
+                    whitePawnCap.push_back(makeMoveMask(PROMOTEBISHOP, 1, pawnTypeNum(), ind, newInd, 0));
+                    whitePawnCap.push_back(makeMoveMask(PROMOTEROOK, 1, pawnTypeNum(), ind, newInd, 0));
+                    whitePawnCap.push_back(makeMoveMask(PROMOTEKNIGHT, 1, pawnTypeNum(), ind, newInd, 0));
+                    whitePawnCap.push_back(makeMoveMask(PROMOTEQUEEN, 1, pawnTypeNum(), ind, newInd, 0));
+                }else whitePawnCap.push_back(makeMoveMask(0, 1, pawnTypeNum(), ind, newInd, 0));
 
             }
         }
@@ -997,7 +998,7 @@ public:
                     int flag = 0;
                     if((getColumn(ind + 1) != 0) && whitePawns&(newInd+1)) flag = 3;
                     if((getColumn(ind - 1) != 7) && whitePawns&(newInd-1)) flag = 3;
-                    blackPawnVM.push_back((ind) | (newInd << 6) | (0 << 12) | ( 0 << 15) | (flag << 16) | (1 << 20));
+                    blackPawnVM.push_back(makeMoveMask(flag, 0, pawnTypeNum(), ind, newInd, 1));
                 }
             }
             //move one square forward --> +8
@@ -1005,11 +1006,11 @@ public:
             if((newInd>=0 && newInd<=63) && !(allPieces&(1ull << newInd))){
                 //new valid move from ind to newInd
                 if(newInd < 8) {
-                    blackPawnVM.push_back((ind) | (newInd << 6) | (0 << 12) | (0 << 15) | (4 << 16) | (1 << 20));
-                    blackPawnVM.push_back((ind) | (newInd << 6) | (0 << 12) | (0 << 15) | (5 << 16) | (1 << 20));
-                    blackPawnVM.push_back((ind) | (newInd << 6) | (0 << 12) | (0 << 15) | (6 << 16) | (1 << 20));
-                    blackPawnVM.push_back((ind) | (newInd << 6) | (0 << 12) | (0 << 15) | (7 << 16) | (1 << 20));
-                }else blackPawnVM.push_back((ind) | (newInd << 6) | (0 << 12) | (0 << 15) | (0 << 16) | (1 << 20));
+                    blackPawnVM.push_back(makeMoveMask(PROMOTEQUEEN, 0, pawnTypeNum(), ind, newInd, 1));
+                    blackPawnVM.push_back(makeMoveMask(PROMOTEKNIGHT, 0, pawnTypeNum(), ind, newInd, 1));
+                    blackPawnVM.push_back(makeMoveMask(PROMOTEBISHOP, 0, pawnTypeNum(), ind, newInd, 1));
+                    blackPawnVM.push_back(makeMoveMask(PROMOTEROOK, 0, pawnTypeNum(), ind, newInd, 1));
+                }else blackPawnVM.push_back(makeMoveMask(0, 0, pawnTypeNum(), ind, newInd, 1));
             }
 
             //captures --> +7 & +9
@@ -1017,21 +1018,21 @@ public:
             if((newInd>=0 && newInd<=63) && (blackPieces&(1ull << newInd))){
                 //new valid capture from ind to newInd
                 if(newInd < 8) {
-                    blackPawnCap.push_back((ind) | (newInd << 6) | (0 << 12) | (1 << 15) | (4 << 16) | (1 << 20));
-                    blackPawnCap.push_back((ind) | (newInd << 6) | (0 << 12) | (1 << 15) | (5 << 16) | (1 << 20));
-                    blackPawnCap.push_back((ind) | (newInd << 6) | (0 << 12) | (1 << 15) | (6 << 16) | (1 << 20));
-                    blackPawnCap.push_back((ind) | (newInd << 6) | (0 << 12) | (1 << 15) | (7 << 16) | (1 << 20));
-                }else blackPawnCap.push_back((ind) | (newInd << 6) | (0 << 12) | (1 << 15) | (0 << 16) | (1 << 20));
+                    blackPawnCap.push_back(makeMoveMask(PROMOTEQUEEN, 1, pawnTypeNum(), ind, newInd, 1));
+                    blackPawnCap.push_back(makeMoveMask(PROMOTEKNIGHT, 1, pawnTypeNum(), ind, newInd, 1));
+                    blackPawnCap.push_back(makeMoveMask(PROMOTEBISHOP, 1, pawnTypeNum(), ind, newInd, 1));
+                    blackPawnCap.push_back(makeMoveMask(PROMOTEROOK, 1, pawnTypeNum(), ind, newInd, 1));
+                }else blackPawnCap.push_back(makeMoveMask(0, 1, pawnTypeNum(), ind, newInd, 1));
             }
             newInd = ind - 9;
             if((newInd>=0 && newInd<=63) && (blackPieces&(1ull << newInd))){
                 //new valid capture from ind to newInd
                 if(newInd < 8) {
-                    blackPawnCap.push_back((ind) | (newInd << 6) | (0 << 12) | (1 << 15) | (4 << 16) | (1 << 20));
-                    blackPawnCap.push_back((ind) | (newInd << 6) | (0 << 12) | (1 << 15) | (5 << 16) | (1 << 20));
-                    blackPawnCap.push_back((ind) | (newInd << 6) | (0 << 12) | (1 << 15) | (6 << 16) | (1 << 20));
-                    blackPawnCap.push_back((ind) | (newInd << 6) | (0 << 12) | (1 << 15) | (7 << 16) | (1 << 20));
-                }else blackPawnCap.push_back((ind) | (newInd << 6) | (0 << 12) | (1 << 15) | (0 << 16) | (1 << 20));
+                    blackPawnCap.push_back(makeMoveMask(PROMOTEQUEEN, 1, pawnTypeNum(), ind, newInd, 1));
+                    blackPawnCap.push_back(makeMoveMask(PROMOTEKNIGHT, 1, pawnTypeNum(), ind, newInd, 1));
+                    blackPawnCap.push_back(makeMoveMask(PROMOTEBISHOP, 1, pawnTypeNum(), ind, newInd, 1));
+                    blackPawnCap.push_back(makeMoveMask(PROMOTEROOK, 1, pawnTypeNum(), ind, newInd, 1));
+                }else blackPawnCap.push_back(makeMoveMask(0, 1, pawnTypeNum(), ind, newInd, 1));
 
             }
         }
@@ -1052,27 +1053,27 @@ public:
             wp-=(wp&-wp);
             int newInd = ind + 6;
             if((newInd>=0 && newInd<=63) && !(allPieces&(1ull << newInd))){
-                whiteKnightVM.push_back((ind) | (newInd << 6) | (1 << 12) | (0 << 15) | (0 << 16));
+                whiteKnightVM.push_back(makeMoveMask(0, 0, knightTypeNum(), ind, newInd, 0));
             }else if((newInd>=0 && newInd<=63) && (blackPieces&(1ull << newInd))){
-                whiteKnightCap.push_back((ind) | (newInd << 6) | (1 << 12) | (1 << 15) | (0 << 16));
+                whiteKnightCap.push_back(makeMoveMask(0, 1, knightTypeNum(), ind, newInd, 0));
             }
             newInd = ind + 10;
             if((newInd>=0 && newInd<=63) && !(allPieces&(1ull << newInd))){
-                whiteKnightVM.push_back((ind) | (newInd << 6) | (1 << 12) | (0 << 15) | (0 << 16));
+                whiteKnightVM.push_back(makeMoveMask(0, 0, knightTypeNum(), ind, newInd, 0));
             }else if((newInd>=0 && newInd<=63) && (blackPieces&(1ull << newInd))){
-                whiteKnightCap.push_back((ind) | (newInd << 6) | (1 << 12) | (1 << 15) | (0 << 16));
+                whiteKnightCap.push_back(makeMoveMask(0, 1, knightTypeNum(), ind, newInd, 0));
             }
             newInd = ind + 15;
             if((newInd>=0 && newInd<=63) && !(allPieces&(1ull << newInd))){
-                whiteKnightVM.push_back((ind) | (newInd << 6) | (1 << 12) | (0 << 15) | (0 << 16));
+                whiteKnightVM.push_back(makeMoveMask(0, 0, knightTypeNum(), ind, newInd, 0));
             }else if((newInd>=0 && newInd<=63) && (blackPieces&(1ull << newInd))){
-                whiteKnightCap.push_back((ind) | (newInd << 6) | (1 << 12) | (1 << 15) | (0 << 16));
+                whiteKnightCap.push_back(makeMoveMask(0, 1, knightTypeNum(), ind, newInd, 0));
             }
             newInd = ind + 17;
             if((newInd>=0 && newInd<=63) && !(allPieces&(1ull << newInd))){
-                whiteKnightVM.push_back((ind) | (newInd << 6) | (1 << 12) | (0 << 15) | (0 << 16));
+                whiteKnightVM.push_back(makeMoveMask(0, 0, knightTypeNum(), ind, newInd, 0));
             }else if((newInd>=0 && newInd<=63) && (blackPieces&(1ull << newInd))){
-                whiteKnightCap.push_back((ind) | (newInd << 6) | (1 << 12) | (1 << 15) | (0 << 16));
+                whiteKnightCap.push_back(makeMoveMask(0, 1, knightTypeNum(), ind, newInd, 0));
             }
 
 
@@ -1080,27 +1081,27 @@ public:
 
             newInd = ind - 6;
             if((newInd>=0 && newInd<=63) && !(allPieces&(1ull << newInd))){
-                whiteKnightVM.push_back((ind) | (newInd << 6) | (1 << 12) | (0 << 15) | (0 << 16));
+                whiteKnightVM.push_back(makeMoveMask(0, 0, knightTypeNum(), ind, newInd, 0));
             }else if((newInd>=0 && newInd<=63) && (blackPieces&(1ull << newInd))){
-                whiteKnightCap.push_back((ind) | (newInd << 6) | (1 << 12) | (1 << 15) | (0 << 16));
+                whiteKnightCap.push_back(makeMoveMask(0, 1, knightTypeNum(), ind, newInd, 0));
             }
             newInd = ind - 10;
             if((newInd>=0 && newInd<=63) && !(allPieces&(1ull << newInd))){
-                whiteKnightVM.push_back((ind) | (newInd << 6) | (1 << 12) | (0 << 15) | (0 << 16));
+                whiteKnightVM.push_back(makeMoveMask(0, 0, knightTypeNum(), ind, newInd, 0));
             }else if((newInd>=0 && newInd<=63) && (blackPieces&(1ull << newInd))){
-                whiteKnightCap.push_back((ind) | (newInd << 6) | (1 << 12) | (1 << 15) | (0 << 16));
+                whiteKnightCap.push_back(makeMoveMask(0, 1, knightTypeNum(), ind, newInd, 0));
             }
             newInd = ind - 15;
             if((newInd>=0 && newInd<=63) && !(allPieces&(1ull << newInd))){
-                whiteKnightVM.push_back((ind) | (newInd << 6) | (1 << 12) | (0 << 15) | (0 << 16));
+                whiteKnightVM.push_back(makeMoveMask(0, 0, knightTypeNum(), ind, newInd, 0));
             }else if((newInd>=0 && newInd<=63) && (blackPieces&(1ull << newInd))){
-                whiteKnightCap.push_back((ind) | (newInd << 6) | (1 << 12) | (1 << 15) | (0 << 16));
+                whiteKnightCap.push_back(makeMoveMask(0, 1, knightTypeNum(), ind, newInd, 0));
             }
             newInd = ind - 17;
             if((newInd>=0 && newInd<=63) && !(allPieces&(1ull << newInd))){
-                whiteKnightVM.push_back((ind) | (newInd << 6) | (1 << 12) | (0 << 15) | (0 << 16));
+                whiteKnightVM.push_back(makeMoveMask(0, 0, knightTypeNum(), ind, newInd, 0));
             }else if((newInd>=0 && newInd<=63) && (blackPieces&(1ull << newInd))){
-                whiteKnightCap.push_back((ind) | (newInd << 6) | (1 << 12) | (1 << 15) | (0 << 16));
+                whiteKnightCap.push_back(makeMoveMask(0, 1, knightTypeNum(), ind, newInd, 0));
             }
 
         }
@@ -1121,27 +1122,27 @@ public:
             wp-=(wp&-wp);
             int newInd = ind + 6;
             if((newInd>=0 && newInd<=63) && !(allPieces&(1ull << newInd))){
-                blackKnightVM.push_back((ind) | (newInd << 6) | (1 << 12) | (0 << 15) | (0 << 16) | (1 << 20));
+                blackKnightVM.push_back(makeMoveMask(0, 0, knightTypeNum(), ind, newInd, 1));
             }else if((newInd>=0 && newInd<=63) && (whitePieces&(1ull << newInd))){
-                blackKnightCap.push_back((ind) | (newInd << 6) | (1 << 12) | (1 << 15) | (0 << 16) | (1 << 20));
+                blackKnightCap.push_back(makeMoveMask(0, 1, knightTypeNum(), ind, newInd, 1));
             }
             newInd = ind + 10;
             if((newInd>=0 && newInd<=63) && !(allPieces&(1ull << newInd))){
-                blackKnightVM.push_back((ind) | (newInd << 6) | (1 << 12) | (0 << 15) | (0 << 16) | (1 << 20));
+                blackKnightVM.push_back(makeMoveMask(0, 0, knightTypeNum(), ind, newInd, 1));
             }else if((newInd>=0 && newInd<=63) && (whitePieces&(1ull << newInd))){
-                blackKnightCap.push_back((ind) | (newInd << 6) | (1 << 12) | (1 << 15) | (0 << 16) | (1 << 20));
+                blackKnightCap.push_back(makeMoveMask(0, 1, knightTypeNum(), ind, newInd, 1));
             }
             newInd = ind + 15;
             if((newInd>=0 && newInd<=63) && !(allPieces&(1ull << newInd))){
-                blackKnightVM.push_back((ind) | (newInd << 6) | (1 << 12) | (0 << 15) | (0 << 16) | (1 << 20));
+                blackKnightVM.push_back(makeMoveMask(0, 0, knightTypeNum(), ind, newInd, 1));
             }else if((newInd>=0 && newInd<=63) && (whitePieces&(1ull << newInd))){
-                blackKnightCap.push_back((ind) | (newInd << 6) | (1 << 12) | (1 << 15) | (0 << 16) | (1 << 20));
+                blackKnightCap.push_back(makeMoveMask(0, 1, knightTypeNum(), ind, newInd, 1));
             }
             newInd = ind + 17;
             if((newInd>=0 && newInd<=63) && !(allPieces&(1ull << newInd))){
-                blackKnightVM.push_back((ind) | (newInd << 6) | (1 << 12) | (0 << 15) | (0 << 16) | (1 << 20));
+                blackKnightVM.push_back(makeMoveMask(0, 0, knightTypeNum(), ind, newInd, 1));
             }else if((newInd>=0 && newInd<=63) && (whitePieces&(1ull << newInd))){
-                blackKnightCap.push_back((ind) | (newInd << 6) | (1 << 12) | (1 << 15) | (0 << 16) | (1 << 20));
+                blackKnightCap.push_back(makeMoveMask(0, 1, knightTypeNum(), ind, newInd, 1));
             }
 
 
@@ -1149,27 +1150,27 @@ public:
 
             newInd = ind - 6;
             if((newInd>=0 && newInd<=63) && !(allPieces&(1ull << newInd))){
-                blackKnightVM.push_back((ind) | (newInd << 6) | (1 << 12) | (0 << 15) | (0 << 16) | (1 << 20));
+                blackKnightVM.push_back(makeMoveMask(0, 0, knightTypeNum(), ind, newInd, 1));
             }else if((newInd>=0 && newInd<=63) && (whitePieces&(1ull << newInd))){
-                blackKnightCap.push_back((ind) | (newInd << 6) | (1 << 12) | (1 << 15) | (0 << 16) | (1 << 20));
+                blackKnightCap.push_back(makeMoveMask(0, 1, knightTypeNum(), ind, newInd, 1));
             }
             newInd = ind - 10;
             if((newInd>=0 && newInd<=63) && !(allPieces&(1ull << newInd))){
-                blackKnightVM.push_back((ind) | (newInd << 6) | (1 << 12) | (0 << 15) | (0 << 16) | (1 << 20));
+                blackKnightVM.push_back(makeMoveMask(0, 0, knightTypeNum(), ind, newInd, 1));
             }else if((newInd>=0 && newInd<=63) && (whitePieces&(1ull << newInd))){
-                blackKnightCap.push_back((ind) | (newInd << 6) | (1 << 12) | (1 << 15) | (0 << 16) | (1 << 20));
+                blackKnightCap.push_back(makeMoveMask(0, 1, knightTypeNum(), ind, newInd, 1));
             }
             newInd = ind - 15;
             if((newInd>=0 && newInd<=63) && !(allPieces&(1ull << newInd))){
-                blackKnightVM.push_back((ind) | (newInd << 6) | (1 << 12) | (0 << 15) | (0 << 16) | (1 << 20));
+                blackKnightVM.push_back(makeMoveMask(0, 0, knightTypeNum(), ind, newInd, 1));
             }else if((newInd>=0 && newInd<=63) && (whitePieces&(1ull << newInd))){
-                blackKnightCap.push_back((ind) | (newInd << 6) | (1 << 12) | (1 << 15) | (0 << 16) | (1 << 20));
+                blackKnightCap.push_back(makeMoveMask(0, 1, knightTypeNum(), ind, newInd, 1));
             }
             newInd = ind - 17;
             if((newInd>=0 && newInd<=63) && !(allPieces&(1ull << newInd))){
-                blackKnightVM.push_back((ind) | (newInd << 6) | (1 << 12) | (0 << 15) | (0 << 16) | (1 << 20));
+                blackKnightVM.push_back(makeMoveMask(0, 0, knightTypeNum(), ind, newInd, 1));
             }else if((newInd>=0 && newInd<=63) && (whitePieces&(1ull << newInd))){
-                blackKnightCap.push_back((ind) | (newInd << 6) | (1 << 12) | (1 << 15) | (0 << 16) | (1 << 20));
+                blackKnightCap.push_back(makeMoveMask(0, 1, knightTypeNum(), ind, newInd, 1));
             }
 
         }
