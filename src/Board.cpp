@@ -420,14 +420,18 @@ public:
 
     void undoo() {}
 
-    bool isDraw() {}
+    bool isDraw() {
+
+
+
+    }
 
     bool isMate() {
 
-        if(!validMovesKing)
-            return true;
-        else
-            return false;
+//        if(!validMovesKing)
+//            return true;
+//        else
+//            return false;
     }
 
     bool isEndOfGame() { return (isMate() || isDraw()); }
