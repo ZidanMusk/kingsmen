@@ -6,8 +6,11 @@ int main() {
 
     b.disp();
     b.whitePawnVMGen();
-    b.doo(b.whiteKnightVMGen()[1]);
-    cout<<endl<<endl;
+    cout<<endl<<__builtin_popcountll(b.whiteKnights)<<endl;
+
+    b.doo(b.whiteKnightVMGen()[3]);
+    cout<<endl<<__builtin_popcountll(b.whiteKnights)<<endl;
+
     b.disp();
 
     return 0;
