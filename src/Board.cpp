@@ -464,5 +464,120 @@ public:
         return white_endgame && black_endgame;
     }
 
+    //valid moves
+    int whitePawnVM[64];
+    int whitePawnVMCnt = 0;
+    int whitePawnCap[64];
+    int whitePawnCapCnt = 0;
+
+    void whitePawnVMGen() {
+        int pawnCnt = __builtin_popcountull(whitePawns);
+        ull wp = whitePawns;
+        while (pawnCnt--) {
+            int ind = (log2(wp&-wp) + 0.00001);
+            wp-=(wp&-wp);
+            if(ind >= 8 && ind <= 15){//move two squares forward --> +16
+                int newInd = ind + 16;
+                if((newInd>=0 && newInd<=63) && !(allPieces&(1ull << newInd))){
+                    //new valid move from ind to newInd
+                    int flag = 0;
+                    if((getColumn(ind + 1) != 0) && blackPawns&(newInd+1)) flag = 3;
+                    if((getColumn(ind - 1) != 7) && blackPawns&(newInd-1)) flag = 3;
+                    whitePawnVM[whitePawnVMCnt++] = (ind) | (newInd << 6) | (0 << 12) | ( 0 << 15) | (flag << 16);
+                }
+            }
+            //move one square forward --> +8
+            int newInd = ind + 8;
+            if((newInd>=0 && newInd<=63) && !(allPieces&(1ull << newInd))){
+                //new valid move from ind to newInd
+                if(newInd > 55) {
+                    whitePawnVM[whitePawnVMCnt++] = (ind) | (newInd << 6) | (0 << 12) | (0 << 15) | (4 << 16);
+                    whitePawnVM[whitePawnVMCnt++] = (ind) | (newInd << 6) | (0 << 12) | (0 << 15) | (5 << 16);
+                    whitePawnVM[whitePawnVMCnt++] = (ind) | (newInd << 6) | (0 << 12) | (0 << 15) | (6 << 16);
+                    whitePawnVM[whitePawnVMCnt++] = (ind) | (newInd << 6) | (0 << 12) | (0 << 15) | (7 << 16);
+                }else whitePawnVM[whitePawnVMCnt++] = (ind) | (newInd << 6) | (0 << 12) | (0 << 15) | (0 << 16);
+            }
+
+            //captures --> +7 & +9
+            newInd = ind + 7;
+            if((newInd>=0 && newInd<=63) && (blackPieces&(1ull << newInd))){
+                //new valid capture from ind to newInd
+                if(newInd > 55) {
+                    whitePawnCap[whitePawnCapCnt++] = (ind) | (newInd << 6) | (0 << 12) | (1 << 15) | (4 << 16);
+                    whitePawnCap[whitePawnCapCnt++] = (ind) | (newInd << 6) | (0 << 12) | (1 << 15) | (5 << 16);
+                    whitePawnCap[whitePawnCapCnt++] = (ind) | (newInd << 6) | (0 << 12) | (1 << 15) | (6 << 16);
+                    whitePawnCap[whitePawnCapCnt++] = (ind) | (newInd << 6) | (0 << 12) | (1 << 15) | (7 << 16);
+                }else whitePawnCap[whitePawnCapCnt++] = (ind) | (newInd << 6) | (0 << 12) | (1 << 15) | (0 << 16);
+            }
+            newInd = ind + 9;
+            if((newInd>=0 && newInd<=63) && (blackPieces&(1ull << newInd))){
+                //new valid capture from ind to newInd
+                if(newInd > 55) {
+                    whitePawnCap[whitePawnCapCnt++] = (ind) | (newInd << 6) | (0 << 12) | (1 << 15) | (4 << 16);
+                    whitePawnCap[whitePawnCapCnt++] = (ind) | (newInd << 6) | (0 << 12) | (1 << 15) | (5 << 16);
+                    whitePawnCap[whitePawnCapCnt++] = (ind) | (newInd << 6) | (0 << 12) | (1 << 15) | (6 << 16);
+                    whitePawnCap[whitePawnCapCnt++] = (ind) | (newInd << 6) | (0 << 12) | (1 << 15) | (7 << 16);
+                }else whitePawnCap[whitePawnCapCnt++] = (ind) | (newInd << 6) | (0 << 12) | (1 << 15) | (0 << 16);
+
+            }
+        }
+    }
+    int blackPawnVM[64];
+    int blackPawnVMCnt = 0;
+    int blackPawnCap[64];
+    int blackPawnCapCnt = 0;
+
+    void blackPawnVMGen() {
+        int pawnCnt = __builtin_popcountull(blackPawns);
+        ull wp = blackPawns;
+        while (pawnCnt--) {
+            int ind = (log2(wp&-wp) + EPS);
+            wp-=(wp&-wp);
+            if(ind >= 48 && ind <= 55){//move two squares forward --> +16
+                int newInd = ind - 16;
+                if((newInd>=0 && newInd<=63) && !(allPieces&(1ull << newInd))){
+                    //new valid move from ind to newInd
+                    int flag = 0;
+                    if((getColumn(ind + 1) != 0) && whitePawns&(newInd+1)) flag = 3;
+                    if((getColumn(ind - 1) != 7) && whitePawns&(newInd-1)) flag = 3;
+                    blackPawnVM[blackPawnVMCnt++] = (ind) | (newInd << 6) | (0 << 12) | ( 0 << 15) | (flag << 16) | (1 << 20);
+                }
+            }
+            //move one square forward --> +8
+            int newInd = ind - 8;
+            if((newInd>=0 && newInd<=63) && !(allPieces&(1ull << newInd))){
+                //new valid move from ind to newInd
+                if(newInd < 8) {
+                    blackPawnVM[blackPawnVMCnt++] = (ind) | (newInd << 6) | (0 << 12) | (0 << 15) | (4 << 16) | (1 << 20);
+                    blackPawnVM[blackPawnVMCnt++] = (ind) | (newInd << 6) | (0 << 12) | (0 << 15) | (5 << 16) | (1 << 20);
+                    blackPawnVM[blackPawnVMCnt++] = (ind) | (newInd << 6) | (0 << 12) | (0 << 15) | (6 << 16) | (1 << 20);
+                    blackPawnVM[blackPawnVMCnt++] = (ind) | (newInd << 6) | (0 << 12) | (0 << 15) | (7 << 16) | (1 << 20);
+                }else blackPawnVM[blackPawnVMCnt++] = (ind) | (newInd << 6) | (0 << 12) | (0 << 15) | (0 << 16) | (1 << 20);
+            }
+
+            //captures --> +7 & +9
+            newInd = ind - 7;
+            if((newInd>=0 && newInd<=63) && (blackPieces&(1ull << newInd))){
+                //new valid capture from ind to newInd
+                if(newInd < 8) {
+                    blackPawnCap[blackPawnCapCnt++] = (ind) | (newInd << 6) | (0 << 12) | (1 << 15) | (4 << 16) | (1 << 20);
+                    blackPawnCap[blackPawnCapCnt++] = (ind) | (newInd << 6) | (0 << 12) | (1 << 15) | (5 << 16) | (1 << 20);
+                    blackPawnCap[blackPawnCapCnt++] = (ind) | (newInd << 6) | (0 << 12) | (1 << 15) | (6 << 16) | (1 << 20);
+                    blackPawnCap[blackPawnCapCnt++] = (ind) | (newInd << 6) | (0 << 12) | (1 << 15) | (7 << 16) | (1 << 20);
+                }else blackPawnCap[blackPawnCapCnt++] = (ind) | (newInd << 6) | (0 << 12) | (1 << 15) | (0 << 16) | (1 << 20);
+            }
+            newInd = ind - 9;
+            if((newInd>=0 && newInd<=63) && (blackPieces&(1ull << newInd))){
+                //new valid capture from ind to newInd
+                if(newInd < 8) {
+                    blackPawnCap[blackPawnCapCnt++] = (ind) | (newInd << 6) | (0 << 12) | (1 << 15) | (4 << 16) | (1 << 20);
+                    blackPawnCap[blackPawnCapCnt++] = (ind) | (newInd << 6) | (0 << 12) | (1 << 15) | (5 << 16) | (1 << 20);
+                    blackPawnCap[blackPawnCapCnt++] = (ind) | (newInd << 6) | (0 << 12) | (1 << 15) | (6 << 16) | (1 << 20);
+                    blackPawnCap[blackPawnCapCnt++] = (ind) | (newInd << 6) | (0 << 12) | (1 << 15) | (7 << 16) | (1 << 20);
+                }else blackPawnCap[blackPawnCapCnt++] = (ind) | (newInd << 6) | (0 << 12) | (1 << 15) | (0 << 16) | (1 << 20);
+
+            }
+        }
+    }
 
 };
