@@ -192,9 +192,8 @@ public:
             else if (blackKnights & (1ULL << loc)) return 'n';
             else if (blackQueens & (1ULL << loc)) return 'q';
             else if (blackRooks & (1ULL << loc)) return 'r';
-            else return '';
-        }else return '';
-
+        }
+        return 0;
     };
 
 
@@ -266,11 +265,11 @@ public:
 
     void undoo() {}
 
-    bool isEndOfGame() {return (isMate() || isDraw());}
-
     bool isDraw() {}
 
     bool isMate() {}
+
+    bool isEndOfGame() {return (isMate() || isDraw());}
 
     bool ischeck() {}
 
