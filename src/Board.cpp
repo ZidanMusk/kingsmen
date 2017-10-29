@@ -389,6 +389,7 @@ public:
             blackPieces = blackPawns | blackKnights | blackBishops | blackQueens | blackKing;
         }
 
+        
         allPieces = whitePieces | blackPieces;
 
         if (specialEvent == ENPASSANT)
