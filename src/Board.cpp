@@ -332,7 +332,7 @@ public:
     ull blackCastleK;
     ull blackCastleQ;
     ull enPassantLoc;
-    ull whiteToMove;
+    bool whiteToMove = true;
 
     int moveNumber = 0;
     int fiftyMoveRule = 0;
@@ -575,16 +575,19 @@ public:
 
         //saving all of our history
         saveHistory();
-
         moveNumber++;
+
+        //three same moves
         zobristTable[key]++;
         if (zobristTable[key] >= 3)
             drawState = true;
 
+        //switch turns
+        whiteToMove = !whiteToMove;
+
     }
 
 //==================================================Saving history, Undo
-
     void saveHistory() {
         whitePawnHistory[moveNumber] = whitePawns;
         whiteKnightHistory[moveNumber] = whiteKnights;
@@ -717,7 +720,17 @@ public:
         return white_endgame && black_endgame;
     }
 
-    void pass() {}
+    void pass() {
+        saveHistory();
+        moveNumber++;
+        if (enPassantLoc != -1)
+            key ^= passantColumn[getColumn(enPassantLoc)];
+        enPassantLoc = -1;
+        whiteToMove = !whiteToMove;
+        key ^= whiteMove;
+
+
+    }
 
 
 /**********************************************************************************************************************
