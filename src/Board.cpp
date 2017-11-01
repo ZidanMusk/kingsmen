@@ -955,7 +955,7 @@ public:
 
             //captures --> +7 & +9
             newInd = ind + 7;
-            if((newInd>=0 && newInd<=63) && (getColumn(newInd) == getColumn(enPassantLoc))){
+            if((newInd>=0 && newInd<=63) && (getColumn(newInd) == getColumn(enPassantLoc) && getRow(enPassantLoc) == getRow(ind))){
                 whitePawnCap.push_back(makeMoveMask(0, 1, pawnTypeNum(), ind, newInd, 0));
             }
             if((newInd>=0 && newInd<=63) && (blackPieces&(1ull << newInd))){
@@ -968,7 +968,7 @@ public:
                 }else whitePawnCap.push_back(makeMoveMask(0, 1, pawnTypeNum(), ind, newInd, 0));
             }
             newInd = ind + 9;
-            if((newInd>=0 && newInd<=63) && (getColumn(newInd) == getColumn(enPassantLoc))){
+            if((newInd>=0 && newInd<=63) && (getColumn(newInd) == getColumn(enPassantLoc) && getRow(enPassantLoc) == getRow(ind))){
                 whitePawnCap.push_back(makeMoveMask(0, 1, pawnTypeNum(), ind, newInd, 0));
             }
             if ((newInd >= 0 && newInd <= 63) && (blackPieces & (1ull << newInd))) {
@@ -1021,7 +1021,7 @@ public:
 
             //captures --> +7 & +9
             newInd = ind - 7;
-            if((newInd>=0 && newInd<=63) && (getColumn(newInd) == getColumn(enPassantLoc))){
+            if((newInd>=0 && newInd<=63) && (getColumn(newInd) == getColumn(enPassantLoc) && getRow(enPassantLoc) == getRow(ind))){
                 blackPawnCap.push_back(makeMoveMask(0, 1, pawnTypeNum(), ind, newInd, 1));
             }
             if((newInd>=0 && newInd<=63) && (blackPieces&(1ull << newInd))){
@@ -1034,7 +1034,7 @@ public:
                 }else blackPawnCap.push_back(makeMoveMask(0, 1, pawnTypeNum(), ind, newInd, 1));
             }
             newInd = ind - 9;
-            if((newInd>=0 && newInd<=63) && (getColumn(newInd) == getColumn(enPassantLoc))){
+            if((newInd>=0 && newInd<=63) && (getColumn(newInd) == getColumn(enPassantLoc) && getRow(enPassantLoc) == getRow(ind))){
                 blackPawnCap.push_back(makeMoveMask(0, 1, pawnTypeNum(), ind, newInd, 1));
             }
             if((newInd>=0 && newInd<=63) && (blackPieces&(1ull << newInd))){
