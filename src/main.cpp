@@ -2,14 +2,18 @@
 
 int main() {
     Board b;
-    b.fenInterpreter("rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2");
+    b.fenInterpreter("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR b KQkq - 1 2");
 
     b.disp();
     b.whitePawnVMGen();
     cout<<endl<<__builtin_popcountll(b.whiteKnights)<<endl;
 
-    b.doo(b.whiteKnightVMGen()[3]);
-    cout<<endl<<__builtin_popcountll(b.whiteKnights)<<endl;
+    b.doo(b.makeMoveMask(0, 0, b.pawnTypeNum(), 8, 16, 0));
+    b.doo(b.makeMoveMask(0, 0, b.pawnTypeNum(), 16, 32, 0));
+    b.doo(b.makeMoveMask(0, 0, b.pawnTypeNum(), 32, 40, 0));
+    b.doo(b.whitePawnVMGen()[14]);
+    //b.doo(b.makeMoveMask(b.ENPASSANT, 0, b.pawnTypeNum(), 49, 49-16, 1));
+    cout<<endl<<(b.whitePawnVMGen().size())<<endl;
 
     b.disp();
 

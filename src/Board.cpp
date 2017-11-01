@@ -936,8 +936,8 @@ public:
                 if((newInd>=0 && newInd<=63) && !(allPieces&(1ull << newInd))&& !(allPieces&(1ull << (newInd-8)))){
                     //new valid move from ind to newInd
                     int flag = 0;
-                    if((getColumn(ind + 1) != 0) && blackPawns&(newInd+1)) flag = 3;
-                    if((getColumn(ind - 1) != 7) && blackPawns&(newInd-1)) flag = 3;
+                    if((getColumn(ind + 1) != 0) && blackPawns&(newInd+1)) flag = ENPASSANT;
+                    if((getColumn(ind - 1) != 7) && blackPawns&(newInd-1)) flag = ENPASSANT;
                     whitePawnVM.push_back(makeMoveMask(flag, 0, pawnTypeNum(), ind, newInd, 0));
                 }
             }
@@ -955,6 +955,9 @@ public:
 
             //captures --> +7 & +9
             newInd = ind + 7;
+            if((newInd>=0 && newInd<=63) && (getColumn(newInd) == getColumn(enPassantLoc))){
+                whitePawnCap.push_back(makeMoveMask(0, 1, pawnTypeNum(), ind, newInd, 0));
+            }
             if((newInd>=0 && newInd<=63) && (blackPieces&(1ull << newInd))){
                 //new valid capture from ind to newInd
                 if(newInd > 55) {
@@ -965,6 +968,9 @@ public:
                 }else whitePawnCap.push_back(makeMoveMask(0, 1, pawnTypeNum(), ind, newInd, 0));
             }
             newInd = ind + 9;
+            if((newInd>=0 && newInd<=63) && (getColumn(newInd) == getColumn(enPassantLoc))){
+                whitePawnCap.push_back(makeMoveMask(0, 1, pawnTypeNum(), ind, newInd, 0));
+            }
             if ((newInd >= 0 && newInd <= 63) && (blackPieces & (1ull << newInd))) {
                 //new valid capture from ind to newInd
                 if(newInd > 55) {
@@ -996,8 +1002,8 @@ public:
                 if((newInd>=0 && newInd<=63) && !(allPieces&(1ull << newInd)) && !(allPieces&(1ull << (newInd+8)))){
                     //new valid move from ind to newInd
                     int flag = 0;
-                    if((getColumn(ind + 1) != 0) && whitePawns&(newInd+1)) flag = 3;
-                    if((getColumn(ind - 1) != 7) && whitePawns&(newInd-1)) flag = 3;
+                    if((getColumn(ind + 1) != 0) && whitePawns&(newInd+1)) flag = ENPASSANT;
+                    if((getColumn(ind - 1) != 7) && whitePawns&(newInd-1)) flag = ENPASSANT;
                     blackPawnVM.push_back(makeMoveMask(flag, 0, pawnTypeNum(), ind, newInd, 1));
                 }
             }
@@ -1015,6 +1021,9 @@ public:
 
             //captures --> +7 & +9
             newInd = ind - 7;
+            if((newInd>=0 && newInd<=63) && (getColumn(newInd) == getColumn(enPassantLoc))){
+                blackPawnCap.push_back(makeMoveMask(0, 1, pawnTypeNum(), ind, newInd, 1));
+            }
             if((newInd>=0 && newInd<=63) && (blackPieces&(1ull << newInd))){
                 //new valid capture from ind to newInd
                 if(newInd < 8) {
@@ -1025,6 +1034,9 @@ public:
                 }else blackPawnCap.push_back(makeMoveMask(0, 1, pawnTypeNum(), ind, newInd, 1));
             }
             newInd = ind - 9;
+            if((newInd>=0 && newInd<=63) && (getColumn(newInd) == getColumn(enPassantLoc))){
+                blackPawnCap.push_back(makeMoveMask(0, 1, pawnTypeNum(), ind, newInd, 1));
+            }
             if((newInd>=0 && newInd<=63) && (blackPieces&(1ull << newInd))){
                 //new valid capture from ind to newInd
                 if(newInd < 8) {
