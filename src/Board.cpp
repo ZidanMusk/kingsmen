@@ -930,44 +930,47 @@ public:
     }
 
     ull getOccupiedSquares() {
-
         return allPieces;
     }
 
-    ull getPieces(string c) {
-        return c == "white" ? whitePieces : blackPieces;
+    ull getPieces(int c) {
+        //get the whitePieces ->0 or the black ones
+        return c == 0 ? whitePieces : blackPieces;
     }
 
-    ull getBitBoard(string c, string p) {
+    ull getBitBoard(int c, int p) {
+        //get the mask of white/black pieces of specific type(0->5 => pawn, knight....)
 
-        if (c == "white" && p == "pawn")
+        if (c == 0 && p == 0)
             return whitePawns;
-        else if (c == "white" && p == "knight")
+        else if (c == 0 && p == 1)
             return whiteKnights;
-        else if (c == "white" && p == "bishop")
+        else if (c == 0 && p == 2)
             return whiteBishops;
-        else if (c == "white" && p == "rook")
+        else if (c == 0 && p == 3)
             return whiteRooks;
-        else if (c == "white" && p == "queen")
+        else if (c == 0 && p == 4)
             return whiteQueens;
-        else if (c == "white" && p == "king")
+        else if (c == 0 && p == 5)
             return whiteKing;
 
-
-        else if (c == "black" && p == "pawn")
+        else if (c == 1 && p == 0)
             return blackPawns;
-        else if (c == "black" && p == "knight")
+        else if (c == 1 && p == 1)
             return blackKnights;
-        else if (c == "black" && p == "bishop")
+        else if (c == 1 && p == 2)
             return blackBishops;
-        else if (c == "black" && p == "rook")
+        else if (c == 1 && p == 3)
             return blackRooks;
-        else if (c == "black" && p == "queen")
+        else if (c == 1 && p == 4)
             return blackQueens;
-        else if (c == "black" && p == "king")
+        else if (c == 1 && p == 5)
             return blackKing;
+    }
 
-
+    ull popLsb(ull bitBoard){
+        //get LS 1 in the board and toggle it
+        return (bitBoard & -bitBoard) ^ bitBoard;
     }
 
 
