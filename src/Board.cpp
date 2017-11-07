@@ -1,4 +1,5 @@
 #include <bits/stdc++.h>
+
 typedef unsigned long long ull;
 using namespace std;
 
@@ -855,32 +856,32 @@ public:
 
     bool isMate() {
 
-//        if(!validMovesKing && isCheck())
-//            return true;
-//        else
-//            return false;
+        //decide if you want to save history here
+        if (!(kingMoves().size()) && isCheck())
+            return true;
+        else
+            return false;
     }
 
     bool isCheck() {
+        //getting whiteKing position
+        ull locRaisedPowW = getLSB(whiteKing);
+        int locW = log2(locRaisedPowW) + EPS;
 
-        //if the destination of any valid moves is at king`s position
-        bool threat = false;
-        for(int i= 0; i< allValidMoves.size();i++){
+        //getting blackKing position
+        ull locRaisedPowB = getLSB(blackKing);
+        int locB = log2(locRaisedPowB) + EPS;
 
-            int to = allValidMoves[i] & 516096;
-            int x = (ull(to) & whiteKing) | (ull(to) & blackKing);
+        if(threat[locB] == key || threat[locW] == key)
+            return true;
+        else
+            return false;
 
-            if(x) {
-                kingCheckers.push_back(allValidMoves[i]);
-                threat = true;
-            }
-        }
-        return threat;
     }
 
     bool isEndOfGame() { return (isMate() || isDraw()); }
 
-    bool isEndGame() {
+    bool isEndGamePhase() {
         // q == 0 ||
         // .... ((q == 1 && n == 1 && b == 0 && r == 0)
         // .... || (q == 1 && n == 0 && b == 1 && r == 0))
@@ -914,6 +915,53 @@ public:
         enPassantLoc = -1;
         whiteToMove = !whiteToMove;
         key ^= whiteMove;
+
+
+    }
+
+//==================================================Phase2 functions
+    int popCnt(ull x) {
+
+        return __builtin_popcountll(x);
+    }
+
+    ull getOccupiedSquares() {
+
+        return allPieces;
+    }
+
+    ull getPieces(string c) {
+        return c == "white" ? whitePieces : blackPieces;
+    }
+
+    ull getBitBoard(string c, string p) {
+
+        if (c == "white" && p == "pawn")
+            return whitePawns;
+        else if (c == "white" && p == "knight")
+            return whiteKnights;
+        else if (c == "white" && p == "bishop")
+            return whiteBishops;
+        else if (c == "white" && p == "rook")
+            return whiteRooks;
+        else if (c == "white" && p == "queen")
+            return whiteQueens;
+        else if (c == "white" && p == "king")
+            return whiteKing;
+
+
+        else if (c == "black" && p == "pawn")
+            return blackPawns;
+        else if (c == "black" && p == "knight")
+            return blackKnights;
+        else if (c == "black" && p == "bishop")
+            return blackBishops;
+        else if (c == "black" && p == "rook")
+            return blackRooks;
+        else if (c == "black" && p == "queen")
+            return blackQueens;
+        else if (c == "black" && p == "king")
+            return blackKing;
 
 
     }
