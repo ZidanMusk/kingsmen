@@ -16,11 +16,13 @@ int AlphaBeta::alphaBetaSearch(int stateID, int alpha, int beta, int depth, bool
         //make move
         int nextState = nextMoves[i];
         score = - this->alphaBetaSearch(nextState, -beta, -alpha, depth- 1, !isMax);
-        if( score >= beta )
+        if( score >= beta ){
             return beta;   //  fail hard beta-cutoff
-        if( score > alpha )
+        }
+        if( score > alpha ){
             this->MoveTable[stateID] = nextMoves[i];
             alpha = score;
+        }
     }
     return alpha;
 }
