@@ -969,7 +969,7 @@ public:
     }
 
     ull popLsb(ull bitBoard){
-        //get LS 1 in the board and toggle it
+        //get LS 1 in the board and toggle itpop
         return (bitBoard & -bitBoard) ^ bitBoard;
     }
 
