@@ -921,7 +921,6 @@ public:
 
 //==================================================Phase2 functions
     int popCnt(ull x) {
-
         return __builtin_popcountll(x);
     }
 
