@@ -377,6 +377,8 @@ public:
     int whiteKingMoves = 0;     //move counters
     int blackKingMoves = 0;
 
+    int pawnCntInFile[2][8];       //counting number of pawns in each file (used for isolated pawns)
+
 /**********************************************************************************************************************
 *                                               Optimization functions                                                 *
 **********************************************************************************************************************/

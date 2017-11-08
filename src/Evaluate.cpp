@@ -5,7 +5,11 @@ Evaluate::Evaluate(Board *b) {
 }
 
 int Evaluate::pawnStructureEval(int color) {
+    ull tmpPawns = color ? _board->blackPawns : _board->whitePawns;
 
+    while (tmpPawns) {
+        int loc = _board->getLSB(tmpPawns);
+    }
 }
 
 int Evaluate::kingSafty(int blackKingSafety, int whiteKingSafty) {
