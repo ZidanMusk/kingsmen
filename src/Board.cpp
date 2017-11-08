@@ -1908,10 +1908,11 @@ public:
 
 
 
-    ///////////////king safty evaluation resides here untill we push it to evaluation branch/////////////////////////
-    int blackKingSafety, whiteKingSafty;
-    int kingSafty(){
 
+///////////////king safty evaluation resides here untill we push it to evaluation branch/////////////////////////
+
+    int kingSafty(int blackKingSafety, int whiteKingSafty){
+        Board b = *this;
         ull openFilePenalty[] = { 6, 5, 4, 4, 4, 4, 5, 6 },
                 halfopenFilePenalty[] = { 5, 4, 3, 3, 3, 3, 4, 5 },
                 pawnStormPenalty[] = { 0, 0, 0, 1, 2, 3, 0, 0 },
@@ -1941,34 +1942,34 @@ public:
         };
         //evaluate white pawn shelter
         int penalty = 0;
-        int kingFile = min(1, max(6, getColumn(log2(whiteKing) + EPS)));
+        int kingFile = min(1, max(6, b.getColumn(log2(b.whiteKing) + b.EPS)));
         for(int i = kingFile - 1; i <= kingFile; i++){
-            ull whitePawnsOfFile = files[i] & whitePawns;
-            ull blackPawnsOfFile = files[i] & blackPawns;
+            ull whitePawnsOfFile = files[i] & b.whitePawns;
+            ull blackPawnsOfFile = files[i] & b.blackPawns;
             penalty += (whitePawnsOfFile | blackPawnsOfFile) ? 0 : openFilePenalty[i];
             penalty += (!whitePawnsOfFile && blackPawnsOfFile) ? halfopenFilePenalty[i] : 0;
-            penalty += blackPawnsOfFile ? pawnStormPenalty[7 - (int)((log2(getLSB(blackPawnsOfFile)) + EPS)/8)] : 0;
+            penalty += blackPawnsOfFile ? pawnStormPenalty[7 - (int)((log2(b.getLSB(blackPawnsOfFile)) + b.EPS)/8)] : 0;
         }
         int whitePawnShelterPenalty = penalty;
 
         //evaluate black pawn shelter
         penalty = 0;
-        kingFile = min(1, max(6, getColumn(log2(blackKing) + EPS)));
+        kingFile = min(1, max(6, b.getColumn(log2(b.blackKing) + b.EPS)));
         for(int i = kingFile - 1; i <= kingFile; i++){
-            ull whitePawnsOfFile = files[i] & whitePawns;
-            ull blackPawnsOfFile = files[i] & blackPawns;
+            ull whitePawnsOfFile = files[i] & b.whitePawns;
+            ull blackPawnsOfFile = files[i] & b.blackPawns;
             penalty += (whitePawnsOfFile | blackPawnsOfFile) ? 0 : openFilePenalty[i];
             penalty += (whitePawnsOfFile && !blackPawnsOfFile) ? halfopenFilePenalty[i] : 0;
-            penalty += whitePawnsOfFile ? pawnStormPenalty[(int)((log2(getMSB(whitePawnsOfFile)) + EPS)/8)] : 0;
+            penalty += whitePawnsOfFile ? pawnStormPenalty[(int)((log2(b.getMSB(whitePawnsOfFile)) + b.EPS)/8)] : 0;
         }
         int blackPawnShelterPenalty = penalty;
-        int phase = piecePhase[pawnTypeNum()] * 16 + piecePhase[knightTypeNum()] * 4
-                    + piecePhase[bishopTypeNum()] * 4 + piecePhase[rookTypeNum()] * 4
-                    + piecePhase[queenTypeNum()] * 2;
-        phase -= (__builtin_popcountll(whiteKnights) + __builtin_popcountll(blackKnights)) * piecePhase[knightTypeNum()];
-        phase -= (__builtin_popcountll(whiteBishops) + __builtin_popcountll(blackBishops)) * piecePhase[bishopTypeNum()];
-        phase -= (__builtin_popcountll(whiteRooks) + __builtin_popcountll(blackRooks)) * piecePhase[rookTypeNum()];
-        phase -= (__builtin_popcountll(whiteQueens) + __builtin_popcountll(blackQueens)) * piecePhase[queenTypeNum()];
+        int phase = piecePhase[b.pawnTypeNum()] * 16 + piecePhase[b.knightTypeNum()] * 4
+                    + piecePhase[b.bishopTypeNum()] * 4 + piecePhase[b.rookTypeNum()] * 4
+                    + piecePhase[b.queenTypeNum()] * 2;
+        phase -= (__builtin_popcountll(b.whiteKnights) + __builtin_popcountll(b.blackKnights)) * piecePhase[b.knightTypeNum()];
+        phase -= (__builtin_popcountll(b.whiteBishops) + __builtin_popcountll(b.blackBishops)) * piecePhase[b.bishopTypeNum()];
+        phase -= (__builtin_popcountll(b.whiteRooks) + __builtin_popcountll(b.blackRooks)) * piecePhase[b.rookTypeNum()];
+        phase -= (__builtin_popcountll(b.whiteQueens) + __builtin_popcountll(b.blackQueens)) * piecePhase[b.queenTypeNum()];
 
         whiteKingSafty += whitePawnShelterPenalty;
         blackKingSafety += blackPawnShelterPenalty;
@@ -1979,4 +1980,5 @@ public:
         return ((score*(64-phase))/64);
 
     }
+
 };

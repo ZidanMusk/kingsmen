@@ -2,6 +2,7 @@
 
 int main() {
     Board b;
+
     b.fenInterpreter("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR b KQkq - 1 2");
 
     b.disp();
