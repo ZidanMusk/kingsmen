@@ -1033,6 +1033,93 @@ public:
 
     ull knightAttacks(int square) {
 
+        //vectors to get the valid moves
+        vector <int> tmpW;
+        vector <int> tmpB;
+
+        //Detecing If I am white or black Bishop
+        ull myKnight = (1ull << square);
+
+        if(allPieces & whiteKnights)
+            tmpW = whiteKnightVMGen();
+        else
+            tmpB = blackKnightVMGen();
+
+        //mask which marks all my attack squares
+        ull ans;
+
+        //checking if my piece is from white pieces
+        if(tmpW.size()) {
+            for (int i = 0; i < tmpW.size(); i++) {
+
+                if (((tmpW[i] & 8064) >> 7) ==
+                    square) {//check if this move of a piece of my wanted square(from == square)
+                    //Oring with destination to mark it with 1 (<<to)
+                    ans |= (1ull << ((tmpW[i] & 516096) >> 13));
+                }
+            }
+        } else {
+            //checking if my piece is from black pieces
+            for (int i = 0; i < tmpB.size(); i++) {
+
+                if (((tmpB[i] & 8064) >> 7) == square) {//check if this move of a piece of my wanted square
+                    //Oring with destination to mark it with 1
+                    ans |= (1ull << ((tmpB[i] & 516096) >> 13));
+                }
+            }
+        }
+
+        return ans;
+    }
+
+    //Normal version(default -> false)
+    //Version after removing other bishops
+    ull bishopAttacks(int square, ull occupied, bool version) {
+
+        ull currentBoard = allPieces;
+        vector <int> tmpW;
+        vector <int> tmpB;
+
+        //Detecing If I am white or black Bishop
+        ull myBishop = (1ull << square);
+
+        if(whiteBishops & myBishop) {
+
+            tmpW = whiteKnightVMGen();
+
+            if(version) {
+                //Removing all other white Bishops
+                allPieces = (allPieces ^ whiteBishops);
+
+                //Restoring my Bishop again
+                allPieces |= myBishop;
+            }
+        }
+        else{
+
+            tmpB = blackKnightVMGen();
+
+            if(version) {
+                //Removing all other black Bishops
+                allPieces = (allPieces ^ blackBishops);
+
+                //Restoring my Bishop again
+                allPieces |= myBishop;
+            }
+        }
+
+        //mask which marks all my attack squares
+        ull ans;
+
+
+        //make sure that our board is not changed
+        allPieces = currentBoard;
+    }
+
+    //Normal version
+    //Version after removing other rooks and queens
+    ull rookAttacks(int square, ull occupied, bool version) {
+
         vector <int> tmpW = whiteKnightVMGen();
         vector <int> tmpB = blackKnightVMGen();
 
@@ -1057,39 +1144,10 @@ public:
                 ans |=  (1ull << ((tmpB[i]  & 516096) >> 13));
             }
         }
-
-        return ans;
     }
 
-    ull bishopAttacks(int square) {
 
-        vector <int> tmpW = blackKnightVMGen();
-        vector <int> tmpB = blackKnightVMGen();
-
-        //mask which marks all my attack squares
-        ull ans;
-
-        //checking if my piece is from white pieces
-        for(int i=0; i<tmpW.size();i++){
-
-            if(((tmpW[i] & 8064) >> 7) == square){//check if this move of a piece of my wanted square(from == square)
-                //Oring with destination to mark it with 1 (<<to)
-                ans |=  (1ull << ((tmpW[i]  & 516096) >> 13));
-            }
-        }
-
-        //checking if my piece is from black pieces
-        for(int i=0; i<tmpB.size();i++){
-
-            if(((tmpB[i] & 8064) >> 7) == square){//check if this move of a piece of my wanted square
-
-                //Oring with destination to mark it with 1
-                ans |=  (1ull << ((tmpB[i]  & 516096) >> 13));
-            }
-        }
-    }
-
-    ull rookAttacks(int square) {
+    ull queenAttacks(int square, ull occupied, bool version) {
 
         vector <int> tmpW = whiteKnightVMGen();
         vector <int> tmpB = blackKnightVMGen();
