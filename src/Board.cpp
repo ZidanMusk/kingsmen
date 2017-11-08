@@ -709,7 +709,6 @@ public:
     // move mask, returns void but affects the masks that represents
     // the board and updates the zobrist key
     void doo(int move) {
-        allValidMoves.clear();
         if (enPassantLoc != -1)
             key ^= passantColumn[getColumn(enPassantLoc)];
 
@@ -825,6 +824,7 @@ public:
             fiftyMoveRule = 0;
 
 
+        allValidMoves.clear();
         allValidMoves = generateAllMoves();
 
 
