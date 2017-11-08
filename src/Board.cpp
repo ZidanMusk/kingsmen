@@ -718,6 +718,29 @@ public:
         return kingSafetyZone[pos][color];
     }
 
+    bool pawnForwardAttack(int i, int ii){
+        if(i%8+1==ii%8 && i/8+1==ii/8)return true;
+        if(i%8-1==ii%8 && i/8+1==ii/8)return true;
+        return false;
+    }
+    bool pawnBackwardAttack(int i, int ii){
+        if(i%8+1==ii%8 && i/8-1==ii/8)return true;
+        if(i%8-1==ii%8 && i/8-1==ii/8)return true;
+        return false;
+    }
+    bool knightCh(int i, int ii){
+        if(i%8+1==ii%8 && i/8+2==ii/8)return true;
+        if(i%8+1==ii%8 && i/8-2==ii/8)return true;
+        if(i%8-1==ii%8 && i/8+2==ii/8)return true;
+        if(i%8-1==ii%8 && i/8-2==ii/8)return true;
+
+        if(i%8+2==ii%8 && i/8+1==ii/8)return true;
+        if(i%8+2==ii%8 && i/8-1==ii/8)return true;
+        if(i%8-2==ii%8 && i/8+1==ii/8)return true;
+        if(i%8-2==ii%8 && i/8-1==ii/8)return true;
+        return false;
+    }
+
     // the move mask is how the move is represented in the board
     // one integer to hold'em all [all needed information to identify the move]
     int makeMoveMask(int specialEvent, int capture, int type, int from, int to, int turn) {
@@ -1740,7 +1763,7 @@ public:
             wp -= (wp & -wp);
             if (ind >= 8 && ind <= 15) {//move two squares forward --> +16
                 int newInd = ind + 16;
-                if ((newInd >= 0 && newInd <= 63) && !(allPieces & (1ull << newInd)) &&
+                if ( (newInd >= 0 && newInd <= 63) && !(allPieces & (1ull << newInd)) &&
                     !(allPieces & (1ull << (newInd - 8)))) {
                     //new valid move from ind to newInd
                     int flag = 0;
@@ -1753,7 +1776,7 @@ public:
             }
             //move one square forward --> +8
             int newInd = ind + 8;
-            if ((newInd >= 0 && newInd <= 63) && !(allPieces & (1ull << newInd))) {
+            if ( (newInd >= 0 && newInd <= 63) && !(allPieces & (1ull << newInd))) {
                 //new valid move from ind to newInd
                 if (newInd > 55) {
                     int move = makeMoveMask(0, 0, pawnTypeNum(), ind, newInd, 0);
@@ -1773,7 +1796,7 @@ public:
 
             //captures --> +7 & +9
             newInd = ind + 7;
-            if ((newInd >= 0 && newInd <= 63) &&
+            if (pawnForwardAttack(ind, newInd) && (newInd >= 0 && newInd <= 63) &&
                 (getColumn(newInd) == getColumn(enPassantLoc) && getRow(enPassantLoc) == getRow(ind))) {
                 int move = makeMoveMask(0, 1, pawnTypeNum(), ind, newInd, 0);
 
@@ -1782,7 +1805,7 @@ public:
                     threat[newInd] = key;
                 }
             }
-            if ((newInd >= 0 && newInd <= 63) && (blackPieces & (1ull << newInd))) {
+            if (pawnForwardAttack(ind, newInd) && (newInd >= 0 && newInd <= 63) && (blackPieces & (1ull << newInd))) {
                 //new valid capture from ind to newInd
                 if (newInd > 55) {
                     int move = makeMoveMask(0, 1, pawnTypeNum(), ind, newInd, 0);
@@ -1802,7 +1825,7 @@ public:
                 }
             }
             newInd = ind + 9;
-            if ((newInd >= 0 && newInd <= 63) &&
+            if (pawnForwardAttack(ind, newInd) && (newInd >= 0 && newInd <= 63) &&
                 (getColumn(newInd) == getColumn(enPassantLoc) && getRow(enPassantLoc) == getRow(ind))) {
                 int move = makeMoveMask(0, 1, pawnTypeNum(), ind, newInd, 0);
                 if (isValid(true, move)) {
@@ -1810,7 +1833,7 @@ public:
                     threat[newInd] = key;
                 }
             }
-            if ((newInd >= 0 && newInd <= 63) && (blackPieces & (1ull << newInd))) {
+            if (pawnForwardAttack(ind, newInd) && (newInd >= 0 && newInd <= 63) && (blackPieces & (1ull << newInd))) {
                 //new valid capture from ind to newInd
                 if (newInd > 55) {
                     int move = makeMoveMask(0, 1, pawnTypeNum(), ind, newInd, 0);
@@ -1849,7 +1872,7 @@ public:
             wp -= (wp & -wp);
             if (ind >= 48 && ind <= 55) {//move two squares forward --> +16
                 int newInd = ind - 16;
-                if ((newInd >= 0 && newInd <= 63) && !(allPieces & (1ull << newInd)) &&
+                if ( (newInd >= 0 && newInd <= 63) && !(allPieces & (1ull << newInd)) &&
                     !(allPieces & (1ull << (newInd + 8)))) {
                     //new valid move from ind to newInd
                     int flag = 0;
@@ -1861,7 +1884,7 @@ public:
             }
             //move one square forward --> +8
             int newInd = ind - 8;
-            if ((newInd >= 0 && newInd <= 63) && !(allPieces & (1ull << newInd))) {
+            if ( (newInd >= 0 && newInd <= 63) && !(allPieces & (1ull << newInd))) {
                 //new valid move from ind to newInd
                 if (newInd < 8) {
                     int move = makeMoveMask(0, 0, pawnTypeNum(), ind, newInd, 1);
@@ -1879,7 +1902,7 @@ public:
 
             //captures --> +7 & +9
             newInd = ind - 7;
-            if ((newInd >= 0 && newInd <= 63) &&
+            if (pawnBackwardAttack(ind, newInd) && (newInd >= 0 && newInd <= 63) &&
                 (getColumn(newInd) == getColumn(enPassantLoc) && getRow(enPassantLoc) == getRow(ind))) {
                 int move = makeMoveMask(0, 1, pawnTypeNum(), ind, newInd, 1);
                 if (isValid(false, move)) {
@@ -1887,7 +1910,7 @@ public:
                     threat[newInd] = key;
                 }
             }
-            if ((newInd >= 0 && newInd <= 63) && (blackPieces & (1ull << newInd))) {
+            if (pawnBackwardAttack(ind, newInd) && (newInd >= 0 && newInd <= 63) && (blackPieces & (1ull << newInd))) {
                 //new valid capture from ind to newInd
                 if (newInd < 8) {
                     int move = makeMoveMask(0, 1, pawnTypeNum(), ind, newInd, 1);
@@ -1907,7 +1930,7 @@ public:
                 }
             }
             newInd = ind - 9;
-            if ((newInd >= 0 && newInd <= 63) &&
+            if (pawnBackwardAttack(ind, newInd) && (newInd >= 0 && newInd <= 63) &&
                 (getColumn(newInd) == getColumn(enPassantLoc) && getRow(enPassantLoc) == getRow(ind))) {
                 int move = makeMoveMask(0, 1, pawnTypeNum(), ind, newInd, 1);
                 if (isValid(false, move)) {
@@ -1915,7 +1938,7 @@ public:
                     threat[newInd] = key;
                 }
             }
-            if ((newInd >= 0 && newInd <= 63) && (blackPieces & (1ull << newInd))) {
+            if (pawnBackwardAttack(ind, newInd) && (newInd >= 0 && newInd <= 63) && (blackPieces & (1ull << newInd))) {
                 //new valid capture from ind to newInd
                 if (newInd < 8) {
                     int move = makeMoveMask(0, 1, pawnTypeNum(), ind, newInd, 1);
@@ -1952,10 +1975,10 @@ public:
             int ind = (log2(wp & -wp) + EPS);
             wp -= (wp & -wp);
             int newInd = ind + 6;
-            if ((newInd >= 0 && newInd <= 63) && !(allPieces & (1ull << newInd))) {
+            if (knightCh(ind, newInd) && (newInd >= 0 && newInd <= 63) && !(allPieces & (1ull << newInd))) {
                 int move = makeMoveMask(0, 0, knightTypeNum(), ind, newInd, 0);
                 if (isValid(true, move))whiteKnightVM.push_back(move);
-            } else if ((newInd >= 0 && newInd <= 63) && (blackPieces & (1ull << newInd))) {
+            } else if (knightCh(ind, newInd) && (newInd >= 0 && newInd <= 63) && (blackPieces & (1ull << newInd))) {
                 int move = makeMoveMask(0, 1, knightTypeNum(), ind, newInd, 0);
                 if (isValid(true, move)) {
                     whiteKnightCap.push_back(move);
@@ -1963,10 +1986,10 @@ public:
                 }
             }
             newInd = ind + 10;
-            if ((newInd >= 0 && newInd <= 63) && !(allPieces & (1ull << newInd))) {
+            if (knightCh(ind, newInd) && (newInd >= 0 && newInd <= 63) && !(allPieces & (1ull << newInd))) {
                 int move = makeMoveMask(0, 0, knightTypeNum(), ind, newInd, 0);
                 if (isValid(true, move))whiteKnightVM.push_back(move);
-            } else if ((newInd >= 0 && newInd <= 63) && (blackPieces & (1ull << newInd))) {
+            } else if (knightCh(ind, newInd) && (newInd >= 0 && newInd <= 63) && (blackPieces & (1ull << newInd))) {
                 int move = makeMoveMask(0, 1, knightTypeNum(), ind, newInd, 0);
                 if (isValid(true, move)) {
                     whiteKnightCap.push_back(move);
@@ -1974,10 +1997,10 @@ public:
                 }
             }
             newInd = ind + 15;
-            if ((newInd >= 0 && newInd <= 63) && !(allPieces & (1ull << newInd))) {
+            if (knightCh(ind, newInd) && (newInd >= 0 && newInd <= 63) && !(allPieces & (1ull << newInd))) {
                 int move = makeMoveMask(0, 0, knightTypeNum(), ind, newInd, 0);
                 if (isValid(true, move))whiteKnightVM.push_back(move);
-            } else if ((newInd >= 0 && newInd <= 63) && (blackPieces & (1ull << newInd))) {
+            } else if (knightCh(ind, newInd) && (newInd >= 0 && newInd <= 63) && (blackPieces & (1ull << newInd))) {
                 int move = makeMoveMask(0, 1, knightTypeNum(), ind, newInd, 0);
                 if (isValid(true, move)) {
                     whiteKnightCap.push_back(move);
@@ -1985,10 +2008,10 @@ public:
                 }
             }
             newInd = ind + 17;
-            if ((newInd >= 0 && newInd <= 63) && !(allPieces & (1ull << newInd))) {
+            if (knightCh(ind, newInd) && (newInd >= 0 && newInd <= 63) && !(allPieces & (1ull << newInd))) {
                 int move = makeMoveMask(0, 0, knightTypeNum(), ind, newInd, 0);
                 if (isValid(true, move))whiteKnightVM.push_back(move);
-            } else if ((newInd >= 0 && newInd <= 63) && (blackPieces & (1ull << newInd))) {
+            } else if (knightCh(ind, newInd) && (newInd >= 0 && newInd <= 63) && (blackPieces & (1ull << newInd))) {
                 int move = makeMoveMask(0, 1, knightTypeNum(), ind, newInd, 0);
                 if (isValid(true, move)) {
                     whiteKnightCap.push_back(move);
@@ -1998,10 +2021,10 @@ public:
 
 
             newInd = ind - 6;
-            if ((newInd >= 0 && newInd <= 63) && !(allPieces & (1ull << newInd))) {
+            if (knightCh(ind, newInd) && (newInd >= 0 && newInd <= 63) && !(allPieces & (1ull << newInd))) {
                 int move = makeMoveMask(0, 0, knightTypeNum(), ind, newInd, 0);
                 if (isValid(true, move))whiteKnightVM.push_back(move);
-            } else if ((newInd >= 0 && newInd <= 63) && (blackPieces & (1ull << newInd))) {
+            } else if (knightCh(ind, newInd) && (newInd >= 0 && newInd <= 63) && (blackPieces & (1ull << newInd))) {
                 int move = makeMoveMask(0, 1, knightTypeNum(), ind, newInd, 0);
                 if (isValid(true, move)) {
                     whiteKnightCap.push_back(move);
@@ -2009,10 +2032,10 @@ public:
                 }
             }
             newInd = ind - 10;
-            if ((newInd >= 0 && newInd <= 63) && !(allPieces & (1ull << newInd))) {
+            if (knightCh(ind, newInd) && (newInd >= 0 && newInd <= 63) && !(allPieces & (1ull << newInd))) {
                 int move = makeMoveMask(0, 0, knightTypeNum(), ind, newInd, 0);
                 if (isValid(true, move))whiteKnightVM.push_back(move);
-            } else if ((newInd >= 0 && newInd <= 63) && (blackPieces & (1ull << newInd))) {
+            } else if (knightCh(ind, newInd) && (newInd >= 0 && newInd <= 63) && (blackPieces & (1ull << newInd))) {
                 int move = makeMoveMask(0, 1, knightTypeNum(), ind, newInd, 0);
                 if (isValid(true, move)) {
                     whiteKnightCap.push_back(move);
@@ -2020,10 +2043,10 @@ public:
                 }
             }
             newInd = ind - 15;
-            if ((newInd >= 0 && newInd <= 63) && !(allPieces & (1ull << newInd))) {
+            if (knightCh(ind, newInd) && (newInd >= 0 && newInd <= 63) && !(allPieces & (1ull << newInd))) {
                 int move = makeMoveMask(0, 0, knightTypeNum(), ind, newInd, 0);
                 if (isValid(true, move))whiteKnightVM.push_back(move);
-            } else if ((newInd >= 0 && newInd <= 63) && (blackPieces & (1ull << newInd))) {
+            } else if (knightCh(ind, newInd) && (newInd >= 0 && newInd <= 63) && (blackPieces & (1ull << newInd))) {
                 int move = makeMoveMask(0, 1, knightTypeNum(), ind, newInd, 0);
                 if (isValid(true, move)) {
                     whiteKnightCap.push_back(move);
@@ -2031,10 +2054,10 @@ public:
                 }
             }
             newInd = ind - 17;
-            if ((newInd >= 0 && newInd <= 63) && !(allPieces & (1ull << newInd))) {
+            if (knightCh(ind, newInd) && (newInd >= 0 && newInd <= 63) && !(allPieces & (1ull << newInd))) {
                 int move = makeMoveMask(0, 0, knightTypeNum(), ind, newInd, 0);
                 if (isValid(true, move))whiteKnightVM.push_back(move);
-            } else if ((newInd >= 0 && newInd <= 63) && (blackPieces & (1ull << newInd))) {
+            } else if (knightCh(ind, newInd) && (newInd >= 0 && newInd <= 63) && (blackPieces & (1ull << newInd))) {
                 int move = makeMoveMask(0, 1, knightTypeNum(), ind, newInd, 0);
                 if (isValid(true, move)) {
                     whiteKnightCap.push_back(move);
@@ -2059,10 +2082,10 @@ public:
             int ind = (log2(wp & -wp) + EPS);
             wp -= (wp & -wp);
             int newInd = ind + 6;
-            if ((newInd >= 0 && newInd <= 63) && !(allPieces & (1ull << newInd))) {
+            if (knightCh(ind, newInd) && (newInd >= 0 && newInd <= 63) && !(allPieces & (1ull << newInd))) {
                 int move = makeMoveMask(0, 0, knightTypeNum(), ind, newInd, 1);
                 if (isValid(false, move))blackKnightVM.push_back(move);
-            } else if ((newInd >= 0 && newInd <= 63) && (whitePieces & (1ull << newInd))) {
+            } else if (knightCh(ind, newInd) && (newInd >= 0 && newInd <= 63) && (whitePieces & (1ull << newInd))) {
                 int move = makeMoveMask(0, 1, knightTypeNum(), ind, newInd, 1);
                 if (isValid(false, move)) {
                     blackKnightCap.push_back(move);
@@ -2070,10 +2093,10 @@ public:
                 }
             }
             newInd = ind + 10;
-            if ((newInd >= 0 && newInd <= 63) && !(allPieces & (1ull << newInd))) {
+            if (knightCh(ind, newInd) && (newInd >= 0 && newInd <= 63) && !(allPieces & (1ull << newInd))) {
                 int move = makeMoveMask(0, 0, knightTypeNum(), ind, newInd, 1);
                 if (isValid(false, move))blackKnightVM.push_back(move);
-            } else if ((newInd >= 0 && newInd <= 63) && (whitePieces & (1ull << newInd))) {
+            } else if (knightCh(ind, newInd) && (newInd >= 0 && newInd <= 63) && (whitePieces & (1ull << newInd))) {
                 int move = makeMoveMask(0, 1, knightTypeNum(), ind, newInd, 1);
                 if (isValid(false, move)) {
                     blackKnightCap.push_back(move);
@@ -2081,10 +2104,10 @@ public:
                 }
             }
             newInd = ind + 15;
-            if ((newInd >= 0 && newInd <= 63) && !(allPieces & (1ull << newInd))) {
+            if (knightCh(ind, newInd) && (newInd >= 0 && newInd <= 63) && !(allPieces & (1ull << newInd))) {
                 int move = makeMoveMask(0, 0, knightTypeNum(), ind, newInd, 1);
                 if (isValid(false, move))blackKnightVM.push_back(move);
-            } else if ((newInd >= 0 && newInd <= 63) && (whitePieces & (1ull << newInd))) {
+            } else if (knightCh(ind, newInd) && (newInd >= 0 && newInd <= 63) && (whitePieces & (1ull << newInd))) {
                 int move = makeMoveMask(0, 1, knightTypeNum(), ind, newInd, 1);
                 if (isValid(false, move)) {
                     blackKnightCap.push_back(move);
@@ -2092,10 +2115,10 @@ public:
                 }
             }
             newInd = ind + 17;
-            if ((newInd >= 0 && newInd <= 63) && !(allPieces & (1ull << newInd))) {
+            if (knightCh(ind, newInd) && (newInd >= 0 && newInd <= 63) && !(allPieces & (1ull << newInd))) {
                 int move = makeMoveMask(0, 0, knightTypeNum(), ind, newInd, 1);
                 if (isValid(false, move))blackKnightVM.push_back(move);
-            } else if ((newInd >= 0 && newInd <= 63) && (whitePieces & (1ull << newInd))) {
+            } else if (knightCh(ind, newInd) && (newInd >= 0 && newInd <= 63) && (whitePieces & (1ull << newInd))) {
                 int move = makeMoveMask(0, 1, knightTypeNum(), ind, newInd, 1);
                 if (isValid(false, move)) {
                     blackKnightCap.push_back(move);
@@ -2105,10 +2128,10 @@ public:
 
 
             newInd = ind - 6;
-            if ((newInd >= 0 && newInd <= 63) && !(allPieces & (1ull << newInd))) {
+            if (knightCh(ind, newInd) && (newInd >= 0 && newInd <= 63) && !(allPieces & (1ull << newInd))) {
                 int move = makeMoveMask(0, 0, knightTypeNum(), ind, newInd, 1);
                 if (isValid(false, move))blackKnightVM.push_back(move);
-            } else if ((newInd >= 0 && newInd <= 63) && (whitePieces & (1ull << newInd))) {
+            } else if (knightCh(ind, newInd) && (newInd >= 0 && newInd <= 63) && (whitePieces & (1ull << newInd))) {
                 int move = makeMoveMask(0, 1, knightTypeNum(), ind, newInd, 1);
                 if (isValid(false, move)) {
                     blackKnightCap.push_back(move);
@@ -2116,10 +2139,10 @@ public:
                 }
             }
             newInd = ind - 10;
-            if ((newInd >= 0 && newInd <= 63) && !(allPieces & (1ull << newInd))) {
+            if (knightCh(ind, newInd) && (newInd >= 0 && newInd <= 63) && !(allPieces & (1ull << newInd))) {
                 int move = makeMoveMask(0, 0, knightTypeNum(), ind, newInd, 1);
                 if (isValid(false, move))blackKnightVM.push_back(move);
-            } else if ((newInd >= 0 && newInd <= 63) && (whitePieces & (1ull << newInd))) {
+            } else if (knightCh(ind, newInd) && (newInd >= 0 && newInd <= 63) && (whitePieces & (1ull << newInd))) {
                 int move = makeMoveMask(0, 1, knightTypeNum(), ind, newInd, 1);
                 if (isValid(false, move)) {
                     blackKnightCap.push_back(move);
@@ -2127,10 +2150,10 @@ public:
                 }
             }
             newInd = ind - 15;
-            if ((newInd >= 0 && newInd <= 63) && !(allPieces & (1ull << newInd))) {
+            if (knightCh(ind, newInd) && (newInd >= 0 && newInd <= 63) && !(allPieces & (1ull << newInd))) {
                 int move = makeMoveMask(0, 0, knightTypeNum(), ind, newInd, 1);
                 if (isValid(false, move))blackKnightVM.push_back(move);
-            } else if ((newInd >= 0 && newInd <= 63) && (whitePieces & (1ull << newInd))) {
+            } else if (knightCh(ind, newInd) && (newInd >= 0 && newInd <= 63) && (whitePieces & (1ull << newInd))) {
                 int move = makeMoveMask(0, 1, knightTypeNum(), ind, newInd, 1);
                 if (isValid(false, move)) {
                     blackKnightCap.push_back(move);
@@ -2138,10 +2161,10 @@ public:
                 }
             }
             newInd = ind - 17;
-            if ((newInd >= 0 && newInd <= 63) && !(allPieces & (1ull << newInd))) {
+            if (knightCh(ind, newInd) && (newInd >= 0 && newInd <= 63) && !(allPieces & (1ull << newInd))) {
                 int move = makeMoveMask(0, 0, knightTypeNum(), ind, newInd, 1);
                 if (isValid(false, move))blackKnightVM.push_back(move);
-            } else if ((newInd >= 0 && newInd <= 63) && (whitePieces & (1ull << newInd))) {
+            } else if (knightCh(ind, newInd) && (newInd >= 0 && newInd <= 63) && (whitePieces & (1ull << newInd))) {
                 int move = makeMoveMask(0, 1, knightTypeNum(), ind, newInd, 1);
                 if (isValid(false, move)) {
                     blackKnightCap.push_back(move);
