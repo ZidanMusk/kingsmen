@@ -1710,80 +1710,78 @@ public:
     }
 
 //==================================================BlackKnight valid Moves
-    vector <int> blackKnightVMGen(){
+    vector<int> blackKnightVMGen() {
         vector<int> blackKnightVM, blackKnightCap;
         int knightCnt = __builtin_popcountll(blackKnights);
         ull wp = blackKnights;
-        while(knightCnt--){
-            int ind = (log2(wp&-wp) + EPS);
-            wp-=(wp&-wp);
+        while (knightCnt--) {
+            int ind = (log2(wp & -wp) + EPS);
+            wp -= (wp & -wp);
             int newInd = ind + 6;
-            if((newInd>=0 && newInd<=63) && !(allPieces&(1ull << newInd))){
+            if ((newInd >= 0 && newInd <= 63) && !(allPieces & (1ull << newInd))) {
                 int move = makeMoveMask(0, 0, knightTypeNum(), ind, newInd, 1);
-                if(isValid(false, move))blackKnightVM.push_back(move);
-            }else if((newInd>=0 && newInd<=63) && (whitePieces&(1ull << newInd))){
+                if (isValid(false, move))blackKnightVM.push_back(move);
+            } else if ((newInd >= 0 && newInd <= 63) && (whitePieces & (1ull << newInd))) {
                 int move = makeMoveMask(0, 1, knightTypeNum(), ind, newInd, 1);
-                if(isValid(false, move))blackKnightCap.push_back(move);
+                if (isValid(false, move))blackKnightCap.push_back(move);
             }
             newInd = ind + 10;
-            if((newInd>=0 && newInd<=63) && !(allPieces&(1ull << newInd))){
+            if ((newInd >= 0 && newInd <= 63) && !(allPieces & (1ull << newInd))) {
                 int move = makeMoveMask(0, 0, knightTypeNum(), ind, newInd, 1);
-                if(isValid(false, move))blackKnightVM.push_back(move);
-            }else if((newInd>=0 && newInd<=63) && (whitePieces&(1ull << newInd))){
+                if (isValid(false, move))blackKnightVM.push_back(move);
+            } else if ((newInd >= 0 && newInd <= 63) && (whitePieces & (1ull << newInd))) {
                 int move = makeMoveMask(0, 1, knightTypeNum(), ind, newInd, 1);
-                if(isValid(false, move))blackKnightCap.push_back(move);
+                if (isValid(false, move))blackKnightCap.push_back(move);
             }
             newInd = ind + 15;
-            if((newInd>=0 && newInd<=63) && !(allPieces&(1ull << newInd))){
+            if ((newInd >= 0 && newInd <= 63) && !(allPieces & (1ull << newInd))) {
                 int move = makeMoveMask(0, 0, knightTypeNum(), ind, newInd, 1);
-                if(isValid(false, move))blackKnightVM.push_back(move);
-            }else if((newInd>=0 && newInd<=63) && (whitePieces&(1ull << newInd))){
+                if (isValid(false, move))blackKnightVM.push_back(move);
+            } else if ((newInd >= 0 && newInd <= 63) && (whitePieces & (1ull << newInd))) {
                 int move = makeMoveMask(0, 1, knightTypeNum(), ind, newInd, 1);
-                if(isValid(false, move))blackKnightCap.push_back(move);
+                if (isValid(false, move))blackKnightCap.push_back(move);
             }
             newInd = ind + 17;
-            if((newInd>=0 && newInd<=63) && !(allPieces&(1ull << newInd))){
+            if ((newInd >= 0 && newInd <= 63) && !(allPieces & (1ull << newInd))) {
                 int move = makeMoveMask(0, 0, knightTypeNum(), ind, newInd, 1);
-                if(isValid(false, move))blackKnightVM.push_back(move);
-            }else if((newInd>=0 && newInd<=63) && (whitePieces&(1ull << newInd))){
+                if (isValid(false, move))blackKnightVM.push_back(move);
+            } else if ((newInd >= 0 && newInd <= 63) && (whitePieces & (1ull << newInd))) {
                 int move = makeMoveMask(0, 1, knightTypeNum(), ind, newInd, 1);
-                if(isValid(false, move))blackKnightCap.push_back(move);
+                if (isValid(false, move))blackKnightCap.push_back(move);
             }
-
-
 
 
             newInd = ind - 6;
-            if((newInd>=0 && newInd<=63) && !(allPieces&(1ull << newInd))){
+            if ((newInd >= 0 && newInd <= 63) && !(allPieces & (1ull << newInd))) {
                 int move = makeMoveMask(0, 0, knightTypeNum(), ind, newInd, 1);
-                if(isValid(false, move))blackKnightVM.push_back(move);
-            }else if((newInd>=0 && newInd<=63) && (whitePieces&(1ull << newInd))){
+                if (isValid(false, move))blackKnightVM.push_back(move);
+            } else if ((newInd >= 0 && newInd <= 63) && (whitePieces & (1ull << newInd))) {
                 int move = makeMoveMask(0, 1, knightTypeNum(), ind, newInd, 1);
-                if(isValid(false, move))blackKnightCap.push_back(move);
+                if (isValid(false, move))blackKnightCap.push_back(move);
             }
             newInd = ind - 10;
-            if((newInd>=0 && newInd<=63) && !(allPieces&(1ull << newInd))){
+            if ((newInd >= 0 && newInd <= 63) && !(allPieces & (1ull << newInd))) {
                 int move = makeMoveMask(0, 0, knightTypeNum(), ind, newInd, 1);
-                if(isValid(false, move))blackKnightVM.push_back(move);
-            }else if((newInd>=0 && newInd<=63) && (whitePieces&(1ull << newInd))){
+                if (isValid(false, move))blackKnightVM.push_back(move);
+            } else if ((newInd >= 0 && newInd <= 63) && (whitePieces & (1ull << newInd))) {
                 int move = makeMoveMask(0, 1, knightTypeNum(), ind, newInd, 1);
-                if(isValid(false, move))blackKnightCap.push_back(move);
+                if (isValid(false, move))blackKnightCap.push_back(move);
             }
             newInd = ind - 15;
-            if((newInd>=0 && newInd<=63) && !(allPieces&(1ull << newInd))){
+            if ((newInd >= 0 && newInd <= 63) && !(allPieces & (1ull << newInd))) {
                 int move = makeMoveMask(0, 0, knightTypeNum(), ind, newInd, 1);
-                if(isValid(false, move))blackKnightVM.push_back(move);
-            }else if((newInd>=0 && newInd<=63) && (whitePieces&(1ull << newInd))){
+                if (isValid(false, move))blackKnightVM.push_back(move);
+            } else if ((newInd >= 0 && newInd <= 63) && (whitePieces & (1ull << newInd))) {
                 int move = makeMoveMask(0, 1, knightTypeNum(), ind, newInd, 1);
-                if(isValid(false, move))blackKnightCap.push_back(move);
+                if (isValid(false, move))blackKnightCap.push_back(move);
             }
             newInd = ind - 17;
-            if((newInd>=0 && newInd<=63) && !(allPieces&(1ull << newInd))){
+            if ((newInd >= 0 && newInd <= 63) && !(allPieces & (1ull << newInd))) {
                 int move = makeMoveMask(0, 0, knightTypeNum(), ind, newInd, 1);
-                if(isValid(false, move))blackKnightVM.push_back(move);
-            }else if((newInd>=0 && newInd<=63) && (whitePieces&(1ull << newInd))){
+                if (isValid(false, move))blackKnightVM.push_back(move);
+            } else if ((newInd >= 0 && newInd <= 63) && (whitePieces & (1ull << newInd))) {
                 int move = makeMoveMask(0, 1, knightTypeNum(), ind, newInd, 1);
-                if(isValid(false, move))blackKnightCap.push_back(move);
+                if (isValid(false, move))blackKnightCap.push_back(move);
             }
 
         }
@@ -1794,13 +1792,15 @@ public:
 
 //==================================================Rook valid Moves
 
-    vector<int> rookMoves(ull mask, int type) {
+    vector<int> rookMoves(ull mask, int type, int color) {
         vector<int> ret;
-        ull tmpWhiteRooks = mask;
+        ull tmpRooks = mask;
 
-        while (tmpWhiteRooks) {
-            ull locRaisedPow = getLSB(tmpWhiteRooks);
-            tmpWhiteRooks -= locRaisedPow;
+        ull target = color ? blackRooks : whiteRooks;
+
+        while (tmpRooks) {
+            ull locRaisedPow = getLSB(tmpRooks);
+            tmpRooks -= locRaisedPow;
             int loc = log2(locRaisedPow) + EPS;
             int lim[] = {64, (loc / 8 + 1) * 8, -1, loc / 8 * 8};
             int dx[] = {8, 1, -8, -1};
@@ -1814,11 +1814,11 @@ public:
                 int firstCollisionCell = log2(firstCollision) + EPS;
 
                 for (int j = loc + dx[i]; j < lim[i] && (j < firstCollisionCell || noCollision); j += dx[i])
-                    ret.push_back(makeMoveMask(0, 0, type, loc, j, 0)), threat[j] = key;
+                    ret.push_back(makeMoveMask(0, 0, type, loc, j, color)), threat[j] = key;
                 if (!noCollision) {
                     threat[firstCollisionCell] = key;
-                    if (locExist(blackPieces, firstCollision))
-                        ret.push_back(makeMoveMask(0, 1, type, loc, firstCollisionCell, 0));
+                    if (locExist(target, firstCollision))
+                        ret.push_back(makeMoveMask(0, 1, type, loc, firstCollisionCell, color));
                 }
             }
 
@@ -1831,11 +1831,11 @@ public:
                 int firstCollisionCell = log2(firstCollision) + EPS;
 
                 for (int j = loc + dx[i]; j > lim[i] && (j > firstCollisionCell || noCollision); j += dx[i])
-                    ret.push_back(makeMoveMask(0, 0, type, loc, j, 0)), threat[j] = key;
+                    ret.push_back(makeMoveMask(0, 0, type, loc, j, color)), threat[j] = key;
                 if (!noCollision) {
                     threat[firstCollisionCell] = key;
-                    if (locExist(blackPieces, firstCollision))
-                        ret.push_back(makeMoveMask(0, 1, type, loc, firstCollisionCell, 0));
+                    if (locExist(target, firstCollision))
+                        ret.push_back(makeMoveMask(0, 1, type, loc, firstCollisionCell, color));
                 }
             }
         }
@@ -1844,13 +1844,15 @@ public:
 
 //==================================================Bishop valid Moves
 
-    vector<int> bishopMoves(ull mask, int type) {
+    vector<int> bishopMoves(ull mask, int type, int color) {
         vector<int> ret;
-        ull tmpWhiteBishops = mask;
+        ull tmpBishops = mask;
 
-        while (tmpWhiteBishops) {
-            ull locRaisedPow = getLSB(tmpWhiteBishops);
-            tmpWhiteBishops -= locRaisedPow;
+        ull target = color ? blackBishops : whiteBishops;
+
+        while (tmpBishops) {
+            ull locRaisedPow = getLSB(tmpBishops);
+            tmpBishops -= locRaisedPow;
             int loc = log2(locRaisedPow) + EPS;
             int x = getRow(loc), y = getColumn(loc);
 
@@ -1869,11 +1871,11 @@ public:
                 for (int j = loc + di[i], x2 = x + dx[i], y2 = y + dy[i];
                      (j < firstCollisionCell || noCollision) && inBoundaries(x2,
                                                                              y2); j += di[i], x2 += dx[i], y2 += dy[i])
-                    ret.push_back(makeMoveMask(0, 0, type, loc, j, 0)), threat[j] = key;
+                    ret.push_back(makeMoveMask(0, 0, type, loc, j, color)), threat[j] = key;
                 if (!noCollision) {
                     threat[firstCollisionCell] = key;
-                    if (locExist(blackPieces, firstCollision))
-                        ret.push_back(makeMoveMask(0, 1, type, loc, firstCollisionCell, 0));
+                    if (locExist(target, firstCollision))
+                        ret.push_back(makeMoveMask(0, 1, type, loc, firstCollisionCell, color));
                 }
             }
 
@@ -1888,14 +1890,23 @@ public:
                 for (int j = loc + di[i], x2 = x + dx[i], y2 = y + dy[i];
                      (j > firstCollisionCell || noCollision) && inBoundaries(x2,
                                                                              y2); j += di[i], x2 += dx[i], y2 += dy[i])
-                    ret.push_back(makeMoveMask(0, 0, type, loc, j, 0)), threat[j] = key;
+                    ret.push_back(makeMoveMask(0, 0, type, loc, j, color)), threat[j] = key;
                 if (!noCollision) {
                     threat[firstCollisionCell] = key;
-                    if (locExist(blackPieces, firstCollision))
-                        ret.push_back(makeMoveMask(0, 1, type, loc, firstCollisionCell, 0));
+                    if (locExist(target, firstCollision))
+                        ret.push_back(makeMoveMask(0, 1, type, loc, firstCollisionCell, color));
                 }
             }
         }
+        return ret;
+    }
+
+    vector<int> queenMoves(int color) {
+        vector<int> ret = bishopMoves(color ? whiteQueens : blackQueens, queenTypeNum(), color);
+        vector<int> tmp = rookMoves(color ? whiteQueens : blackQueens, queenTypeNum(), color);
+
+        for (auto m:tmp)ret.push_back(m);
+
         return ret;
     }
 
@@ -1965,76 +1976,4 @@ public:
     }
 
 
-
-    ///////////////king safty evaluation resides here untill we push it to evaluation branch/////////////////////////
-    int blackKingSafety, whiteKingSafty;
-    int kingSafty(){
-
-        ull openFilePenalty[] = { 6, 5, 4, 4, 4, 4, 5, 6 },
-                halfopenFilePenalty[] = { 5, 4, 3, 3, 3, 3, 4, 5 },
-                pawnStormPenalty[] = { 0, 0, 0, 1, 2, 3, 0, 0 },
-                piecePhase[] = { 0, 3, 3, 5, 10, 0 },
-                files[] = {
-                0x0101010101010101,
-                0x0202020202020202,
-                0x0404040404040404,
-                0x0808080808080808,
-                0x1010101010101010,
-                0x2020202020202020,
-                0x4040404040404040,
-                0x8080808080808080
-        },
-                ranks[] = {
-                0x00000000000000FF,
-                0x000000000000FF00,
-                0x0000000000FF0000,
-                0x00000000FF000000,
-                0x000000FF00000000,
-                0x0000FF0000000000,
-                0x00FF000000000000,
-                0xFF00000000000000
-        },
-                kingSafetyTable[] = {
-                21, 7, 11, 7, 7, 9, 5, 7, 10, 14, 15, 20, 19, 20, 25, 22, 28, 40, 45, 47, 46, 60, 56, 82, 86, 102, 98, 109, 107, 117, 125, 132, 159, 168, 181, 188, 211, 213, 234, 216, 265, 276, 288, 272, 308, 339, 351, 355, 374, 354, 370, 412, 420, 481, 439, 457, 478, 478, 441, 509, 494, 431, 517, 569, 562, 499, 500, 531, 523, 500, 500, 500, 522, 517, 500, 500, 500, 508, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500
-        };
-        //evaluate white pawn shelter
-        int penalty = 0;
-        int kingFile = min(1, max(6, getColumn(log2(whiteKing) + EPS)));
-        for(int i = kingFile - 1; i <= kingFile; i++){
-            ull whitePawnsOfFile = files[i] & whitePawns;
-            ull blackPawnsOfFile = files[i] & blackPawns;
-            penalty += (whitePawnsOfFile | blackPawnsOfFile) ? 0 : openFilePenalty[i];
-            penalty += (!whitePawnsOfFile && blackPawnsOfFile) ? halfopenFilePenalty[i] : 0;
-            penalty += blackPawnsOfFile ? pawnStormPenalty[7 - (int)((log2(getLSB(blackPawnsOfFile)) + EPS)/8)] : 0;
-        }
-        int whitePawnShelterPenalty = penalty;
-
-        //evaluate black pawn shelter
-        penalty = 0;
-        kingFile = min(1, max(6, getColumn(log2(blackKing) + EPS)));
-        for(int i = kingFile - 1; i <= kingFile; i++){
-            ull whitePawnsOfFile = files[i] & whitePawns;
-            ull blackPawnsOfFile = files[i] & blackPawns;
-            penalty += (whitePawnsOfFile | blackPawnsOfFile) ? 0 : openFilePenalty[i];
-            penalty += (whitePawnsOfFile && !blackPawnsOfFile) ? halfopenFilePenalty[i] : 0;
-            penalty += whitePawnsOfFile ? pawnStormPenalty[(int)((log2(getMSB(whitePawnsOfFile)) + EPS)/8)] : 0;
-        }
-        int blackPawnShelterPenalty = penalty;
-        int phase = piecePhase[pawnTypeNum()] * 16 + piecePhase[knightTypeNum()] * 4
-                    + piecePhase[bishopTypeNum()] * 4 + piecePhase[rookTypeNum()] * 4
-                    + piecePhase[queenTypeNum()] * 2;
-        phase -= (__builtin_popcountll(whiteKnights) + __builtin_popcountll(blackKnights)) * piecePhase[knightTypeNum()];
-        phase -= (__builtin_popcountll(whiteBishops) + __builtin_popcountll(blackBishops)) * piecePhase[bishopTypeNum()];
-        phase -= (__builtin_popcountll(whiteRooks) + __builtin_popcountll(blackRooks)) * piecePhase[rookTypeNum()];
-        phase -= (__builtin_popcountll(whiteQueens) + __builtin_popcountll(blackQueens)) * piecePhase[queenTypeNum()];
-
-        whiteKingSafty += whitePawnShelterPenalty;
-        blackKingSafety += blackPawnShelterPenalty;
-        whiteKingSafty = min(whiteKingSafty, 99);
-        blackKingSafety = min(blackKingSafety, 99);
-
-        int score = kingSafetyTable[whiteKingSafty] - kingSafetyTable[blackKingSafety];
-        return ((score*(64-phase))/64);
-
-    }
 };
