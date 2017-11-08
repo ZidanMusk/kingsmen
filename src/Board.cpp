@@ -926,8 +926,6 @@ public:
     }
 
 //==================================================Draw, Mate, Check, EndOfGame, EndGame, Pass
-
-
     bool isDraw() {
 
         // stale
@@ -1010,8 +1008,6 @@ public:
         enPassantLoc = -1;
         whiteToMove = !whiteToMove;
         key ^= whiteMove;
-
-
     }
 
 //==================================================Phase2 functions
