@@ -303,6 +303,25 @@ public:
     ull blackPieces;
     ull allPieces;
 
+    ull virWhitePawns;
+    ull virWhiteKnights;
+    ull virWhiteBishops;
+    ull virWhiteRooks;
+    ull virWhiteQueens;
+    ull virWhiteKing;
+
+    ull virBlackPawns;
+    ull virBlackKnights;
+    ull virBlackBishops;
+    ull virBlackRooks;
+    ull virBlackQueens;
+    ull virBlackKing;
+
+    ull virWhitePieces;
+    ull virBlackPieces;
+    ull virAllPieces;
+
+
     bool drawState = false;
     ull key; // zobrist key
 
@@ -1101,10 +1120,8 @@ public:
 /**********************************************************************************************************************
  *                                               Valid Moves                                                           *
  **********************************************************************************************************************/
-    bool isValid(bool white, int move){}
     bool kingSafePawns(bool white){
         bool safe = true;
-        ull virWhiteKing, virBlackPawns,virBlackKing, virWhitePawns;
         if(white) {
 
             int kingInd = (log2(virWhiteKing & -virWhiteKing) + EPS);
@@ -1127,7 +1144,6 @@ public:
     }
     bool kingSafeKnights(bool white){
         bool safe = true;
-        ull virWhiteKing, virBlackKnights,virBlackKing, virWhiteKnights;
         if(white) {
             //6 10 15 17
             int kingInd = (log2(virWhiteKing & -virWhiteKing) + EPS);
@@ -1365,7 +1381,7 @@ public:
         } else {
 
         }
-        return checkVirtualMovePawn(move) && checkVirtualMoveKnight(move) &&
+        return kingSafePawns(whiteTurn) && kingSafeKnights(whiteTurn) &&
                checkVirtualMoveBishop(whiteTurn, move, loc, bishopTypeNum()) &&
                checkVirtualMoveRook(whiteTurn, move, loc, rookTypeNum()) &&
                checkVirtualMoveQueen(whiteTurn, move, loc, queenTypeNum());
@@ -1896,7 +1912,7 @@ public:
     int blackKingSafety, whiteKingSafty;
     int kingSafty(){
 
-        int openFilePenalty[] = { 6, 5, 4, 4, 4, 4, 5, 6 },
+        ull openFilePenalty[] = { 6, 5, 4, 4, 4, 4, 5, 6 },
                 halfopenFilePenalty[] = { 5, 4, 3, 3, 3, 3, 4, 5 },
                 pawnStormPenalty[] = { 0, 0, 0, 1, 2, 3, 0, 0 },
                 piecePhase[] = { 0, 3, 3, 5, 10, 0 },
