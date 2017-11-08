@@ -1072,6 +1072,7 @@ public:
 
         return ans;
     }
+    
 
     //Normal version(default -> false)
     //Version after removing other bishops
