@@ -1064,26 +1064,26 @@ public:
         return (bitBoard & -bitBoard) ^ bitBoard;
     }
 
-
+//KNIGHT ATTAKS===============================================
     ull knightAttacks(int square) {
-
-        //vectors to get the valid moves
-        vector <int> tmpW;
-        vector <int> tmpB;
-
-        //Detecing If I am white or black knight
-        ull myKnight = (1ull << square);
-
-        if(allPieces & whiteKnights)
-            tmpW = whiteKnightVMGen();
-        else
-            tmpB = blackKnightVMGen();
 
         //mask which marks all my attack squares
         ull ans;
 
+        //vectors to get the valid moves
+        vector<int> tmpW;
+        vector<int> tmpB;
+
+        //Detecing If I am white or black knight
+        ull myKnight = (1ull << square);
+
+        if (allPieces & whiteKnights)
+            tmpW = whiteKnightVMGen();
+        else
+            tmpB = blackKnightVMGen();
+
         //checking if my piece is from white pieces
-        if(tmpW.size()) {
+        if (tmpW.size()) {
             for (int i = 0; i < tmpW.size(); i++) {
 
                 if (((tmpW[i] & 8064) >> 7) == square) {//check if this move of a piece of my wanted square(from == square)
@@ -1104,109 +1104,235 @@ public:
 
         return ans;
     }
-    
 
-    //Normal version(default -> false)
-    //Version after removing other bishops
+
+//BISHOP ATTAKS===================================Normal version(default -> false)
+//Version after removing other queens
     ull bishopAttacks(int square, ull occupied, bool version) {
 
+        //mask which marks all my attack squares
+        ull ans;
+
+        //tmp variables
         ull currentBoard = allPieces;
-        vector <int> tmpW;
-        vector <int> tmpB;
+
+        vector<int> tmpW;
+        vector<int> tmpB;
 
         //Detecing If I am white or black Bishop
         ull myBishop = (1ull << square);
 
-        if(whiteBishops & myBishop) {
+        if (whiteBishops & myBishop) {
 
-            tmpW = whiteKnightVMGen();
-
-            if(version) {
-                //Removing all other white Bishops
-                allPieces = (allPieces ^ whiteBishops);
-
-                //Restoring my Bishop again
-                allPieces |= myBishop;
+            if (version) {
+                //Removing white queens
+                allPieces = (allPieces ^ whiteQueens);
             }
-        }
-        else{
 
-            tmpB = blackKnightVMGen();
+            tmpW = bishopMoves(whiteBishops, bishopTypeNum(), 0);
+        } else {
 
-            if(version) {
-                //Removing all other black Bishops
-                allPieces = (allPieces ^ blackBishops);
-
-                //Restoring my Bishop again
-                allPieces |= myBishop;
+            if (version) {
+                //Removing black Queens
+                allPieces = (allPieces ^ blackQueens);
             }
+
+            tmpB = bishopMoves(blackBishops, bishopTypeNum(), 1);
         }
 
-        //mask which marks all my attack squares
-        ull ans;
+        //generating valid moves musk
+        if (tmpW.size()) {
+            for (int i = 0; i < tmpW.size(); i++) {
+
+                if (((tmpW[i] & 8064) >> 7) == square) {//check if this move of a piece of my wanted square(from == square)
+                    //Oring with destination to mark it with 1 (<<to)
+                    ans |= (1ull << ((tmpW[i] & 516096) >> 13));
+                }
+            }
+        } else {
+            //checking if my piece is from black pieces
+            for (int i = 0; i < tmpB.size(); i++) {
+
+                if (((tmpB[i] & 8064) >> 7) == square) {//check if this move of a piece of my wanted square
+                    //Oring with destination to mark it with 1
+                    ans |= (1ull << ((tmpB[i] & 516096) >> 13));
+                }
+            }
+        }
 
         //make sure that our board is not changed
         allPieces = currentBoard;
+
+        return ans;
     }
 
-    //Normal version
-    //Version after removing other rooks and queens
+//ROOK ATTAKS================================================Normal version
+//Version after removing other rooks and queens
     ull rookAttacks(int square, ull occupied, bool version) {
 
-        vector <int> tmpW = whiteKnightVMGen();
-        vector <int> tmpB = blackKnightVMGen();
-
         //mask which marks all my attack squares
         ull ans;
 
-        //checking if my piece is from white pieces
-        for(int i=0; i<tmpW.size();i++){
+        //tmp variables
+        ull currentBoard = allPieces;
 
-            if(((tmpW[i] & 8064) >> 7) == square){//check if this move of a piece of my wanted square(from == square)
-                //Oring with destination to mark it with 1 (<<to)
-                ans |=  (1ull << ((tmpW[i]  & 516096) >> 13));
+        ull whiteTmpR = whiteRooks;
+        ull blackTmpR = blackRooks;
+
+        ull whiteTmpQ = whiteQueens;
+        ull blackTmpQ = blackQueens;
+
+        vector<int> tmpW;
+        vector<int> tmpB;
+
+        //Detecing If I am white or black Bishop
+        ull myRook = (1ull << square);
+
+        if (whiteRooks & myRook) {
+
+            if (version) {
+                //Removing all other white Rooks
+                allPieces = (allPieces ^ whiteRooks);
+
+                //Removing all whiteQueens
+                allPieces = (allPieces ^ whiteQueens);
+
+                //Restoring my Rook again
+                allPieces |= myRook;
+
+                //execluding any other Rooks
+                whiteRooks &= allPieces;
+            }
+
+            tmpW = rookMoves(whiteRooks, rookTypeNum(), 0);
+        } else {
+
+            if (version) {
+                //Removing all other white Rooks
+                allPieces = (allPieces ^ blackRooks);
+
+
+                //Removing all whiteQueens
+                allPieces = (allPieces ^ blackQueens);
+
+                //Restoring my Rook again
+                allPieces |= myRook;
+
+                //execluding any other Rooks
+                blackRooks &= allPieces;
+            }
+
+            tmpW = rookMoves(blackRooks, rookTypeNum(), 1);
+        }
+
+        //generating valid moves musk
+        if (tmpW.size()) {
+            for (int i = 0; i < tmpW.size(); i++) {
+
+                if (((tmpW[i] & 8064) >> 7) == square) {//check if this move of a piece of my wanted square(from == square)
+                    //Oring with destination to mark it with 1 (<<to)
+                    ans |= (1ull << ((tmpW[i] & 516096) >> 13));
+                }
+            }
+        } else {
+            //checking if my piece is from black pieces
+            for (int i = 0; i < tmpB.size(); i++) {
+
+                if (((tmpB[i] & 8064) >> 7) == square) {//check if this move of a piece of my wanted square
+                    //Oring with destination to mark it with 1
+                    ans |= (1ull << ((tmpB[i] & 516096) >> 13));
+                }
             }
         }
 
-        //checking if my piece is from black pieces
-        for(int i=0; i<tmpB.size();i++){
 
-            if(((tmpB[i] & 8064) >> 7) == square){//check if this move of a piece of my wanted square
+        //make sure that our board is not changed
+        allPieces = currentBoard;
+        whiteRooks = whiteTmpR;
+        blackRooks = blackTmpR;
+        whiteQueens = whiteTmpQ;
+        blackQueens = blackTmpQ;
 
-                //Oring with destination to mark it with 1
-                ans |=  (1ull << ((tmpB[i]  & 516096) >> 13));
-            }
-        }
+        return ans;
     }
 
-
+//QUEEN ATTAKS================================================Normal version
+//Version after removing other queens
     ull queenAttacks(int square, ull occupied, bool version) {
 
-        vector <int> tmpW = whiteKnightVMGen();
-        vector <int> tmpB = blackKnightVMGen();
-
         //mask which marks all my attack squares
         ull ans;
 
-        //checking if my piece is from white pieces
-        for(int i=0; i<tmpW.size();i++){
+        //tmp variables
+        ull currentBoard = allPieces;
+        ull whiteTmp = whiteQueens;
+        ull blackTmp = blackQueens;
 
-            if(((tmpW[i] & 8064) >> 7) == square){//check if this move of a piece of my wanted square(from == square)
-                //Oring with destination to mark it with 1 (<<to)
-                ans |=  (1ull << ((tmpW[i]  & 516096) >> 13));
+        vector<int> tmpW;
+        vector<int> tmpB;
+
+        //Detecing If I am white or black Queen
+        ull myQueen = (1ull << square);
+
+        if (whiteQueens & myQueen) {
+
+            if (version) {
+                //Removing all other white Queens
+                allPieces = (allPieces ^ whiteQueens);
+
+                //Restoring my Queen again
+                allPieces |= myQueen;
+
+                //execluding any other Queens
+                whiteQueens &= allPieces;
+            }
+
+            tmpW = queenMoves(0);
+        } else {
+
+            if (version) {
+                //Removing all other black Queens
+                allPieces = (allPieces ^ blackQueens);
+
+                //Restoring my Queen again
+                allPieces |= myQueen;
+
+                //execluding any other Queens
+                blackQueens &= allPieces;
+            }
+
+            tmpB = queenMoves(1);
+        }
+
+        //generating valid moves musk
+        if (tmpW.size()) {
+            for (int i = 0; i < tmpW.size(); i++) {
+
+                if (((tmpW[i] & 8064) >> 7) == square) {//check if this move of a piece of my wanted square(from == square)
+                    //Oring with destination to mark it with 1 (<<to)
+                    ans |= (1ull << ((tmpW[i] & 516096) >> 13));
+                }
+            }
+        } else {
+            //checking if my piece is from black pieces
+            for (int i = 0; i < tmpB.size(); i++) {
+
+                if (((tmpB[i] & 8064) >> 7) == square) {//check if this move of a piece of my wanted square
+                    //Oring with destination to mark it with 1
+                    ans |= (1ull << ((tmpB[i] & 516096) >> 13));
+                }
             }
         }
 
-        //checking if my piece is from black pieces
-        for(int i=0; i<tmpB.size();i++){
 
-            if(((tmpB[i] & 8064) >> 7) == square){//check if this move of a piece of my wanted square
+        //make sure that our board is not changed
+        allPieces= currentBoard;
+        whiteQueens = whiteTmp;
+        blackQueens = blackTmp;
 
-                //Oring with destination to mark it with 1
-                ans |=  (1ull << ((tmpB[i]  & 516096) >> 13));
-            }
-        }
+        return ans;
     }
+
 
 /**********************************************************************************************************************
  *                                               Valid Moves                                                           *
