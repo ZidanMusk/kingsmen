@@ -715,7 +715,7 @@ public:
         return x >= 0 && x < 8 && y >= 0 && y < 8;
     }
 
-    ull getKingSafetyZone(int pos, int color){
+    ull getKingSafetyZone(int pos, int color) {
         return kingSafetyZone[pos][color];
     }
 
@@ -1719,7 +1719,7 @@ public:
         ull locRaisedPowW = getLSB(tmpWhiteKing);
 
         loc = log2(locRaisedPowW) + EPS;
-       
+
         return kingSafePawns(whiteTurn) && kingSafeKnights(whiteTurn) &&
                checkVirtualMoveBishop(whiteTurn, move, loc, bishopTypeNum()) &&
                checkVirtualMoveRook(whiteTurn, move, loc, rookTypeNum()) &&
@@ -2179,12 +2179,18 @@ public:
                 bool noCollision = firstCollision == 0;
                 int firstCollisionCell = log2(firstCollision) + EPS;
 
-                for (int j = loc + dx[i]; j < lim[i] && (j < firstCollisionCell || noCollision); j += dx[i])
-                    ret.push_back(makeMoveMask(0, 0, type, loc, j, color)), threat[j] = key;
+                for (int j = loc + dx[i]; j < lim[i] && (j < firstCollisionCell || noCollision); j += dx[i]) {
+                    int moveMask = makeMoveMask(0, 0, type, loc, j, color);
+                    if (isValid(color, moveMask))
+                        ret.push_back(moveMask), threat[j] = key;
+                }
                 if (!noCollision) {
                     threat[firstCollisionCell] = key;
-                    if (locExist(target, firstCollision))
-                        ret.push_back(makeMoveMask(0, 1, type, loc, firstCollisionCell, color));
+                    if (locExist(target, firstCollision)) {
+                        int moveMask = makeMoveMask(0, 1, type, loc, firstCollisionCell, color);
+                        if (isValid(color, moveMask))
+                            ret.push_back(makeMoveMask(0, 1, type, loc, firstCollisionCell, color));
+                    }
                 }
             }
 
@@ -2196,11 +2202,15 @@ public:
                 bool noCollision = firstCollision == 0;
                 int firstCollisionCell = log2(firstCollision) + EPS;
 
-                for (int j = loc + dx[i]; j > lim[i] && (j > firstCollisionCell || noCollision); j += dx[i])
-                    ret.push_back(makeMoveMask(0, 0, type, loc, j, color)), threat[j] = key;
+                for (int j = loc + dx[i]; j > lim[i] && (j > firstCollisionCell || noCollision); j += dx[i]) {
+                    int moveMask = makeMoveMask(0, 0, type, loc, j, color);
+                    if (isValid(color, moveMask))
+                        ret.push_back(makeMoveMask(0, 0, type, loc, j, color)), threat[j] = key;
+                }
                 if (!noCollision) {
                     threat[firstCollisionCell] = key;
-                    if (locExist(target, firstCollision))
+                    int moveMask = makeMoveMask(0, 1, type, loc, firstCollisionCell, color);
+                    if (locExist(target, firstCollision) && isValid(color, moveMask))
                         ret.push_back(makeMoveMask(0, 1, type, loc, firstCollisionCell, color));
                 }
             }
@@ -2236,11 +2246,15 @@ public:
 
                 for (int j = loc + di[i], x2 = x + dx[i], y2 = y + dy[i];
                      (j < firstCollisionCell || noCollision) && inBoundaries(x2,
-                                                                             y2); j += di[i], x2 += dx[i], y2 += dy[i])
-                    ret.push_back(makeMoveMask(0, 0, type, loc, j, color)), threat[j] = key;
+                                                                             y2); j += di[i], x2 += dx[i], y2 += dy[i]) {
+                    int moveMask = makeMoveMask(0, 0, type, loc, j, color);
+                    if (isValid(color, moveMask))
+                        ret.push_back(makeMoveMask(0, 0, type, loc, j, color)), threat[j] = key;
+                }
                 if (!noCollision) {
                     threat[firstCollisionCell] = key;
-                    if (locExist(target, firstCollision))
+                    int moveMask = makeMoveMask(0, 1, type, loc, firstCollisionCell, color);
+                    if (locExist(target, firstCollision) && isValid(color, moveMask))
                         ret.push_back(makeMoveMask(0, 1, type, loc, firstCollisionCell, color));
                 }
             }
@@ -2255,11 +2269,15 @@ public:
 
                 for (int j = loc + di[i], x2 = x + dx[i], y2 = y + dy[i];
                      (j > firstCollisionCell || noCollision) && inBoundaries(x2,
-                                                                             y2); j += di[i], x2 += dx[i], y2 += dy[i])
-                    ret.push_back(makeMoveMask(0, 0, type, loc, j, color)), threat[j] = key;
+                                                                             y2); j += di[i], x2 += dx[i], y2 += dy[i]) {
+                    int moveMask = makeMoveMask(0, 0, type, loc, j, color);
+                    if (isValid(color, moveMask))
+                        ret.push_back(makeMoveMask(0, 0, type, loc, j, color)), threat[j] = key;
+                }
                 if (!noCollision) {
                     threat[firstCollisionCell] = key;
-                    if (locExist(target, firstCollision))
+                    int moveMask = makeMoveMask(0, 1, type, loc, firstCollisionCell, color);
+                    if (locExist(target, firstCollision) && isValid(color, moveMask))
                         ret.push_back(makeMoveMask(0, 1, type, loc, firstCollisionCell, color));
                 }
             }
