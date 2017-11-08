@@ -439,25 +439,29 @@ public:
         allPieces = 0;
         int file = 1;
         int rank = 8;
-        for (int i = 0; i < fen.size(); i++){
-            if(fen[i] == ' ')break;
-            if(fen[i] == '/'){if(file != 9)rank--; file = 1;  continue;}
-            if(isdigit(fen[i])){file += (fen[i] - '0')-1;}
-            if(fen[i] == 'p'){blackPawns |= (1ull << ((rank-1)*8 + (file-1)));}
-            if(fen[i] == 'n'){blackKnights |= (1ull << ((rank-1)*8 + (file-1)));}
-            if(fen[i] == 'r'){blackRooks |= (1ull << ((rank-1)*8 + (file-1)));}
-            if(fen[i] == 'q'){blackQueens |= (1ull << ((rank-1)*8 + (file-1)));}
-            if(fen[i] == 'k'){blackKing |= (1ull << ((rank-1)*8 + (file-1)));}
-            if(fen[i] == 'b'){blackBishops |= (1ull << ((rank-1)*8 + (file-1)));}
+        for (int i = 0; i < fen.size(); i++) {
+            if (fen[i] == ' ')break;
+            if (fen[i] == '/') {
+                if (file != 9)rank--;
+                file = 1;
+                continue;
+            }
+            if (isdigit(fen[i])) { file += (fen[i] - '0') - 1; }
+            if (fen[i] == 'p') { blackPawns |= (1ull << ((rank - 1) * 8 + (file - 1))); }
+            if (fen[i] == 'n') { blackKnights |= (1ull << ((rank - 1) * 8 + (file - 1))); }
+            if (fen[i] == 'r') { blackRooks |= (1ull << ((rank - 1) * 8 + (file - 1))); }
+            if (fen[i] == 'q') { blackQueens |= (1ull << ((rank - 1) * 8 + (file - 1))); }
+            if (fen[i] == 'k') { blackKing |= (1ull << ((rank - 1) * 8 + (file - 1))); }
+            if (fen[i] == 'b') { blackBishops |= (1ull << ((rank - 1) * 8 + (file - 1))); }
 
-            if(fen[i] == 'P'){whitePawns |= (1ull << ((rank-1)*8 + (file-1)));  }
-            if(fen[i] == 'N'){whiteKnights |= (1ull << ((rank-1)*8 + (file-1)));}
-            if(fen[i] == 'R'){whiteRooks |= (1ull << ((rank-1)*8 + (file-1)));}
-            if(fen[i] == 'Q'){whiteQueens |= (1ull << ((rank-1)*8 + (file-1)));}
-            if(fen[i] == 'K'){whiteKing |= (1ull << ((rank-1)*8 + (file-1)));}
-            if(fen[i] == 'B'){whiteBishops |= (1ull << ((rank-1)*8 + (file-1)));}
+            if (fen[i] == 'P') { whitePawns |= (1ull << ((rank - 1) * 8 + (file - 1))); }
+            if (fen[i] == 'N') { whiteKnights |= (1ull << ((rank - 1) * 8 + (file - 1))); }
+            if (fen[i] == 'R') { whiteRooks |= (1ull << ((rank - 1) * 8 + (file - 1))); }
+            if (fen[i] == 'Q') { whiteQueens |= (1ull << ((rank - 1) * 8 + (file - 1))); }
+            if (fen[i] == 'K') { whiteKing |= (1ull << ((rank - 1) * 8 + (file - 1))); }
+            if (fen[i] == 'B') { whiteBishops |= (1ull << ((rank - 1) * 8 + (file - 1))); }
             file++;
-            if(file == 9){rank--;}
+            if (file == 9) { rank--; }
         }
 
 
@@ -969,6 +973,92 @@ public:
     }
 
 
+    ull knightAttacks(int square) {
+
+        vector <int> tmpW = whiteKnightVMGen();
+        vector <int> tmpB = blackKnightVMGen();
+
+        //mask which marks all my attack squares
+        ull ans;
+
+        //checking if my piece is from white pieces
+        for(int i=0; i<tmpW.size();i++){
+
+            if(((tmpW[i] & 8064) >> 7) == square){//check if this move of a piece of my wanted square(from == square)
+                //Oring with destination to mark it with 1 (<<to)
+                ans |=  (1ull << ((tmpW[i]  & 516096) >> 13));
+            }
+        }
+
+        //checking if my piece is from black pieces
+        for(int i=0; i<tmpB.size();i++){
+
+            if(((tmpB[i] & 8064) >> 7) == square){//check if this move of a piece of my wanted square
+
+                //Oring with destination to mark it with 1
+                ans |=  (1ull << ((tmpB[i]  & 516096) >> 13));
+            }
+        }
+
+        return ans;
+    }
+
+    ull bishopAttacks(int square) {
+
+        vector <int> tmpW = blackKnightVMGen();
+        vector <int> tmpB = blackKnightVMGen();
+
+        //mask which marks all my attack squares
+        ull ans;
+
+        //checking if my piece is from white pieces
+        for(int i=0; i<tmpW.size();i++){
+
+            if(((tmpW[i] & 8064) >> 7) == square){//check if this move of a piece of my wanted square(from == square)
+                //Oring with destination to mark it with 1 (<<to)
+                ans |=  (1ull << ((tmpW[i]  & 516096) >> 13));
+            }
+        }
+
+        //checking if my piece is from black pieces
+        for(int i=0; i<tmpB.size();i++){
+
+            if(((tmpB[i] & 8064) >> 7) == square){//check if this move of a piece of my wanted square
+
+                //Oring with destination to mark it with 1
+                ans |=  (1ull << ((tmpB[i]  & 516096) >> 13));
+            }
+        }
+    }
+
+    ull rookAttacks(int square) {
+
+        vector <int> tmpW = whiteKnightVMGen();
+        vector <int> tmpB = blackKnightVMGen();
+
+        //mask which marks all my attack squares
+        ull ans;
+
+        //checking if my piece is from white pieces
+        for(int i=0; i<tmpW.size();i++){
+
+            if(((tmpW[i] & 8064) >> 7) == square){//check if this move of a piece of my wanted square(from == square)
+                //Oring with destination to mark it with 1 (<<to)
+                ans |=  (1ull << ((tmpW[i]  & 516096) >> 13));
+            }
+        }
+
+        //checking if my piece is from black pieces
+        for(int i=0; i<tmpB.size();i++){
+
+            if(((tmpB[i] & 8064) >> 7) == square){//check if this move of a piece of my wanted square
+
+                //Oring with destination to mark it with 1
+                ans |=  (1ull << ((tmpB[i]  & 516096) >> 13));
+            }
+        }
+    }
+
 /**********************************************************************************************************************
  *                                               Valid Moves                                                           *
  **********************************************************************************************************************/
@@ -1278,8 +1368,6 @@ public:
             }
 
 
-
-
             newInd = ind - 6;
             if((newInd>=0 && newInd<=63) && !(allPieces&(1ull << newInd))){
                 int move = makeMoveMask(0, 0, knightTypeNum(), ind, newInd, 0);
@@ -1575,79 +1663,4 @@ public:
         }
         return ret;
     }
-
-
-    ///////////////king safty evaluation resides here untill we push it to evaluation branch/////////////////////////
-    int blackKingSafety, whiteKingSafty;
-    int kingSafty(){
-
-        int openFilePenalty[] = { 6, 5, 4, 4, 4, 4, 5, 6 },
-                halfopenFilePenalty[] = { 5, 4, 3, 3, 3, 3, 4, 5 },
-                pawnStormPenalty[] = { 0, 0, 0, 1, 2, 3, 0, 0 },
-                piecePhase[] = { 0, 3, 3, 5, 10, 0 },
-                files[] = {
-                0x0101010101010101,
-                0x0202020202020202,
-                0x0404040404040404,
-                0x0808080808080808,
-                0x1010101010101010,
-                0x2020202020202020,
-                0x4040404040404040,
-                0x8080808080808080
-        },
-                ranks[] = {
-                0x00000000000000FF,
-                0x000000000000FF00,
-                0x0000000000FF0000,
-                0x00000000FF000000,
-                0x000000FF00000000,
-                0x0000FF0000000000,
-                0x00FF000000000000,
-                0xFF00000000000000
-        },
-                kingSafetyTable[] = {
-                21, 7, 11, 7, 7, 9, 5, 7, 10, 14, 15, 20, 19, 20, 25, 22, 28, 40, 45, 47, 46, 60, 56, 82, 86, 102, 98, 109, 107, 117, 125, 132, 159, 168, 181, 188, 211, 213, 234, 216, 265, 276, 288, 272, 308, 339, 351, 355, 374, 354, 370, 412, 420, 481, 439, 457, 478, 478, 441, 509, 494, 431, 517, 569, 562, 499, 500, 531, 523, 500, 500, 500, 522, 517, 500, 500, 500, 508, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500
-        };
-        //evaluate white pawn shelter
-        int penalty = 0;
-        int kingFile = min(1, max(6, getColumn(log2(whiteKing) + EPS)));
-        for(int i = kingFile - 1; i <= kingFile; i++){
-            ull whitePawnsOfFile = files[i] & whitePawns;
-            ull blackPawnsOfFile = files[i] & blackPawns;
-            penalty += (whitePawnsOfFile | blackPawnsOfFile) ? 0 : openFilePenalty[i];
-            penalty += (!whitePawnsOfFile && blackPawnsOfFile) ? halfopenFilePenalty[i] : 0;
-            penalty += blackPawnsOfFile ? pawnStormPenalty[7 - (int)((log2(getLSB(blackPawnsOfFile)) + EPS)/8)] : 0;
-        }
-        int whitePawnShelterPenalty = penalty;
-
-        //evaluate black pawn shelter
-        penalty = 0;
-        kingFile = min(1, max(6, getColumn(log2(blackKing) + EPS)));
-        for(int i = kingFile - 1; i <= kingFile; i++){
-            ull whitePawnsOfFile = files[i] & whitePawns;
-            ull blackPawnsOfFile = files[i] & blackPawns;
-            penalty += (whitePawnsOfFile | blackPawnsOfFile) ? 0 : openFilePenalty[i];
-            penalty += (whitePawnsOfFile && !blackPawnsOfFile) ? halfopenFilePenalty[i] : 0;
-            penalty += whitePawnsOfFile ? pawnStormPenalty[(int)((log2(getMSB(whitePawnsOfFile)) + EPS)/8)] : 0;
-        }
-        int blackPawnShelterPenalty = penalty;
-        int phase = piecePhase[pawnTypeNum()] * 16 + piecePhase[knightTypeNum()] * 4
-                         + piecePhase[bishopTypeNum()] * 4 + piecePhase[rookTypeNum()] * 4
-                         + piecePhase[queenTypeNum()] * 2;
-        phase -= (__builtin_popcountll(whiteKnights) + __builtin_popcountll(blackKnights)) * piecePhase[knightTypeNum()];
-        phase -= (__builtin_popcountll(whiteBishops) + __builtin_popcountll(blackBishops)) * piecePhase[bishopTypeNum()];
-        phase -= (__builtin_popcountll(whiteRooks) + __builtin_popcountll(blackRooks)) * piecePhase[rookTypeNum()];
-        phase -= (__builtin_popcountll(whiteQueens) + __builtin_popcountll(blackQueens)) * piecePhase[queenTypeNum()];
-
-        whiteKingSafty += whitePawnShelterPenalty;
-        blackKingSafety += blackPawnShelterPenalty;
-        whiteKingSafty = min(whiteKingSafty, 99);
-        blackKingSafety = min(blackKingSafety, 99);
-
-        int score = kingSafetyTable[whiteKingSafty] - kingSafetyTable[blackKingSafety];
-        return ((score*(64-phase))/64);
-
-    }
 };
-
-
