@@ -23,6 +23,9 @@ public:
     static const int MAX_GAME_LENGTH = 1024;
 
     // Zobrist tables
+    // assosiates each piece with a cell at the board w/ a unique key
+    // used for representing the board with a single 64bit integer
+    // it's main use is detecting some draw cases
     ull pawn[2][64] = {{0x79ad695501e7d1e8L, 0x8249a47aee0e41f7L, 0x637a7780decfc0d9L, 0x19fc8a768cf4b6d4L, 0x7bcbc38da25a7f3cL, 0x5093417aa8a7ed5eL, 0x7fb9f855a997142L,  0x5355f900c2a82dc7L,
                                0xe99d662af4243939L, 0xa49cd132bfbf7cc4L, 0xce26c0b95c980d9L, 0xbb6e2924f03912eaL, 0x24c3c94df9c8d3f6L, 0xdabf2ac8201752fcL, 0xf145b6beccdea195L, 0x14acbaf4777d5776L,
                                0xf9b89d3e99a075c2L, 0x70ac4cd9f04f21f5L, 0x9a85ac909a24eaa1L, 0xee954d3c7b411f47L, 0x72b12c32127fed2bL, 0x54b3f4fa5f40d873L, 0x8535f040b9744ff1L, 0x27e6ad7891165c3fL,
@@ -129,6 +132,9 @@ public:
                                0xabbdcdd7ed5c0860L, 0x9853eab63b5e0b35L, 0x352787baa0d7c22fL, 0xc7f6aa2de59aea61L, 0x3727073c2e134b1L,  0x5a0f544dd2b1fb18L, 0x74f85198b05a2e7dL, 0x963ef2c96b33be31L,
                                0xff577222c14f0a3aL, 0x4e4b705b92903ba4L, 0x730499af921549ffL, 0x13ae978d09fe5557L, 0xd9e92aa246bf719eL, 0x7a4c10ec2158c4a6L, 0x49cad48cebf4a71eL, 0xcf05daf5ac8d77b0L}};
 
+    // These tables contains bitmasks that determines the attack zones of
+    // bishops, rooks and kings in 4 directions at every position at the board
+    // queens are assumed to be bishops XOR rooks
     ull bishopZoneAttack[64][4] = {{9241421688590303744, 0,                 0,                 0},
                                    {36099303471055872,   0,                 0,                 256},
                                    {141012904183808,     0,                 0,                 66048},
@@ -273,6 +279,8 @@ public:
                               13853283560024178688, 144959613005987840, 362258295026614272, 724516590053228544,
                               1449033180106457088, 2898066360212914176, 5796132720425828352, 11592265440851656704,
                               4665729213955833856};
+
+    // Zobrist keys for castling and en passant locations
     ull whiteKingSideCastling = 0x31d71dce64b2c310L;
     ull whiteQueenSideCastling = 0xf165b587df898190L;
     ull blackKingSideCastling = 0xa57e6339dd2cf3a0L;
@@ -280,11 +288,13 @@ public:
     ull passantColumn[8] = {0x70cc73d90bc26e24L, 0xe21a6b35df0c3ad7L, 0x3a93d8b2806962L,
                             0x1c99ded33cb890a1L, 0xcf3145de0add4289L, 0xd0e4427a5514fb72L,
                             0x77c621cc9fb3a483L, 0x67a34dac4356550bL};
+    // contains the zobrist key of the position where each cell was threatened
     ull threat[64];
+    // zobrist key for whose turn is it
     ull whiteMove = 0xf8d626aaaf278509L;
 
     // board representation
-
+    //bitmasks that holds the position of the board
     ull whitePawns;
     ull whiteKnights;
     ull whiteBishops;
@@ -303,6 +313,8 @@ public:
     ull blackPieces;
     ull allPieces;
 
+    // these masks are virtual representation of the board
+    // used when it's necessary
     ull virWhitePawns;
     ull virWhiteKnights;
     ull virWhiteBishops;
@@ -325,6 +337,8 @@ public:
     bool drawState = false;
     ull key; // zobrist key
 
+    // the history is used for undoing the moves and for
+    // generating the game log
     ull keyHistory[MAX_GAME_LENGTH];
     ull whitePawnHistory[MAX_GAME_LENGTH];
     ull whiteKnightHistory[MAX_GAME_LENGTH];
@@ -387,6 +401,7 @@ public:
         validMovesHistory.resize(MAX_GAME_LENGTH);
     }
 
+    // displaying the board in the terminal for debugging purposes
     void disp(){
         char arr[8][8];
         memset(arr,0,sizeof(arr));
@@ -441,6 +456,7 @@ public:
         }
     }
 
+    // interpretes fen strings.
     void fenInterpreter(string fen){
         whiteRooks = 0;
         whiteQueens = 0;
@@ -492,7 +508,7 @@ public:
         //this function is not complete yet a7ba2i fellah
     }
 
-
+    // loc 0-63 counting from the bottom left corner [A1]
     char getPieceAt(int loc) {
         if (allPieces & (1ULL << loc)) {
             if (whitePawns & (1ULL << loc)) return 'P';
@@ -542,11 +558,12 @@ public:
         }
         return 0;
     }
-
+    // generating Zobrist hashing for moves[src, dst, piece]
     ull ZMove(int from, int to, char piece) {
         return squareZKey(from, piece) ^ squareZKey(to, piece);
     }
 
+    // calculating Zkey at first
     ull ZBoard() {
         ull key = 0;
 
@@ -572,6 +589,8 @@ public:
         return key;
     }
 
+    // the following functions are utility functions and their headers
+    //are discriptive
     bool locExist(ull mask, ull check) {
         return (mask & check) != 0;
     }
@@ -628,6 +647,8 @@ public:
         return x >= 0 && x < 8 && y >= 0 && y < 8;
     }
 
+    // the move mask is how the move is represented in the board
+    // one integer to hold'em all [all needed information to identify the move]
     int makeMoveMask(int specialEvent, int capture, int type, int from, int to, int turn) {
         return specialEvent | capture << 3 | type << 4 | from << 7 | to << 13 | turn << 19;
     }
@@ -636,6 +657,7 @@ public:
         return x >= 0 && x < 64;
     }
 
+    // the following interpretes the move mask
     int getSpecialEvent(int move) {
         return move & 7;
     }
@@ -656,6 +678,7 @@ public:
         return (move & 516096) >> 13;
     }
 
+    // used when it's necessary to clone the board
     void makeClone() {                  //making virtual masks clones of real masks
         virWhitePawns = whitePawns;
         virWhiteKnights = whiteKnights;
@@ -682,8 +705,11 @@ public:
 **********************************************************************************************************************/
 
 //==================================================Make Move(doo)
+    // Obviouse, the function does a move which is generated by the
+    // move mask, returns void but affects the masks that represents
+    // the board and updates the zobrist key
     void doo(int move) {
-
+        allValidMoves.clear();
         if (enPassantLoc != -1)
             key ^= passantColumn[getColumn(enPassantLoc)];
 
@@ -798,6 +824,10 @@ public:
         else
             fiftyMoveRule = 0;
 
+
+        allValidMoves = generateAllMoves();
+
+
         //saving all of our history
         saveHistory();
 
@@ -811,13 +841,11 @@ public:
         //switch turns
         whiteToMove = !whiteToMove;
 
-        //reset the valid moves
-        allValidMoves.clear();
 
     }
 
 //==================================================Saving history, Undo
-
+    // saves history for undo and generating game log
     void saveHistory() {
         whitePawnHistory[moveNumber] = whitePawns;
         whiteKnightHistory[moveNumber] = whiteKnights;
@@ -847,8 +875,10 @@ public:
         blackCastleKHistory[moveNumber] = blackCastleK;
         blackCastleQHistory[moveNumber] = blackCastleQ;
         keyHistory[moveNumber] = key;
+        validMovesHistory[moveNumber] = allValidMoves;
     }
 
+    // reverts the previous move, for search
     void undoo() {
 
         if (fiftyMoveRule != 0)
@@ -891,17 +921,18 @@ public:
         blackCastleQ = blackCastleQHistory[moveNumber];
 
         key = keyHistory[moveNumber];
+        allValidMoves = validMovesHistory[moveNumber];
 
     }
 
 //==================================================Draw, Mate, Check, EndOfGame, EndGame, Pass
 
+
     bool isDraw() {
 
         // stale
-//        int current_moves[] = new int current_moves[MAX_MOVES];
-//        if (MoveGenerator.getAllLegalMoves(this, current_moves) == 0 && !isCheck())
-//            return true;
+        if (!(kingMoves().size()) && !isCheck())
+            return true;
 
         // 50mr
         if (fiftyMoveRule >= 50)
@@ -984,6 +1015,7 @@ public:
     }
 
 //==================================================Phase2 functions
+// utility functions
     int popCnt(ull x) {
         return __builtin_popcountll(x);
     }
@@ -1179,6 +1211,7 @@ public:
 /**********************************************************************************************************************
  *                                               Valid Moves                                                           *
  **********************************************************************************************************************/
+    // check if there's a pawn attacking the king
     bool kingSafePawns(bool white){
         bool safe = true;
         if(white) {
@@ -1201,6 +1234,7 @@ public:
         }
         return safe;
     }
+    // checks if there's a knight attacking the queen
     bool kingSafeKnights(bool white){
         bool safe = true;
         if(white) {
@@ -1260,7 +1294,7 @@ public:
         return safe;
     }
 
-
+    // checks if there's a bishop attacking the king
     bool checkVirtualMoveBishop(bool whiteTurn, int move, int loc, int type) {
         int x = getRow(loc), y = getColumn(loc);
 
@@ -1303,6 +1337,7 @@ public:
         return !ret;
     }
 
+    //checks if there's a rook attacking the king
     bool checkVirtualMoveRook(bool whiteTurn, int move, int loc, int type) {
 
 
@@ -1349,7 +1384,8 @@ public:
         return checkVirtualMoveBishop(whiteTurn, move, loc, type) && checkVirtualMoveRook(whiteTurn, move, loc, type);
     }
 
-
+    // checks if the piece is not blocking checkmates for it to be
+    // able to move freely
     bool isValid(bool whiteTurn, int move) {
         makeClone();
         int loc;
@@ -1450,6 +1486,8 @@ public:
 
 //==================================================WhitePawn valid Moves
 
+// generates the valid moves of the white pawns
+// moves are generated by makeMoveMask
     vector<int> whitePawnVMGen() {
         vector<int> whitePawnVM, whitePawnCap;
         int pawnCnt = __builtin_popcountll(whitePawns);
@@ -1494,7 +1532,7 @@ public:
             if((newInd>=0 && newInd<=63) && (getColumn(newInd) == getColumn(enPassantLoc) && getRow(enPassantLoc) == getRow(ind))){
                 int move = makeMoveMask(0, 1, pawnTypeNum(), ind, newInd, 0);
 
-                if(isValid(true, move))whitePawnCap.push_back(move);
+                if(isValid(true, move)){whitePawnCap.push_back(move); threat[newInd] = key;}
             }
             if((newInd>=0 && newInd<=63) && (blackPieces&(1ull << newInd))){
                 //new valid capture from ind to newInd
@@ -1505,16 +1543,17 @@ public:
                         whitePawnCap.push_back(makeMoveMask(PROMOTEROOK, 1, pawnTypeNum(), ind, newInd, 0));
                         whitePawnCap.push_back(makeMoveMask(PROMOTEKNIGHT, 1, pawnTypeNum(), ind, newInd, 0));
                         whitePawnCap.push_back(makeMoveMask(PROMOTEQUEEN, 1, pawnTypeNum(), ind, newInd, 0));
+                        threat[newInd] = key;
                     }
                 }else {
                     int move = makeMoveMask(0, 1, pawnTypeNum(), ind, newInd, 0);
-                    if(isValid(true, move))whitePawnCap.push_back(move);
+                    if(isValid(true, move)){whitePawnCap.push_back(move); threat[newInd] = key;}
                 }
             }
             newInd = ind + 9;
             if((newInd>=0 && newInd<=63) && (getColumn(newInd) == getColumn(enPassantLoc) && getRow(enPassantLoc) == getRow(ind))){
                 int move = makeMoveMask(0, 1, pawnTypeNum(), ind, newInd, 0);
-                if(isValid(true, move))whitePawnCap.push_back(move);
+                if(isValid(true, move)){whitePawnCap.push_back(move); threat[newInd] = key;}
             }
             if ((newInd >= 0 && newInd <= 63) && (blackPieces & (1ull << newInd))) {
                 //new valid capture from ind to newInd
@@ -1525,10 +1564,11 @@ public:
                         whitePawnCap.push_back(makeMoveMask(PROMOTEROOK, 1, pawnTypeNum(), ind, newInd, 0));
                         whitePawnCap.push_back(makeMoveMask(PROMOTEKNIGHT, 1, pawnTypeNum(), ind, newInd, 0));
                         whitePawnCap.push_back(makeMoveMask(PROMOTEQUEEN, 1, pawnTypeNum(), ind, newInd, 0));
+                        threat[newInd] = key;
                     }
                 }else {
                     int move = makeMoveMask(0, 1, pawnTypeNum(), ind, newInd, 0);
-                    if(isValid(true, move))whitePawnCap.push_back(move);
+                    if(isValid(true, move)){whitePawnCap.push_back(move); threat[newInd] = key;}
                 }
 
             }
@@ -1541,6 +1581,7 @@ public:
 
 //==================================================BlackPawn valid Moves
 
+// does the same as the previous function but for the black pawns
     vector<int> blackPawnVMGen() {
         vector<int> blackPawnVM, blackPawnCap;
         int pawnCnt = __builtin_popcountll(blackPawns);
@@ -1581,7 +1622,7 @@ public:
             newInd = ind - 7;
             if((newInd>=0 && newInd<=63) && (getColumn(newInd) == getColumn(enPassantLoc) && getRow(enPassantLoc) == getRow(ind))){
                 int move = makeMoveMask(0, 1, pawnTypeNum(), ind, newInd, 1);
-                if(isValid(false, move))blackPawnCap.push_back(move);
+                if(isValid(false, move)){blackPawnCap.push_back(move); threat[newInd] = key;}
             }
             if((newInd>=0 && newInd<=63) && (blackPieces&(1ull << newInd))){
                 //new valid capture from ind to newInd
@@ -1592,16 +1633,17 @@ public:
                         blackPawnCap.push_back(makeMoveMask(PROMOTEKNIGHT, 1, pawnTypeNum(), ind, newInd, 1));
                         blackPawnCap.push_back(makeMoveMask(PROMOTEBISHOP, 1, pawnTypeNum(), ind, newInd, 1));
                         blackPawnCap.push_back(makeMoveMask(PROMOTEROOK, 1, pawnTypeNum(), ind, newInd, 1));
+                        threat[newInd] = key;
                     }
                 }else {
                     int move = makeMoveMask(0, 1, pawnTypeNum(), ind, newInd, 1);
-                    if(isValid(false, move))blackPawnCap.push_back(move);
+                    if(isValid(false, move)){blackPawnCap.push_back(move); threat[newInd] = key;}
                 }
             }
             newInd = ind - 9;
             if((newInd>=0 && newInd<=63) && (getColumn(newInd) == getColumn(enPassantLoc) && getRow(enPassantLoc) == getRow(ind))){
                 int move = makeMoveMask(0, 1, pawnTypeNum(), ind, newInd, 1);
-                if(isValid(false, move))blackPawnCap.push_back(move);
+                if(isValid(false, move)){blackPawnCap.push_back(move); threat[newInd] = key;}
             }
             if((newInd>=0 && newInd<=63) && (blackPieces&(1ull << newInd))){
                 //new valid capture from ind to newInd
@@ -1612,10 +1654,11 @@ public:
                         blackPawnCap.push_back(makeMoveMask(PROMOTEKNIGHT, 1, pawnTypeNum(), ind, newInd, 1));
                         blackPawnCap.push_back(makeMoveMask(PROMOTEBISHOP, 1, pawnTypeNum(), ind, newInd, 1));
                         blackPawnCap.push_back(makeMoveMask(PROMOTEROOK, 1, pawnTypeNum(), ind, newInd, 1));
+                        threat[newInd] = key;
                     }
                 }else {
                     int move = makeMoveMask(0, 1, pawnTypeNum(), ind, newInd, 1);
-                    if(isValid(false, move))blackPawnCap.push_back(move);
+                    if(isValid(false, move)){blackPawnCap.push_back(move); threat[newInd] = key;}
                 }
 
             }
@@ -1641,7 +1684,7 @@ public:
                 if(isValid(true, move))whiteKnightVM.push_back(move);
             }else if((newInd>=0 && newInd<=63) && (blackPieces&(1ull << newInd))){
                 int move = makeMoveMask(0, 1, knightTypeNum(), ind, newInd, 0);
-                if(isValid(true, move))whiteKnightCap.push_back(move);
+                if(isValid(true, move)){whiteKnightCap.push_back(move); threat[newInd] = key;}
             }
             newInd = ind + 10;
             if((newInd>=0 && newInd<=63) && !(allPieces&(1ull << newInd))){
@@ -1649,7 +1692,7 @@ public:
                 if(isValid(true, move))whiteKnightVM.push_back(move);
             }else if((newInd>=0 && newInd<=63) && (blackPieces&(1ull << newInd))){
                 int move = makeMoveMask(0, 1, knightTypeNum(), ind, newInd, 0);
-                if(isValid(true, move))whiteKnightCap.push_back(move);
+                if(isValid(true, move)){whiteKnightCap.push_back(move); threat[newInd] = key;}
             }
             newInd = ind + 15;
             if((newInd>=0 && newInd<=63) && !(allPieces&(1ull << newInd))){
@@ -1657,7 +1700,7 @@ public:
                 if(isValid(true, move))whiteKnightVM.push_back(move);
             }else if((newInd>=0 && newInd<=63) && (blackPieces&(1ull << newInd))){
                 int move = makeMoveMask(0, 1, knightTypeNum(), ind, newInd, 0);
-                if(isValid(true, move))whiteKnightCap.push_back(move);
+                if(isValid(true, move)){whiteKnightCap.push_back(move); threat[newInd] = key;}
             }
             newInd = ind + 17;
             if((newInd>=0 && newInd<=63) && !(allPieces&(1ull << newInd))){
@@ -1665,7 +1708,7 @@ public:
                 if(isValid(true, move))whiteKnightVM.push_back(move);
             }else if((newInd>=0 && newInd<=63) && (blackPieces&(1ull << newInd))){
                 int move = makeMoveMask(0, 1, knightTypeNum(), ind, newInd, 0);
-                if(isValid(true, move))whiteKnightCap.push_back(move);
+                if(isValid(true, move)){whiteKnightCap.push_back(move); threat[newInd] = key;}
             }
 
 
@@ -1675,7 +1718,7 @@ public:
                 if(isValid(true, move))whiteKnightVM.push_back(move);
             }else if((newInd>=0 && newInd<=63) && (blackPieces&(1ull << newInd))){
                 int move = makeMoveMask(0, 1, knightTypeNum(), ind, newInd, 0);
-                if(isValid(true, move))whiteKnightCap.push_back(move);
+                if(isValid(true, move)){whiteKnightCap.push_back(move); threat[newInd] = key;}
             }
             newInd = ind - 10;
             if((newInd>=0 && newInd<=63) && !(allPieces&(1ull << newInd))){
@@ -1683,7 +1726,7 @@ public:
                 if(isValid(true, move))whiteKnightVM.push_back(move);
             }else if((newInd>=0 && newInd<=63) && (blackPieces&(1ull << newInd))){
                 int move = makeMoveMask(0, 1, knightTypeNum(), ind, newInd, 0);
-                if(isValid(true, move))whiteKnightCap.push_back(move);
+                if(isValid(true, move)){whiteKnightCap.push_back(move); threat[newInd] = key;}
             }
             newInd = ind - 15;
             if((newInd>=0 && newInd<=63) && !(allPieces&(1ull << newInd))){
@@ -1691,7 +1734,7 @@ public:
                 if(isValid(true, move))whiteKnightVM.push_back(move);
             }else if((newInd>=0 && newInd<=63) && (blackPieces&(1ull << newInd))){
                 int move = makeMoveMask(0, 1, knightTypeNum(), ind, newInd, 0);
-                if(isValid(true, move))whiteKnightCap.push_back(move);
+                if(isValid(true, move)){whiteKnightCap.push_back(move); threat[newInd] = key;}
             }
             newInd = ind - 17;
             if((newInd>=0 && newInd<=63) && !(allPieces&(1ull << newInd))){
@@ -1699,7 +1742,7 @@ public:
                 if(isValid(true, move))whiteKnightVM.push_back(move);
             }else if((newInd>=0 && newInd<=63) && (blackPieces&(1ull << newInd))){
                 int move = makeMoveMask(0, 1, knightTypeNum(), ind, newInd, 0);
-                if(isValid(true, move))whiteKnightCap.push_back(move);
+                if(isValid(true, move)){whiteKnightCap.push_back(move); threat[newInd] = key;}
             }
 
         }
@@ -1724,7 +1767,7 @@ public:
                 if (isValid(false, move))blackKnightVM.push_back(move);
             } else if ((newInd >= 0 && newInd <= 63) && (whitePieces & (1ull << newInd))) {
                 int move = makeMoveMask(0, 1, knightTypeNum(), ind, newInd, 1);
-                if (isValid(false, move))blackKnightCap.push_back(move);
+                if (isValid(false, move)){blackKnightCap.push_back(move); threat[newInd] = key;}
             }
             newInd = ind + 10;
             if ((newInd >= 0 && newInd <= 63) && !(allPieces & (1ull << newInd))) {
@@ -1732,7 +1775,7 @@ public:
                 if (isValid(false, move))blackKnightVM.push_back(move);
             } else if ((newInd >= 0 && newInd <= 63) && (whitePieces & (1ull << newInd))) {
                 int move = makeMoveMask(0, 1, knightTypeNum(), ind, newInd, 1);
-                if (isValid(false, move))blackKnightCap.push_back(move);
+                if (isValid(false, move)){blackKnightCap.push_back(move); threat[newInd] = key;}
             }
             newInd = ind + 15;
             if ((newInd >= 0 && newInd <= 63) && !(allPieces & (1ull << newInd))) {
@@ -1740,7 +1783,7 @@ public:
                 if (isValid(false, move))blackKnightVM.push_back(move);
             } else if ((newInd >= 0 && newInd <= 63) && (whitePieces & (1ull << newInd))) {
                 int move = makeMoveMask(0, 1, knightTypeNum(), ind, newInd, 1);
-                if (isValid(false, move))blackKnightCap.push_back(move);
+                if (isValid(false, move)){blackKnightCap.push_back(move); threat[newInd] = key;}
             }
             newInd = ind + 17;
             if ((newInd >= 0 && newInd <= 63) && !(allPieces & (1ull << newInd))) {
@@ -1748,7 +1791,7 @@ public:
                 if (isValid(false, move))blackKnightVM.push_back(move);
             } else if ((newInd >= 0 && newInd <= 63) && (whitePieces & (1ull << newInd))) {
                 int move = makeMoveMask(0, 1, knightTypeNum(), ind, newInd, 1);
-                if (isValid(false, move))blackKnightCap.push_back(move);
+                if (isValid(false, move)){blackKnightCap.push_back(move); threat[newInd] = key;}
             }
 
 
@@ -1758,7 +1801,7 @@ public:
                 if (isValid(false, move))blackKnightVM.push_back(move);
             } else if ((newInd >= 0 && newInd <= 63) && (whitePieces & (1ull << newInd))) {
                 int move = makeMoveMask(0, 1, knightTypeNum(), ind, newInd, 1);
-                if (isValid(false, move))blackKnightCap.push_back(move);
+                if (isValid(false, move)){blackKnightCap.push_back(move); threat[newInd] = key;}
             }
             newInd = ind - 10;
             if ((newInd >= 0 && newInd <= 63) && !(allPieces & (1ull << newInd))) {
@@ -1766,7 +1809,7 @@ public:
                 if (isValid(false, move))blackKnightVM.push_back(move);
             } else if ((newInd >= 0 && newInd <= 63) && (whitePieces & (1ull << newInd))) {
                 int move = makeMoveMask(0, 1, knightTypeNum(), ind, newInd, 1);
-                if (isValid(false, move))blackKnightCap.push_back(move);
+                if (isValid(false, move)){blackKnightCap.push_back(move); threat[newInd] = key;}
             }
             newInd = ind - 15;
             if ((newInd >= 0 && newInd <= 63) && !(allPieces & (1ull << newInd))) {
@@ -1774,7 +1817,7 @@ public:
                 if (isValid(false, move))blackKnightVM.push_back(move);
             } else if ((newInd >= 0 && newInd <= 63) && (whitePieces & (1ull << newInd))) {
                 int move = makeMoveMask(0, 1, knightTypeNum(), ind, newInd, 1);
-                if (isValid(false, move))blackKnightCap.push_back(move);
+                if (isValid(false, move)){blackKnightCap.push_back(move); threat[newInd] = key;}
             }
             newInd = ind - 17;
             if ((newInd >= 0 && newInd <= 63) && !(allPieces & (1ull << newInd))) {
@@ -1782,7 +1825,7 @@ public:
                 if (isValid(false, move))blackKnightVM.push_back(move);
             } else if ((newInd >= 0 && newInd <= 63) && (whitePieces & (1ull << newInd))) {
                 int move = makeMoveMask(0, 1, knightTypeNum(), ind, newInd, 1);
-                if (isValid(false, move))blackKnightCap.push_back(move);
+                if (isValid(false, move)){blackKnightCap.push_back(move); threat[newInd] = key;}
             }
 
         }
@@ -1901,7 +1944,7 @@ public:
         }
         return ret;
     }
-
+// generating queen moves
     vector<int> queenMoves(int color) {
         vector<int> ret = bishopMoves(color ? whiteQueens : blackQueens, queenTypeNum(), color);
         vector<int> tmp = rookMoves(color ? whiteQueens : blackQueens, queenTypeNum(), color);
@@ -1910,7 +1953,7 @@ public:
 
         return ret;
     }
-
+// king moves generation
     vector<int> kingMoves() {
         vector<int> ret;
 
@@ -1975,6 +2018,55 @@ public:
         }
         return ret;
     }
+    //use allValidMoves vector, this function is not efficient to be used in serch or evaluation
+    vector<int> generateAllMoves(){ // generates white moves in case of white turn, black in black's turn
+        int color = !whiteToMove;
+        vector<int> ret;
+        vector<int> m;
+        if(!color) {
+            m = whitePawnVMGen();
+            ret.insert(ret.end(), m.begin(), m.end());
+        }
+        if(color) {
+            m = blackPawnVMGen();
+            ret.insert(ret.end(), m.begin(), m.end());
+        }
+        if(!color) {
+            m = whiteKnightVMGen();
+            ret.insert(ret.end(), m.begin(), m.end());
+        }
+        if(color) {
+            m = blackKnightVMGen();
+            ret.insert(ret.end(), m.begin(), m.end());
+        }
+        if(!color) {
+            m = bishopMoves(whiteBishops, bishopTypeNum(), 0);
+            ret.insert(ret.end(), m.begin(), m.end());
+        }
+        if(color) {
+            m = bishopMoves(blackBishops, bishopTypeNum(), 1);
+            ret.insert(ret.end(), m.begin(), m.end());
+        }
+        if(!color) {
+            m = rookMoves(whiteRooks, rookTypeNum(), 0);
+            ret.insert(ret.end(), m.begin(), m.end());
+        }
+        if(color) {
+            m = rookMoves(blackRooks, rookTypeNum(), 1);
+            ret.insert(ret.end(), m.begin(), m.end());
+        }
+        if(!color) {
+            m = queenMoves(0);
+            ret.insert(ret.end(), m.begin(), m.end());
+        }
+        if(color) {
+            m = queenMoves(1);
+            ret.insert(ret.end(), m.begin(), m.end());
+        }
+        m = kingMoves();
+        ret.insert(ret.end(), m.begin(), m.end());
 
+        return ret;
+    }
 
 };
