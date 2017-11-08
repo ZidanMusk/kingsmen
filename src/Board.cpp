@@ -751,23 +751,43 @@ public:
 
     // used when it's necessary to clone the board
     void makeClone() {                  //making virtual masks clones of real masks
-        virWhitePawns = whitePawns;
-        virWhiteKnights = whiteKnights;
-        virWhiteBishops = whiteBishops;
-        virWhiteRooks = whiteRooks;
-        virWhiteQueens = whiteQueens;
-        virWhiteKing = whiteKing;
+        if (whiteToMove) {
+            virWhitePawns = whitePawns;
+            virWhiteKnights = whiteKnights;
+            virWhiteBishops = whiteBishops;
+            virWhiteRooks = whiteRooks;
+            virWhiteQueens = whiteQueens;
+            virWhiteKing = whiteKing;
 
-        virBlackPawns = blackPawns;
-        virBlackKnights = blackKnights;
-        virBlackBishops = blackBishops;
-        virBlackRooks = blackRooks;
-        virBlackQueens = blackQueens;
-        virBlackKing = blackKing;
+            virBlackPawns = blackPawns;
+            virBlackKnights = blackKnights;
+            virBlackBishops = blackBishops;
+            virBlackRooks = blackRooks;
+            virBlackQueens = blackQueens;
+            virBlackKing = blackKing;
 
-        virWhitePieces = whitePieces;
-        virBlackPieces = blackPieces;
-        virAllPieces = allPieces;
+            virWhitePieces = whitePieces;
+            virBlackPieces = blackPieces;
+            virAllPieces = allPieces;
+        } else {
+            virBlackPawns = whitePawns;
+            virBlackKnights = whiteKnights;
+            virBlackBishops = whiteBishops;
+            virBlackRooks = whiteRooks;
+            virBlackQueens = whiteQueens;
+            virBlackKing = whiteKing;
+
+            virWhitePawns = blackPawns;
+            virWhiteKnights = blackKnights;
+            virWhiteBishops = blackBishops;
+            virWhiteRooks = blackRooks;
+            virWhiteQueens = blackQueens;
+            virWhiteKing = blackKing;
+
+            virBlackPieces = whitePieces;
+            virWhitePieces = blackPieces;
+            virAllPieces = allPieces;
+        }
     }
 
 
@@ -782,6 +802,32 @@ public:
     void doo(int move) {
         if (enPassantLoc != -1)
             key ^= passantColumn[getColumn(enPassantLoc)];
+
+        ull &refPawns = whiteToMove ? whitePawns : blackPawns;
+        ull &refRooks = whiteToMove ? whiteRooks : blackRooks;
+        ull &refBishops = whiteToMove ? whiteBishops : blackBishops;
+        ull &refKnights = whiteToMove ? whiteKnights : blackKnights;
+        ull &refQueens = whiteToMove ? whiteQueens : blackQueens;
+        ull &refKing = whiteToMove ? whiteKing : blackKing;
+
+        ull &refOtherPawns = whiteToMove ? blackPawns : whitePawns;
+        ull &refOtherRooks = whiteToMove ? blackRooks : whiteRooks;
+        ull &refOtherBishops = whiteToMove ? blackBishops : whiteBishops;
+        ull &refOtherKnights = whiteToMove ? blackKnights : whiteKnights;
+        ull &refOtherQueens = whiteToMove ? blackQueens : whiteQueens;
+        ull &refOtherKing = whiteToMove ? blackKing : whiteKing;
+
+        ull &refColorPieces = whiteToMove ? whitePieces : blackPieces;
+        ull &refOtherPieces = whiteToMove ? blackPieces : whitePieces;
+        ull &refAllPieces = allPieces;
+
+        ull kingSideCastling = whiteToMove ? whiteKingSideCastling : blackKingSideCastling;
+        ull queenSideCastling = whiteToMove ? whiteQueenSideCastling : blackQueenSideCastling;
+
+        bool &refCastleK = whiteToMove ? whiteCastleK : blackCastleK;
+        bool &refCastleQ = whiteToMove ? whiteCastleQ : blackCastleQ;
+
+        int &refKingMoves = whiteToMove ? whiteKingMoves : blackKingMoves;
 
         if (whiteToMove)
             key ^= whiteMove;
@@ -805,76 +851,77 @@ public:
             case 0:
                 if (specialEvent == PROMOTEBISHOP || specialEvent == PROMOTEKNIGHT || specialEvent == PROMOTEQUEEN ||
                     specialEvent == PROMOTEROOK)
-                    whitePawns ^= from, key ^= squareZKey(from, 'p');
+                    refPawns ^= from, key ^= squareZKey(from, 'p');
                 else
-                    whitePawns ^= moveXor, key ^= ZMove(from, to, 'p');
+                    refPawns ^= moveXor, key ^= ZMove(from, to, 'p');
                 if (specialEvent == PROMOTEBISHOP)
-                    whiteBishops ^= to, key ^= squareZKey(to, 'b');
+                    refBishops ^= to, key ^= squareZKey(to, 'b');
                 else if (specialEvent == PROMOTEKNIGHT)
-                    whiteKnights ^= to, key ^= squareZKey(to, 'n');
+                    refKnights ^= to, key ^= squareZKey(to, 'n');
                 else if (specialEvent == PROMOTEROOK)
-                    whiteRooks ^= to, key ^= squareZKey(to, 'r');
+                    refRooks ^= to, key ^= squareZKey(to, 'r');
                 else if (specialEvent == PROMOTEQUEEN)
-                    whiteQueens ^= to, key ^= squareZKey(to, 'q');
+                    refRooks ^= to, key ^= squareZKey(to, 'q');
                 break;
             case 1:
-                whiteKnights ^= moveXor;
+                refKnights ^= moveXor;
                 key ^= ZMove(from, to, 'n');
                 break;
             case 2:
-                whiteBishops ^= moveXor;
+                refBishops ^= moveXor;
                 key ^= ZMove(from, to, 'b');
                 break;
             case 3:
-                if (whiteCastleK && from == 1 << 7)whiteCastleK = 0;
-                if (whiteCastleQ && from == 1 << 0)whiteCastleQ = 0;
-                whiteRooks ^= moveXor;
+                if (refCastleK && from == 1 << 7)refCastleK = 0;
+                if (refCastleQ && from == 1 << 0)refCastleQ = 0;
+                refRooks ^= moveXor;
                 key ^= ZMove(from, to, 'r');
                 break;
             case 4:
-                whiteQueens ^= moveXor;
+                refRooks ^= moveXor;
                 key ^= ZMove(from, to, 'q');
                 break;
             case 5:
-                whiteKingMoves++;
-                whiteCastleK = whiteCastleQ = 0;
-                whiteKing ^= moveXor;
+                refKingMoves++;
+                refCastleK = refCastleQ = 0;
+                refKing ^= moveXor;
                 if (specialEvent == CASTLEKINGSIDE)
-                    whiteRooks ^= 160, key ^= whiteKingSideCastling;
+                    refRooks ^= 160, key ^= kingSideCastling;
                 else if (specialEvent == CASTLEQUEENSIDE)
-                    whiteRooks ^= 9, key ^= whiteQueenSideCastling;
+                    refRooks ^= 9, key ^= queenSideCastling;
                 key ^= ZMove(from, to, 'k');
                 break;
             default:
                 break;
         }
 
-        whitePieces = whitePawns | whiteKnights | whiteBishops | whiteQueens | whiteKing | whiteRooks;
+        refColorPieces = refPawns | refKnights | refBishops | refRooks | refKing | refRooks;
 
         if (capture) {
-            if (locExist(blackPawns, 1ull << to)) {
-                unsetBit(blackPawns, 1ull << to);
+            if (locExist(refOtherPawns, 1ull << to)) {
+                unsetBit(refOtherPawns, 1ull << to);
                 key ^= squareZKey(to, 'P');
             } else if (~enPassantLoc && type == 0 && to == enPassantLoc + 40 &&
                        isCellInRow(4, from) &&
                        (getColumn(from) == enPassantLoc - 1 || getColumn(from) == enPassantLoc + 1)) {
-                unsetBit(blackPawns, 1ull << to);
+                unsetBit(refOtherPawns, 1ull << to);
                 key ^= squareZKey(to, 'P');
-            } else if (locExist(blackKnights, 1ull << to)) {
-                unsetBit(blackKnights, 1ull << to);
+            } else if (locExist(refOtherKnights, 1ull << to)) {
+                unsetBit(refOtherKnights, 1ull << to);
                 key ^= squareZKey(to, 'N');
-            } else if (locExist(blackBishops, 1ull << to)) {
-                unsetBit(blackBishops, 1ull << to);
+            } else if (locExist(refOtherBishops, 1ull << to)) {
+                unsetBit(refOtherBishops, 1ull << to);
                 key ^= squareZKey(to, 'B');
-            } else if (locExist(blackQueens, 1ull << to)) {
-                unsetBit(blackQueens, 1ull << to);
+            } else if (locExist(refOtherQueens, 1ull << to)) {
+                unsetBit(refOtherQueens, 1ull << to);
                 key ^= squareZKey(to, 'Q');
             }
 
-            blackPieces = blackPawns | blackKnights | blackBishops | blackQueens | blackKing | blackRooks;
+            refOtherPieces =
+                    refOtherPawns | refOtherKnights | refOtherBishops | refOtherQueens | refOtherKing | refOtherRooks;
         }
 
-        allPieces = whitePieces | blackPieces;
+        refAllPieces = refColorPieces | refOtherPieces;
 
         if (specialEvent == ENPASSANT)
             enPassantLoc = 3;
@@ -997,8 +1044,6 @@ public:
     }
 
 //==================================================Draw, Mate, Check, EndOfGame, EndGame, Pass
-
-
     bool isDraw() {
 
         // stale
@@ -1081,8 +1126,6 @@ public:
         enPassantLoc = -1;
         whiteToMove = !whiteToMove;
         key ^= whiteMove;
-
-
     }
 
 //==================================================Phase2 functions
@@ -1591,93 +1634,91 @@ public:
     bool isValid(bool whiteTurn, int move) {
         makeClone();
         int loc;
-        if (whiteTurn) {
-            int specialEvent = getSpecialEvent(move);
-            int capture = getCapture(move);
-            int type = getType(move);
-            int from = getFrom(move);
-            int to = getTo(move);
 
-            ull moveXor = (1ull << from) ^(1ull << to);
+        int specialEvent = getSpecialEvent(move);
+        int capture = getCapture(move);
+        int type = getType(move);
+        int from = getFrom(move);
+        int to = getTo(move);
 
-            // pawn 0
-            // knight 1
-            // bishop 2
-            // rook 3
-            // queen 4
-            // king 5
+        ull moveXor = (1ull << from) ^(1ull << to);
 
-            switch (type) {
-                case 0:
-                    if (specialEvent == PROMOTEBISHOP || specialEvent == PROMOTEKNIGHT ||
-                        specialEvent == PROMOTEQUEEN ||
-                        specialEvent == PROMOTEROOK)
-                        virWhitePawns ^= from;
-                    else
-                        virWhitePawns ^= moveXor;
-                    if (specialEvent == PROMOTEBISHOP)
-                        virWhiteBishops ^= to;
-                    else if (specialEvent == PROMOTEKNIGHT)
-                        virWhiteKnights ^= to;
-                    else if (specialEvent == PROMOTEROOK)
-                        virWhiteRooks ^= to;
-                    else if (specialEvent == PROMOTEQUEEN)
-                        virWhiteQueens ^= to;
-                    break;
-                case 1:
-                    virWhiteKnights ^= moveXor;
-                    break;
-                case 2:
-                    virWhiteBishops ^= moveXor;
-                    break;
-                case 3:
-                    virWhiteRooks ^= moveXor;
-                    break;
-                case 4:
-                    virWhiteQueens ^= moveXor;
-                    break;
-                case 5:
-                    virWhiteKing ^= moveXor;
-                    if (specialEvent == CASTLEKINGSIDE)
-                        virWhiteRooks ^= 160;
-                    else if (specialEvent == CASTLEQUEENSIDE)
-                        virWhiteRooks ^= 9;
-                    break;
-                default:
-                    break;
-            }
+        // pawn 0
+        // knight 1
+        // bishop 2
+        // rook 3
+        // queen 4
+        // king 5
 
-            virWhitePieces =
-                    virWhitePawns | virWhiteKnights | virWhiteBishops | virWhiteQueens | virWhiteKing | virWhiteRooks;
-
-            if (capture) {
-                if (locExist(virBlackPawns, 1ull << to)) {
-                    unsetBit(virBlackPawns, 1ull << to);
-                } else if (~enPassantLoc && type == 0 && to == enPassantLoc + 40 &&
-                           isCellInRow(4, from) &&
-                           (getColumn(from) == enPassantLoc - 1 || getColumn(from) == enPassantLoc + 1)) {
-                    unsetBit(virBlackPawns, 1ull << to);
-                } else if (locExist(virBlackKnights, 1ull << to)) {
-                    unsetBit(virBlackKnights, 1ull << to);
-                } else if (locExist(virBlackBishops, 1ull << to)) {
-                    unsetBit(virBlackBishops, 1ull << to);
-                } else if (locExist(virBlackQueens, 1ull << to)) {
-                    unsetBit(virBlackQueens, 1ull << to);
-                }
-
-                virBlackPieces = virBlackPawns | virBlackKnights | virBlackBishops | virBlackQueens | virBlackKing |
-                                 virBlackRooks;
-            }
-
-            virAllPieces = virWhitePieces | virBlackPieces;
-
-            ull tmpWhiteKing = virWhiteKing;
-            ull locRaisedPowW = getLSB(tmpWhiteKing);
-
-            loc = log2(locRaisedPowW) + EPS;
-        } else {
-
+        switch (type) {
+            case 0:
+                if (specialEvent == PROMOTEBISHOP || specialEvent == PROMOTEKNIGHT ||
+                    specialEvent == PROMOTEQUEEN ||
+                    specialEvent == PROMOTEROOK)
+                    virWhitePawns ^= from;
+                else
+                    virWhitePawns ^= moveXor;
+                if (specialEvent == PROMOTEBISHOP)
+                    virWhiteBishops ^= to;
+                else if (specialEvent == PROMOTEKNIGHT)
+                    virWhiteKnights ^= to;
+                else if (specialEvent == PROMOTEROOK)
+                    virWhiteRooks ^= to;
+                else if (specialEvent == PROMOTEQUEEN)
+                    virWhiteQueens ^= to;
+                break;
+            case 1:
+                virWhiteKnights ^= moveXor;
+                break;
+            case 2:
+                virWhiteBishops ^= moveXor;
+                break;
+            case 3:
+                virWhiteRooks ^= moveXor;
+                break;
+            case 4:
+                virWhiteQueens ^= moveXor;
+                break;
+            case 5:
+                virWhiteKing ^= moveXor;
+                if (specialEvent == CASTLEKINGSIDE)
+                    virWhiteRooks ^= 160;
+                else if (specialEvent == CASTLEQUEENSIDE)
+                    virWhiteRooks ^= 9;
+                break;
+            default:
+                break;
         }
+
+        virWhitePieces =
+                virWhitePawns | virWhiteKnights | virWhiteBishops | virWhiteQueens | virWhiteKing | virWhiteRooks;
+
+        if (capture) {
+            if (locExist(virBlackPawns, 1ull << to)) {
+                unsetBit(virBlackPawns, 1ull << to);
+            } else if (~enPassantLoc && type == 0 && to == enPassantLoc + 40 &&
+                       isCellInRow(4, from) &&
+                       (getColumn(from) == enPassantLoc - 1 || getColumn(from) == enPassantLoc + 1)) {
+                unsetBit(virBlackPawns, 1ull << to);
+            } else if (locExist(virBlackKnights, 1ull << to)) {
+                unsetBit(virBlackKnights, 1ull << to);
+            } else if (locExist(virBlackBishops, 1ull << to)) {
+                unsetBit(virBlackBishops, 1ull << to);
+            } else if (locExist(virBlackQueens, 1ull << to)) {
+                unsetBit(virBlackQueens, 1ull << to);
+            }
+
+            virBlackPieces = virBlackPawns | virBlackKnights | virBlackBishops | virBlackQueens | virBlackKing |
+                             virBlackRooks;
+        }
+
+        virAllPieces = virWhitePieces | virBlackPieces;
+
+        ull tmpWhiteKing = virWhiteKing;
+        ull locRaisedPowW = getLSB(tmpWhiteKing);
+
+        loc = log2(locRaisedPowW) + EPS;
+
         return kingSafePawns(whiteTurn) && kingSafeKnights(whiteTurn) &&
                checkVirtualMoveBishop(whiteTurn, move, loc, bishopTypeNum()) &&
                checkVirtualMoveRook(whiteTurn, move, loc, rookTypeNum()) &&
@@ -2137,12 +2178,18 @@ public:
                 bool noCollision = firstCollision == 0;
                 int firstCollisionCell = log2(firstCollision) + EPS;
 
-                for (int j = loc + dx[i]; j < lim[i] && (j < firstCollisionCell || noCollision); j += dx[i])
-                    ret.push_back(makeMoveMask(0, 0, type, loc, j, color)), threat[j] = key;
+                for (int j = loc + dx[i]; j < lim[i] && (j < firstCollisionCell || noCollision); j += dx[i]) {
+                    int moveMask = makeMoveMask(0, 0, type, loc, j, color);
+                    if (isValid(color, moveMask))
+                        ret.push_back(moveMask), threat[j] = key;
+                }
                 if (!noCollision) {
                     threat[firstCollisionCell] = key;
-                    if (locExist(target, firstCollision))
-                        ret.push_back(makeMoveMask(0, 1, type, loc, firstCollisionCell, color));
+                    if (locExist(target, firstCollision)) {
+                        int moveMask = makeMoveMask(0, 1, type, loc, firstCollisionCell, color);
+                        if (isValid(color, moveMask))
+                            ret.push_back(makeMoveMask(0, 1, type, loc, firstCollisionCell, color));
+                    }
                 }
             }
 
@@ -2154,11 +2201,15 @@ public:
                 bool noCollision = firstCollision == 0;
                 int firstCollisionCell = log2(firstCollision) + EPS;
 
-                for (int j = loc + dx[i]; j > lim[i] && (j > firstCollisionCell || noCollision); j += dx[i])
-                    ret.push_back(makeMoveMask(0, 0, type, loc, j, color)), threat[j] = key;
+                for (int j = loc + dx[i]; j > lim[i] && (j > firstCollisionCell || noCollision); j += dx[i]) {
+                    int moveMask = makeMoveMask(0, 0, type, loc, j, color);
+                    if (isValid(color, moveMask))
+                        ret.push_back(makeMoveMask(0, 0, type, loc, j, color)), threat[j] = key;
+                }
                 if (!noCollision) {
                     threat[firstCollisionCell] = key;
-                    if (locExist(target, firstCollision))
+                    int moveMask = makeMoveMask(0, 1, type, loc, firstCollisionCell, color);
+                    if (locExist(target, firstCollision) && isValid(color, moveMask))
                         ret.push_back(makeMoveMask(0, 1, type, loc, firstCollisionCell, color));
                 }
             }
@@ -2194,11 +2245,15 @@ public:
 
                 for (int j = loc + di[i], x2 = x + dx[i], y2 = y + dy[i];
                      (j < firstCollisionCell || noCollision) && inBoundaries(x2,
-                                                                             y2); j += di[i], x2 += dx[i], y2 += dy[i])
-                    ret.push_back(makeMoveMask(0, 0, type, loc, j, color)), threat[j] = key;
+                                                                             y2); j += di[i], x2 += dx[i], y2 += dy[i]) {
+                    int moveMask = makeMoveMask(0, 0, type, loc, j, color);
+                    if (isValid(color, moveMask))
+                        ret.push_back(makeMoveMask(0, 0, type, loc, j, color)), threat[j] = key;
+                }
                 if (!noCollision) {
                     threat[firstCollisionCell] = key;
-                    if (locExist(target, firstCollision))
+                    int moveMask = makeMoveMask(0, 1, type, loc, firstCollisionCell, color);
+                    if (locExist(target, firstCollision) && isValid(color, moveMask))
                         ret.push_back(makeMoveMask(0, 1, type, loc, firstCollisionCell, color));
                 }
             }
@@ -2213,11 +2268,15 @@ public:
 
                 for (int j = loc + di[i], x2 = x + dx[i], y2 = y + dy[i];
                      (j > firstCollisionCell || noCollision) && inBoundaries(x2,
-                                                                             y2); j += di[i], x2 += dx[i], y2 += dy[i])
-                    ret.push_back(makeMoveMask(0, 0, type, loc, j, color)), threat[j] = key;
+                                                                             y2); j += di[i], x2 += dx[i], y2 += dy[i]) {
+                    int moveMask = makeMoveMask(0, 0, type, loc, j, color);
+                    if (isValid(color, moveMask))
+                        ret.push_back(makeMoveMask(0, 0, type, loc, j, color)), threat[j] = key;
+                }
                 if (!noCollision) {
                     threat[firstCollisionCell] = key;
-                    if (locExist(target, firstCollision))
+                    int moveMask = makeMoveMask(0, 1, type, loc, firstCollisionCell, color);
+                    if (locExist(target, firstCollision) && isValid(color, moveMask))
                         ret.push_back(makeMoveMask(0, 1, type, loc, firstCollisionCell, color));
                 }
             }
