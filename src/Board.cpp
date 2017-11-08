@@ -1037,7 +1037,7 @@ public:
         vector <int> tmpW;
         vector <int> tmpB;
 
-        //Detecing If I am white or black Bishop
+        //Detecing If I am white or black knight
         ull myKnight = (1ull << square);
 
         if(allPieces & whiteKnights)
@@ -1052,8 +1052,7 @@ public:
         if(tmpW.size()) {
             for (int i = 0; i < tmpW.size(); i++) {
 
-                if (((tmpW[i] & 8064) >> 7) ==
-                    square) {//check if this move of a piece of my wanted square(from == square)
+                if (((tmpW[i] & 8064) >> 7) == square) {//check if this move of a piece of my wanted square(from == square)
                     //Oring with destination to mark it with 1 (<<to)
                     ans |= (1ull << ((tmpW[i] & 516096) >> 13));
                 }
@@ -1110,7 +1109,6 @@ public:
 
         //mask which marks all my attack squares
         ull ans;
-
 
         //make sure that our board is not changed
         allPieces = currentBoard;
