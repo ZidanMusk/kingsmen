@@ -1,6 +1,11 @@
 #include "Evaluate.h"
 
-Evaluate::Evaluate(Board *b) {
+Evaluate::Evaluate(Board *b) : doubledPenaltyOpening({
+                                                             36, 9, 2, 23, 18, 20, 0, 26
+                                                     }), doubledPenaltyEnding({
+                                                                                      46, 25, 31, 24, 21, 19, 29, 44
+                                                                              })
+{
     _board = b;
 }
 
@@ -53,7 +58,9 @@ int Evaluate::kingSafty(int blackKingSafety, int whiteKingSafty) {
         ull blackPawnsOfFile = files[i] & _board->blackPawns;
         penalty += (whitePawnsOfFile | blackPawnsOfFile) ? 0 : openFilePenalty[i];
         penalty += (!whitePawnsOfFile && blackPawnsOfFile) ? halfopenFilePenalty[i] : 0;
-        penalty += blackPawnsOfFile ? pawnStormPenalty[7 - (int) ((log2(_board->getLSB(blackPawnsOfFile)) + _board->EPS) / 8)] : 0;
+        penalty += blackPawnsOfFile ? pawnStormPenalty[7 -
+                                                       (int) ((log2(_board->getLSB(blackPawnsOfFile)) + _board->EPS) /
+                                                              8)] : 0;
     }
     int whitePawnShelterPenalty = penalty;
 
@@ -65,18 +72,23 @@ int Evaluate::kingSafty(int blackKingSafety, int whiteKingSafty) {
         ull blackPawnsOfFile = files[i] & _board->blackPawns;
         penalty += (whitePawnsOfFile | blackPawnsOfFile) ? 0 : openFilePenalty[i];
         penalty += (whitePawnsOfFile && !blackPawnsOfFile) ? halfopenFilePenalty[i] : 0;
-        penalty += whitePawnsOfFile ? pawnStormPenalty[(int) ((log2(_board->getMSB(whitePawnsOfFile)) + _board->EPS) / 8)] : 0;
+        penalty += whitePawnsOfFile ? pawnStormPenalty[(int) ((log2(_board->getMSB(whitePawnsOfFile)) + _board->EPS) /
+                                                              8)] : 0;
     }
     int blackPawnShelterPenalty = penalty;
     int phase = piecePhase[_board->pawnTypeNum()] * 16 + piecePhase[_board->knightTypeNum()] * 4
                 + piecePhase[_board->bishopTypeNum()] * 4 + piecePhase[_board->rookTypeNum()] * 4
                 + piecePhase[_board->queenTypeNum()] * 2;
     phase -=
-            (__builtin_popcountll(_board->whiteKnights) + __builtin_popcountll(_board->blackKnights)) * piecePhase[_board->knightTypeNum()];
+            (__builtin_popcountll(_board->whiteKnights) + __builtin_popcountll(_board->blackKnights)) *
+            piecePhase[_board->knightTypeNum()];
     phase -=
-            (__builtin_popcountll(_board->whiteBishops) + __builtin_popcountll(_board->blackBishops)) * piecePhase[_board->bishopTypeNum()];
-    phase -= (__builtin_popcountll(_board->whiteRooks) + __builtin_popcountll(_board->blackRooks)) * piecePhase[_board->rookTypeNum()];
-    phase -= (__builtin_popcountll(_board->whiteQueens) + __builtin_popcountll(_board->blackQueens)) * piecePhase[_board->queenTypeNum()];
+            (__builtin_popcountll(_board->whiteBishops) + __builtin_popcountll(_board->blackBishops)) *
+            piecePhase[_board->bishopTypeNum()];
+    phase -= (__builtin_popcountll(_board->whiteRooks) + __builtin_popcountll(_board->blackRooks)) *
+             piecePhase[_board->rookTypeNum()];
+    phase -= (__builtin_popcountll(_board->whiteQueens) + __builtin_popcountll(_board->blackQueens)) *
+             piecePhase[_board->queenTypeNum()];
 
     whiteKingSafty += whitePawnShelterPenalty;
     blackKingSafety += blackPawnShelterPenalty;
