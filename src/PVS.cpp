@@ -2,11 +2,15 @@
 
 
 int PVS::pvsSearch(int stateID, int alpha, int beta, int depth,bool isMax) {
+    OpenedStates++;
     int bestScore = 0;
     if( depth <= 0 ){
-        this->cntr++;
-        visitedStates.insert(stateID);
-        return ((isMax)?1:-1)*this->Eval.GetScore(stateID);
+        //visitedStates.insert(stateID);
+        if (VisitedStates.find(stateID)==VisitedStates.end()) {//not visited b4
+            this->cntr++;
+            VisitedStates[stateID] = ((isMax) ? 1 : -1) * Search::Qsearch(stateID, alpha, beta, isMax);
+        }
+        return VisitedStates[stateID];
     } //qsearch(alpha, beta);
     vector<int> nextMoves = this->Eval.GetPossibleMoves(stateID);
     // using fail soft with negamax:
@@ -57,12 +61,15 @@ int PVS::pvsSearch(int stateID, int alpha, int beta, int depth,bool isMax) {
 
 pair<int,int> PVS::_IterativeDeepening(int root_id, int MaxDepth) {
     int nodeScore;
+    clock_t tStart = clock();
     for (int i = 1; i <= MaxDepth; ++i) {
         nodeScore = this->pvsSearch(root_id,-oo,oo,i,true);
+        VisitedStates.clear();
     }
     pair<int,int>mangi=make_pair(nodeScore,PvTable[root_id]);
-    cout<<"EvalStates : "<<visitedStates.size()<<" Of 33"<<endl;
+    cout<<"EvalStates : ["<<this->cntr<<","<<OpenedStates<<"] in "<<clock() - tStart-Eval.TreeCreationTime<<" ms"<<endl;
+
     PvTable.clear();
-    visitedStates.clear();
+    VisitedStates.clear();
     return mangi;
 }

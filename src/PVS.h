@@ -5,12 +5,13 @@
 
 class PVS : public Search{
 public:
+    int OpenedStates=0;
     PVS(int maxDepth):Search(maxDepth) {}
-
 private:
     unordered_map <int,int> PvTable;
+    unordered_map <int,int> VisitedStates;
     int cntr=0;
-    set<int>visitedStates;
+    //set<int>visitedStates;
     int pvsSearch(int stateID, int alpha, int beta, int depth, bool isMax);
     pair<int,int> _IterativeDeepening(int root_id,int MaxDepth);
 
