@@ -14,6 +14,7 @@ public:
 private:
     unordered_map <int,int> MoveTable;
     int cntr=0;
+    int OpenedStates=0;
     int alphaBetaSearch(int stateID, int alpha, int beta, int depth, bool isMax);
     pair<int,int> _IterativeDeepening(int root_id,int MaxDepth);
 

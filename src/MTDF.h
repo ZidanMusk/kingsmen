@@ -9,8 +9,9 @@ public:
     int EvalStates=0;
     MTDF(int maxDepth):Search(maxDepth) {};
 private:
+    int RootBestMove;
+    int RootBestScore;
     unordered_map<int,Node>_MTDfTable;
-    unordered_map<int,Node>_VisitedState;
     map<pair<int,int>,int>_DeepeningTable;
     pair<int,int> _IterativeDeepening(int root_id,int MaxDepth);
     int _MTDF(int root_id, int f, int d);

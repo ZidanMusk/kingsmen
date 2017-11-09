@@ -6,5 +6,5 @@ set(CMAKE_CXX_STANDARD 11)
 set(SOURCE_FILES src/main.cpp src/Search.cpp src/Search.h src/MTDF.cpp
         src/MTDF.h src/PVS.cpp src/PVS.h src/Node.cpp src/External/Extern.h
         src/External/Extern.cpp src/External/Tree.txt src/External/TreeRand.txt src/External/ExternBig.cpp src/External/ExternBig.h
-        src/AlphaBeta.h src/AplhaBeta.cpp)
+        src/AlphaBeta.h src/AlphaBeta.cpp)
 add_executable(kingsmen ${SOURCE_FILES})

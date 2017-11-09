@@ -5,6 +5,7 @@
 #include "AlphaBeta.h"
 
 int AlphaBeta::alphaBetaSearch(int stateID, int alpha, int beta, int depth, bool isMax){
+    OpenedStates++;
     if( depth == 0 ) {
         this->cntr++;
         return ((isMax)?1:-1)*this->Eval.GetScore(stateID);
@@ -29,11 +30,13 @@ int AlphaBeta::alphaBetaSearch(int stateID, int alpha, int beta, int depth, bool
 
 pair<int,int> AlphaBeta::_IterativeDeepening(int root_id, int MaxDepth) {
     int nodeScore;
+    clock_t tStart = clock();
     for (int i = 1; i <= MaxDepth; ++i) {
         nodeScore = this->alphaBetaSearch(root_id,-oo,oo,i,true);
     }
     pair<int,int>baseline=make_pair(nodeScore,MoveTable[root_id]);
-    cout<<"EvalStates : "<<this->cntr<<" Of 33"<<endl;
+    cout<<"EvalStates : ["<<cntr<<","<<OpenedStates<<"] in "<<clock() - tStart-Eval.TreeCreationTime<<" ms"<<endl;
+
     MoveTable.clear();
     return baseline;
 }

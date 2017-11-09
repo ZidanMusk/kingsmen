@@ -47,9 +47,11 @@ pair<int,int> MTDF::_IterativeDeepening(int root_id,int MaxDepth)
     clock_t tStart = clock();
     int firstguess = 0;
     for (int d = 1;d<=MaxDepth; d++) {
+        RootBestMove=-1;
+        RootBestScore=-oo;
         firstguess = this->_MTDF(root_id, firstguess, d);
     }
-    pair<int,int> Bibi={firstguess,-55};
+    pair<int,int> Bibi={firstguess,RootBestMove};
     _MTDfTable.clear();
     _DeepeningTable.clear();
     cout<<"EvalStates : ["<<EvalStates<<","<<OpenedStates<<"] in "<<clock() - tStart-Eval.TreeCreationTime<<" ms"<<endl;
@@ -120,6 +122,11 @@ int MTDF::_AlphaBetaWithMemory(int state_id, int alpha, int beta,int d,bool IsMa
         a = alpha;
         for (int i = 0; (i < Pmoves.size())&&(g<beta); ++i) {
             _g=_AlphaBetaWithMemory(Pmoves[i], a, beta, d-1,!IsMax,MaxDepth,true);
+            if(_g>RootBestScore&&state_id==1)
+            {
+                RootBestScore=_g;
+                RootBestMove=Pmoves[i];
+            }
             //_DeepeningTable[{state_id,Pmoves[i]}]=_g;
             g = max(g,_g);
             a = max(a,g);
