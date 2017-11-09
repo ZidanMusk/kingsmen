@@ -10,6 +10,7 @@ class Extern {
 public:
     int GetScore(int state_id);
     vector<int> GetPossibleMoves(int state_id);
+    vector<int> GetCapturingMoves(int state_id);
     bool hasTime();
     bool IsGameFinished();
 };

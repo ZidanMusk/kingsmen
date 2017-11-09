@@ -42,6 +42,10 @@ vector<int> Extern::GetPossibleMoves(int state_id) {
         }
     }
 }
+vector<int> Extern::GetCapturingMoves(int state_id) {
+   vector<int>R;
+   return R;
+}
 
 bool Extern::hasTime() {return true;}
 bool Extern::IsGameFinished() {return false;}
