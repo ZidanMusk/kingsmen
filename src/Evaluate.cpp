@@ -99,3 +99,35 @@ int Evaluate::kingSafty(int blackKingSafety, int whiteKingSafty) {
     return ((score * (64 - phase)) / 64);
 
 }
+
+template <bool hardwarePopcnt>
+int Evaluation::evaluate()
+{
+    // IF DRAW RETURN 0
+    if (mEndgameModule.drawnEndgame(pos.getMaterialHashKey()))
+    {
+        return 0;
+    }
+
+    std::array<int, 2> kingSafetyScore;
+    const auto phase = clamp(static_cast<int>(pos.getGamePhase()), 0, 64); // The phase can be negative in some weird cases, guard against that.
+
+    auto score = mobilityEval<hardwarePopcnt>(pos, kingSafetyScore, phase);
+    score += pawnStructureEval(pos, phase);
+    score += kingSafetyEval(pos, phase, kingSafetyScore);
+    score += interpolateScore(pos.getPstScoreOp(), pos.getPstScoreEd(), phase);
+
+    // Bishop pair bonus.
+    for (Color c = Color::White; c <= Color::Black; ++c)
+    {
+        if (pos.getPieceCount(c, Piece::Bishop) == 2)
+        {
+            const auto bishopPairBonus = interpolateScore(bishopPairBonusOpening, bishopPairBonusEnding, phase);
+            score += (c ? -bishopPairBonus : bishopPairBonus);
+        }
+    }
+
+    score += (pos.getSideToMove() ? -sideToMoveBonus : sideToMoveBonus);
+
+    return (pos.getSideToMove() ? -score : score);
+}
