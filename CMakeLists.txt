@@ -5,6 +5,8 @@ set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 
 set(SOURCE_FILES
         src/Board.cpp
-        src/main.cpp src/Evaluate.cpp src/Evaluate.h)
+        src/main.cpp
+        src/Evaluate.cpp
+        src/Evaluate.h)
 
 add_executable(kingsmen ${SOURCE_FILES})
