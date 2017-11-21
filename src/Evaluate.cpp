@@ -121,11 +121,11 @@ int Evaluate::kingSafety(int blackKingSafety, int whiteKingSafty) {
 
 }
 
-template<bool hardwarePopcnt>
-int Evaluate::evaluate() {
-int interpolateScore(int scoreOp, int scoreEd, int phase) {
-    return ((scoreOp * (64 - phase)) + (scoreEd * phase)) / 64;
-}
+//template<bool hardwarePopcnt>
+//int Evaluate::evaluate() {
+//int interpolateScore(int scoreOp, int scoreEd, int phase) {
+//    return ((scoreOp * (64 - phase)) + (scoreEd * phase)) / 64;
+//}
 
 template<bool hardwarePopcnt>
 int Evaluate::evaluate() {
