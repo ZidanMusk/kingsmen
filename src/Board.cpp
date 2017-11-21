@@ -572,6 +572,11 @@ public:
         whitePieces = whitePawns | whiteBishops | whiteKing | whiteKnights | whiteQueens | whiteRooks;
         allPieces = whitePieces | blackPieces;
         //this function is not complete yet a7ba2i fellah
+
+
+        key = ZBoard();
+        allValidMoves.clear();
+        allValidMoves = generateAllMoves();
     }
 
     // loc 0-63 counting from the bottom left corner [A1]
@@ -779,7 +784,7 @@ public:
 
     // used when it's necessary to clone the board
     void makeClone() {                  //making virtual masks clones of real masks
-        if (whiteToMove) {
+        //if (whiteToMove) {
             virWhitePawns = whitePawns;
             virWhiteKnights = whiteKnights;
             virWhiteBishops = whiteBishops;
@@ -797,7 +802,7 @@ public:
             virWhitePieces = whitePieces;
             virBlackPieces = blackPieces;
             virAllPieces = allPieces;
-        } else {
+        /*} else {
             virBlackPawns = whitePawns;
             virBlackKnights = whiteKnights;
             virBlackBishops = whiteBishops;
@@ -815,7 +820,7 @@ public:
             virBlackPieces = whitePieces;
             virWhitePieces = blackPieces;
             virAllPieces = allPieces;
-        }
+        }*/
     }
 
 
@@ -866,7 +871,7 @@ public:
         int from = getFrom(move);
         int to = getTo(move);
 
-        ull moveXor = (1ull << from) ^(1ull << to);
+        ull moveXor = ((1ull << from) ^ (1ull << to));
 
         // pawn 0
         // knight 1
@@ -879,17 +884,17 @@ public:
             case 0:
                 if (specialEvent == PROMOTEBISHOP || specialEvent == PROMOTEKNIGHT || specialEvent == PROMOTEQUEEN ||
                     specialEvent == PROMOTEROOK)
-                    refPawns ^= from, key ^= squareZKey(from, 'p');
+                    refPawns ^= (1ull << from), key ^= squareZKey(from, 'p');
                 else
                     refPawns ^= moveXor, key ^= ZMove(from, to, 'p');
                 if (specialEvent == PROMOTEBISHOP)
-                    refBishops ^= to, key ^= squareZKey(to, 'b');
+                    refBishops ^= (1ull << to), key ^= squareZKey(to, 'b');
                 else if (specialEvent == PROMOTEKNIGHT)
-                    refKnights ^= to, key ^= squareZKey(to, 'n');
+                    refKnights ^= (1ull << to), key ^= squareZKey(to, 'n');
                 else if (specialEvent == PROMOTEROOK)
-                    refRooks ^= to, key ^= squareZKey(to, 'r');
+                    refRooks ^= (1ull << to), key ^= squareZKey(to, 'r');
                 else if (specialEvent == PROMOTEQUEEN)
-                    refRooks ^= to, key ^= squareZKey(to, 'q');
+                    refQueens ^= (1ull << to), key ^= squareZKey(to, 'q');
                 break;
             case 1:
                 refKnights ^= moveXor;
@@ -906,7 +911,7 @@ public:
                 key ^= ZMove(from, to, 'r');
                 break;
             case 4:
-                refRooks ^= moveXor;
+                refQueens ^= moveXor;
                 key ^= ZMove(from, to, 'q');
                 break;
             case 5:
@@ -923,7 +928,7 @@ public:
                 break;
         }
 
-        refColorPieces = refPawns | refKnights | refBishops | refRooks | refKing | refRooks;
+        refColorPieces = refPawns | refKnights | refBishops | refRooks | refKing | refQueens;
 
         if (capture) {
             if (locExist(refOtherPawns, 1ull << to)) {
@@ -970,8 +975,6 @@ public:
             fiftyMoveRule = 0;
 
 
-        allValidMoves.clear();
-        allValidMoves = generateAllMoves();
 
 
         //saving all of our history
@@ -986,6 +989,8 @@ public:
 
         //switch turns
         whiteToMove = !whiteToMove;
+        allValidMoves.clear();
+        allValidMoves = generateAllMoves();
 
 
     }
@@ -1510,7 +1515,7 @@ public:
     // checks if there's a knight attacking the queen
     bool kingSafeKnights(bool white) {
         bool safe = true;
-        if (white) {
+        if (!white) {
             //6 10 15 17
             int kingInd = (log2(virWhiteKing & -virWhiteKing) + EPS);
             int dangerKnight = kingInd + 6;
@@ -1589,7 +1594,7 @@ public:
             if (type == bishopTypeNum())
                 target = whiteTurn ? virBlackBishops : virWhiteBishops;
             else target = whiteTurn ? virBlackQueens : virWhiteQueens;
-            ret |= !noCollision && locExist(target, firstCollisionCell);
+            ret |= (!noCollision && locExist(target, firstCollision));
         }
 
         for (int i = 1; i < 3 && !ret; ++i) {
@@ -1605,7 +1610,7 @@ public:
                 target = whiteTurn ? virBlackBishops : virWhiteBishops;
             else target = whiteTurn ? virBlackQueens : virWhiteQueens;
 
-            ret |= !noCollision && locExist(target, firstCollisionCell);
+            ret |= (!noCollision && locExist(target, firstCollision));
         }
         return !ret;
     }
@@ -1627,12 +1632,12 @@ public:
             bool noCollision = firstCollision == 0;
 
             ull target;
-            if (type == bishopTypeNum())
+            if (type == rookTypeNum())
                 target = whiteTurn ? virBlackRooks : virWhiteRooks;
             else target = whiteTurn ? virBlackQueens : virWhiteQueens;
 
 
-            ret |= !noCollision && locExist(target, firstCollision);
+            ret |= (!noCollision && locExist(target, firstCollision));
         }
 
         for (int i = 2; i < 4 && !ret; ++i) {
@@ -1643,12 +1648,12 @@ public:
             bool noCollision = firstCollision == 0;
 
             ull target;
-            if (type == bishopTypeNum())
+            if (type == rookTypeNum())
                 target = whiteTurn ? virBlackRooks : virWhiteRooks;
             else target = whiteTurn ? virBlackQueens : virWhiteQueens;
 
 
-            ret |= !noCollision && locExist(target, firstCollision);
+            ret |= (!noCollision && locExist(target, firstCollision));
         }
         return !ret;
     }
@@ -1742,11 +1747,10 @@ public:
 
         virAllPieces = virWhitePieces | virBlackPieces;
 
-        ull tmpWhiteKing = virWhiteKing;
+        ull tmpWhiteKing = whiteTurn? virWhiteKing : virBlackKing;
         ull locRaisedPowW = getLSB(tmpWhiteKing);
 
         loc = log2(locRaisedPowW) + EPS;
-
         return kingSafePawns(whiteTurn) && kingSafeKnights(whiteTurn) &&
                checkVirtualMoveBishop(whiteTurn, move, loc, bishopTypeNum()) &&
                checkVirtualMoveRook(whiteTurn, move, loc, rookTypeNum()) &&
@@ -1915,7 +1919,7 @@ public:
                     threat[newInd] = key;
                 }
             }
-            if (pawnBackwardAttack(ind, newInd) && (newInd >= 0 && newInd <= 63) && (blackPieces & (1ull << newInd))) {
+            if (pawnBackwardAttack(ind, newInd) && (newInd >= 0 && newInd <= 63) && (whitePieces & (1ull << newInd))) {
                 //new valid capture from ind to newInd
                 if (newInd < 8) {
                     int move = makeMoveMask(0, 1, pawnTypeNum(), ind, newInd, 1);
@@ -1943,7 +1947,7 @@ public:
                     threat[newInd] = key;
                 }
             }
-            if (pawnBackwardAttack(ind, newInd) && (newInd >= 0 && newInd <= 63) && (blackPieces & (1ull << newInd))) {
+            if (pawnBackwardAttack(ind, newInd) && (newInd >= 0 && newInd <= 63) && (whitePieces & (1ull << newInd))) {
                 //new valid capture from ind to newInd
                 if (newInd < 8) {
                     int move = makeMoveMask(0, 1, pawnTypeNum(), ind, newInd, 1);
@@ -2208,14 +2212,14 @@ public:
 
                 for (int j = loc + dx[i]; j < lim[i] && (j < firstCollisionCell || noCollision); j += dx[i]) {
                     int moveMask = makeMoveMask(0, 0, type, loc, j, color);
-                    if (isValid(color, moveMask))
+                    if (isValid(!color, moveMask))
                         ret.push_back(moveMask), threat[j] = key;
                 }
                 if (!noCollision) {
                     threat[firstCollisionCell] = key;
                     if (locExist(target, firstCollision)) {
                         int moveMask = makeMoveMask(0, 1, type, loc, firstCollisionCell, color);
-                        if (isValid(color, moveMask))
+                        if (isValid(!color, moveMask))
                             ret.push_back(makeMoveMask(0, 1, type, loc, firstCollisionCell, color));
                     }
                 }
@@ -2231,13 +2235,13 @@ public:
 
                 for (int j = loc + dx[i]; j > lim[i] && (j > firstCollisionCell || noCollision); j += dx[i]) {
                     int moveMask = makeMoveMask(0, 0, type, loc, j, color);
-                    if (isValid(color, moveMask))
+                    if (isValid(!color, moveMask))
                         ret.push_back(makeMoveMask(0, 0, type, loc, j, color)), threat[j] = key;
                 }
                 if (!noCollision) {
                     threat[firstCollisionCell] = key;
                     int moveMask = makeMoveMask(0, 1, type, loc, firstCollisionCell, color);
-                    if (locExist(target, firstCollision) && isValid(color, moveMask))
+                    if (locExist(target, firstCollision) && isValid(!color, moveMask))
                         ret.push_back(makeMoveMask(0, 1, type, loc, firstCollisionCell, color));
                 }
             }
@@ -2275,13 +2279,13 @@ public:
                      (j < firstCollisionCell || noCollision) && inBoundaries(x2,
                                                                              y2); j += di[i], x2 += dx[i], y2 += dy[i]) {
                     int moveMask = makeMoveMask(0, 0, type, loc, j, color);
-                    if (isValid(color, moveMask))
+                    if (isValid(!color, moveMask))
                         ret.push_back(makeMoveMask(0, 0, type, loc, j, color)), threat[j] = key;
                 }
                 if (!noCollision) {
                     threat[firstCollisionCell] = key;
                     int moveMask = makeMoveMask(0, 1, type, loc, firstCollisionCell, color);
-                    if (locExist(target, firstCollision) && isValid(color, moveMask))
+                    if (locExist(target, firstCollision) && isValid(!color, moveMask))
                         ret.push_back(makeMoveMask(0, 1, type, loc, firstCollisionCell, color));
                 }
             }
@@ -2298,13 +2302,13 @@ public:
                      (j > firstCollisionCell || noCollision) && inBoundaries(x2,
                                                                              y2); j += di[i], x2 += dx[i], y2 += dy[i]) {
                     int moveMask = makeMoveMask(0, 0, type, loc, j, color);
-                    if (isValid(color, moveMask))
+                    if (isValid(!color, moveMask))
                         ret.push_back(makeMoveMask(0, 0, type, loc, j, color)), threat[j] = key;
                 }
                 if (!noCollision) {
                     threat[firstCollisionCell] = key;
                     int moveMask = makeMoveMask(0, 1, type, loc, firstCollisionCell, color);
-                    if (locExist(target, firstCollision) && isValid(color, moveMask))
+                    if (locExist(target, firstCollision) && isValid(!color, moveMask))
                         ret.push_back(makeMoveMask(0, 1, type, loc, firstCollisionCell, color));
                 }
             }
@@ -2314,8 +2318,8 @@ public:
 
 // generating queen moves
     vector<int> queenMoves(int color) {
-        vector<int> ret = bishopMoves(color ? whiteQueens : blackQueens, queenTypeNum(), color);
-        vector<int> tmp = rookMoves(color ? whiteQueens : blackQueens, queenTypeNum(), color);
+        vector<int> ret = bishopMoves(!color ? whiteQueens : blackQueens, queenTypeNum(), color);
+        vector<int> tmp = rookMoves(!color ? whiteQueens : blackQueens, queenTypeNum(), color);
 
         for (auto m:tmp)ret.push_back(m);
 
@@ -2348,9 +2352,9 @@ public:
 
         if (whiteToMove) {
             for (int i = 0; i < 8; ++i) {
-                if (cellInBoard(locW + di[i]) && locExist(intersection, 1 << (locW + di[i])))continue;
+                if (cellInBoard(locW + di[i]) && locExist(intersection, 1ull << (locW + di[i])))continue;
                 if (cellInBoard(locW + di[i]) && threat[locW + di[i]] != key)
-                    if (!((resW >> (locW + di[i])) & 1))
+                    if (!((resW >> (locW + di[i])) & 1ull))
                         ret.push_back(makeMoveMask(0, 0, kingTypeNum(), locW, locW + di[i], 0));
                     else {
                         if (locExist(blackPieces, locW + di[i]))
@@ -2393,6 +2397,8 @@ public:
         int color = !whiteToMove;
         vector<int> ret;
         vector<int> m;
+        m = kingMoves();
+        ret.insert(ret.end(), m.begin(), m.end());
         if (!color) {
             m = whitePawnVMGen();
             ret.insert(ret.end(), m.begin(), m.end());
@@ -2433,8 +2439,7 @@ public:
             m = queenMoves(1);
             ret.insert(ret.end(), m.begin(), m.end());
         }
-        m = kingMoves();
-        ret.insert(ret.end(), m.begin(), m.end());
+
 
         return ret;
     }
