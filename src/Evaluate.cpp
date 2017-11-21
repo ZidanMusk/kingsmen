@@ -128,7 +128,7 @@ int interpolateScore(int scoreOp, int scoreEd, int phase) {
 }
 
 template<bool hardwarePopcnt>
-int Evaluation::evaluate() {
+int Evaluate::evaluate() {
     // IF DRAW RETURN 0
     if (mEndgameModule.drawnEndgame(pos.getMaterialHashKey())) {
         return 0;
@@ -279,15 +279,15 @@ int Evaluate::getPstScore() {
 
 }
 
-std::array<std::array<short, 64>, 12> Evaluation::mPieceSquareTableOpening;
-std::array<std::array<short, 64>, 12> Evaluation::mPieceSquareTableEnding;
+std::array<std::array<short, 64>, 12> Evaluate::mPieceSquareTableOpening;
+std::array<std::array<short, 64>, 12> Evaluate::mPieceSquareTableEnding;
 
-inline short Evaluation::getPieceSquareTableOp(Piece p, Square sq)
+inline short Evaluate::getPieceSquareTableOp(Piece p, Square sq)
 {
     return mPieceSquareTableOpening[p][sq];
 }
 
-inline short Evaluation::getPieceSquareTableEd(Piece p, Square sq)
+inline short Evaluate::getPieceSquareTableEd(Piece p, Square sq)
 {
     return mPieceSquareTableEnding[p][sq];
 }
