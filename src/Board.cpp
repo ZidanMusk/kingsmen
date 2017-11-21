@@ -1207,41 +1207,26 @@ public:
     }
 
 //KNIGHT ATTAKS===============================================
-    ull knightAttacks(int square) {
+    ull knightAttacks(int square, int color) {//0-> white, 1->black
 
         //mask which marks all my attack squares
         ull ans;
 
         //vectors to get the valid moves
-        vector<int> tmpW;
-        vector<int> tmpB;
+        vector<int> tmp;
 
         //Detecing If I am white or black knight
-        ull myKnight = (1ull << square);
-
-        if (allPieces & whiteKnights)
-            tmpW = whiteKnightVMGen();
+        if (!color)
+            tmp = whiteKnightVMGen();
         else
-            tmpB = blackKnightVMGen();
+            tmp = blackKnightVMGen();
 
-        //checking if my piece is from white pieces
-        if (tmpW.size()) {
-            for (int i = 0; i < tmpW.size(); i++) {
 
-                if (((tmpW[i] & 8064) >> 7) ==
-                    square) {//check if this move of a piece of my wanted square(from == square)
-                    //Oring with destination to mark it with 1 (<<to)
-                    ans |= (1ull << ((tmpW[i] & 516096) >> 13));
-                }
-            }
-        } else {
-            //checking if my piece is from black pieces
-            for (int i = 0; i < tmpB.size(); i++) {
+        for (int i = 0; i < tmp.size(); i++) {
 
-                if (((tmpB[i] & 8064) >> 7) == square) {//check if this move of a piece of my wanted square
-                    //Oring with destination to mark it with 1
-                    ans |= (1ull << ((tmpB[i] & 516096) >> 13));
-                }
+            if (((tmp[i] & 8064) >> 7) == square) {//check if this move of a piece of my wanted square(from == square)
+                //Oring with destination to mark it with 1 (<<to)
+                ans |= (1ull << ((tmp[i] & 516096) >> 13));
             }
         }
 
@@ -1251,7 +1236,7 @@ public:
 
 //BISHOP ATTAKS===================================Normal version(default -> false)
 //Version after removing other queens
-    ull bishopAttacks(int square, ull occupied, bool version) {
+    ull bishopAttacks(int square, int color, bool version) {
 
         //mask which marks all my attack squares
         ull ans;
@@ -1263,9 +1248,7 @@ public:
         vector<int> tmpB;
 
         //Detecing If I am white or black Bishop
-        ull myBishop = (1ull << square);
-
-        if (whiteBishops & myBishop) {
+        if (!color) {
 
             if (version) {
                 //Removing white queens
@@ -1312,7 +1295,7 @@ public:
 
 //ROOK ATTAKS================================================Normal version
 //Version after removing other rooks and queens
-    ull rookAttacks(int square, ull occupied, bool version) {
+    ull rookAttacks(int square, int color, bool version) {
 
         //mask which marks all my attack squares
         ull ans;
@@ -1329,10 +1312,10 @@ public:
         vector<int> tmpW;
         vector<int> tmpB;
 
-        //Detecing If I am white or black Bishop
         ull myRook = (1ull << square);
 
-        if (whiteRooks & myRook) {
+        //Detecing If I am white or black Bishop
+        if (!color) {
 
             if (version) {
                 //Removing all other white Rooks
@@ -1403,7 +1386,7 @@ public:
 
 //QUEEN ATTAKS================================================Normal version
 //Version after removing other queens
-    ull queenAttacks(int square, ull occupied, bool version) {
+    ull queenAttacks(int square, int color, bool version) {
 
         //mask which marks all my attack squares
         ull ans;
@@ -1416,10 +1399,10 @@ public:
         vector<int> tmpW;
         vector<int> tmpB;
 
-        //Detecing If I am white or black Queen
         ull myQueen = (1ull << square);
 
-        if (whiteQueens & myQueen) {
+        //Detecing If I am white or black Queen
+        if (!color) {
 
             if (version) {
                 //Removing all other white Queens
