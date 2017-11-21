@@ -50,6 +50,9 @@ public:
     int evaluate();
 
     int getPstScore();
+
+    int mobilityEval(std::array<int, 2>& kingSafetyScore, int phase);
+
 };
 
 #endif //KINGSMEN_EVALUATE_H
