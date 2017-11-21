@@ -3,6 +3,39 @@
 typedef unsigned long long ull;
 using namespace std;
 
+
+enum Color
+{
+    White = 0, Black = 1, NoColor = 2
+};
+
+enum Piece {
+    Pawn = 0, Knight = 1, Bishop = 2, Rook = 3, Queen = 4, King = 5
+};
+
+enum Square {
+    A1, B1, C1, D1, E1, F1, G1, H1,
+    A2, B2, C2, D2, E2, F2, G2, H2,
+    A3, B3, C3, D3, E3, F3, G3, H3,
+    A4, B4, C4, D4, E4, F4, G4, H4,
+    A5, B5, C5, D5, E5, F5, G5, H5,
+    A6, B6, C6, D6, E6, F6, G6, H6,
+    A7, B7, C7, D7, E7, F7, G7, H7,
+    A8, B8, C8, D8, E8, F8, G8, H8,
+    NoSquare
+};
+
+const std::array<int8_t, 6> piecePhase = {
+        0, 3, 3, 5, 10, 0
+};
+
+const int8_t totalPhase = piecePhase[Piece::Pawn] * 16
+                          + piecePhase[Piece::Knight] * 4
+                          + piecePhase[Piece::Bishop] * 4
+                          + piecePhase[Piece::Rook] * 4
+                          + piecePhase[Piece::Queen] * 2;
+
+
 class Board {
 
 
@@ -889,7 +922,7 @@ public:
                 else if (specialEvent == PROMOTEROOK)
                     refRooks ^= to, key ^= squareZKey(to, 'r');
                 else if (specialEvent == PROMOTEQUEEN)
-                    refRooks ^= to, key ^= squareZKey(to, 'q');
+                    refQueens ^= to, key ^= squareZKey(to, 'q');
                 break;
             case 1:
                 refKnights ^= moveXor;
@@ -906,7 +939,7 @@ public:
                 key ^= ZMove(from, to, 'r');
                 break;
             case 4:
-                refRooks ^= moveXor;
+                refQueens ^= moveXor;
                 key ^= ZMove(from, to, 'q');
                 break;
             case 5:
@@ -923,7 +956,7 @@ public:
                 break;
         }
 
-        refColorPieces = refPawns | refKnights | refBishops | refRooks | refKing | refRooks;
+        refColorPieces = refPawns | refKnights | refBishops | refRooks | refKing | refQueens;
 
         if (capture) {
             if (locExist(refOtherPawns, 1ull << to)) {
@@ -1231,7 +1264,7 @@ public:
 
 
 
-        int popLsb(int &bitBoard) {
+    int popLsb(ull &bitBoard) {
         //get LS 1 in the board and toggle itpop
         ull z  = (log2(bitBoard & -bitBoard) + EPS);
         bitBoard = ((bitBoard & -bitBoard) ^ bitBoard);
@@ -2204,7 +2237,7 @@ public:
         vector<int> ret;
         ull tmpRooks = mask;
 
-        ull target = color ? blackRooks : whiteRooks;
+        ull target = color ? blackPieces : whitePieces;
 
         while (tmpRooks) {
             ull locRaisedPow = getLSB(tmpRooks);
@@ -2223,14 +2256,14 @@ public:
 
                 for (int j = loc + dx[i]; j < lim[i] && (j < firstCollisionCell || noCollision); j += dx[i]) {
                     int moveMask = makeMoveMask(0, 0, type, loc, j, color);
-                    if (isValid(color, moveMask))
+                    if (isValid(!color, moveMask))
                         ret.push_back(moveMask), threat[j] = key;
                 }
                 if (!noCollision) {
                     threat[firstCollisionCell] = key;
                     if (locExist(target, firstCollision)) {
                         int moveMask = makeMoveMask(0, 1, type, loc, firstCollisionCell, color);
-                        if (isValid(color, moveMask))
+                        if (isValid(!color, moveMask))
                             ret.push_back(makeMoveMask(0, 1, type, loc, firstCollisionCell, color));
                     }
                 }
@@ -2246,13 +2279,13 @@ public:
 
                 for (int j = loc + dx[i]; j > lim[i] && (j > firstCollisionCell || noCollision); j += dx[i]) {
                     int moveMask = makeMoveMask(0, 0, type, loc, j, color);
-                    if (isValid(color, moveMask))
+                    if (isValid(!color, moveMask))
                         ret.push_back(makeMoveMask(0, 0, type, loc, j, color)), threat[j] = key;
                 }
                 if (!noCollision) {
                     threat[firstCollisionCell] = key;
                     int moveMask = makeMoveMask(0, 1, type, loc, firstCollisionCell, color);
-                    if (locExist(target, firstCollision) && isValid(color, moveMask))
+                    if (locExist(target, firstCollision) && isValid(!color, moveMask))
                         ret.push_back(makeMoveMask(0, 1, type, loc, firstCollisionCell, color));
                 }
             }
@@ -2266,7 +2299,7 @@ public:
         vector<int> ret;
         ull tmpBishops = mask;
 
-        ull target = color ? blackBishops : whiteBishops;
+        ull target = color ? blackPieces : whitePieces;
 
         while (tmpBishops) {
             ull locRaisedPow = getLSB(tmpBishops);
@@ -2290,13 +2323,13 @@ public:
                      (j < firstCollisionCell || noCollision) && inBoundaries(x2,
                                                                              y2); j += di[i], x2 += dx[i], y2 += dy[i]) {
                     int moveMask = makeMoveMask(0, 0, type, loc, j, color);
-                    if (isValid(color, moveMask))
+                    if (isValid(!color, moveMask))
                         ret.push_back(makeMoveMask(0, 0, type, loc, j, color)), threat[j] = key;
                 }
                 if (!noCollision) {
                     threat[firstCollisionCell] = key;
                     int moveMask = makeMoveMask(0, 1, type, loc, firstCollisionCell, color);
-                    if (locExist(target, firstCollision) && isValid(color, moveMask))
+                    if (locExist(target, firstCollision) && isValid(!color, moveMask))
                         ret.push_back(makeMoveMask(0, 1, type, loc, firstCollisionCell, color));
                 }
             }
@@ -2313,13 +2346,13 @@ public:
                      (j > firstCollisionCell || noCollision) && inBoundaries(x2,
                                                                              y2); j += di[i], x2 += dx[i], y2 += dy[i]) {
                     int moveMask = makeMoveMask(0, 0, type, loc, j, color);
-                    if (isValid(color, moveMask))
+                    if (isValid(!color, moveMask))
                         ret.push_back(makeMoveMask(0, 0, type, loc, j, color)), threat[j] = key;
                 }
                 if (!noCollision) {
                     threat[firstCollisionCell] = key;
                     int moveMask = makeMoveMask(0, 1, type, loc, firstCollisionCell, color);
-                    if (locExist(target, firstCollision) && isValid(color, moveMask))
+                    if (locExist(target, firstCollision) && isValid(!color, moveMask))
                         ret.push_back(makeMoveMask(0, 1, type, loc, firstCollisionCell, color));
                 }
             }
@@ -2329,8 +2362,8 @@ public:
 
 // generating queen moves
     vector<int> queenMoves(int color) {
-        vector<int> ret = bishopMoves(color ? whiteQueens : blackQueens, queenTypeNum(), color);
-        vector<int> tmp = rookMoves(color ? whiteQueens : blackQueens, queenTypeNum(), color);
+        vector<int> ret = bishopMoves(!color ? whiteQueens : blackQueens, queenTypeNum(), color);
+        vector<int> tmp = rookMoves(!color ? whiteQueens : blackQueens, queenTypeNum(), color);
 
         for (auto m:tmp)ret.push_back(m);
 
@@ -2454,4 +2487,11 @@ public:
         return ret;
     }
 
+    int8_t mGamePhase;
+
+    // TODO HOW TO HANDLE THE GAME PHASE
+    int getGamePhase(){
+        return mGamePhase;
+    }
 };
+
