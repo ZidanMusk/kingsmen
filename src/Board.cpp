@@ -1201,8 +1201,37 @@ public:
             return blackKing;
     }
 
+    ull getPieceCount(int c, int p) {
+        if (c == 0 && p == 0)
+            return __builtin_popcountll(whitePawns);
+        else if (c == 0 && p == 1)
+            return __builtin_popcountll(whiteKnights);
+        else if (c == 0 && p == 2)
+            return __builtin_popcountll(whiteBishops);
+        else if (c == 0 && p == 3)
+            return __builtin_popcountll(whiteRooks);
+        else if (c == 0 && p == 4)
+            return __builtin_popcountll(whiteQueens);
+        else if (c == 0 && p == 5)
+            return __builtin_popcountll(whiteKing);
 
-    int popLsb(int &bitBoard) {
+        else if (c == 1 && p == 0)
+            return __builtin_popcountll(blackPawns);
+        else if (c == 1 && p == 1)
+            return __builtin_popcountll(blackKnights);
+        else if (c == 1 && p == 2)
+            return __builtin_popcountll(blackBishops);
+        else if (c == 1 && p == 3)
+            return __builtin_popcountll(blackRooks);
+        else if (c == 1 && p == 4)
+            return __builtin_popcountll(blackQueens);
+        else if (c == 1 && p == 5)
+            return __builtin_popcountll(blackKing);
+    }
+
+
+
+        int popLsb(int &bitBoard) {
         //get LS 1 in the board and toggle itpop
         ull z  = (log2(bitBoard & -bitBoard) + EPS);
         bitBoard = ((bitBoard & -bitBoard) ^ bitBoard);
