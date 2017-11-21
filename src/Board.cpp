@@ -1201,10 +1201,10 @@ public:
             return blackKing;
     }
 
-    ull popLsb(ull &bitBoard) {
+    int popLsb(ull &bitBoard) {
         //get LS 1 in the board and toggle itpop
         bitBoard = ((bitBoard & -bitBoard) ^ bitBoard);
-        
+
         return (log2(bitBoard & -bitBoard) + EPS);
     }
 
