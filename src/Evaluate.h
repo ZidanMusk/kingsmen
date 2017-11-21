@@ -20,6 +20,8 @@ public:
     /// @brief Evaluates a given position.
     /// @return The heuristic score given to the position.
     int evaluate();
+
+    int mobilityEval(std::array<int, 2>& kingSafetyScore, int phase);
 };
 
 #endif //KINGSMEN_EVALUATE_H

@@ -1,11 +1,31 @@
 #include "Evaluate.h"
 
+const std::array<std::vector<int>, 6> mobilityOpening = {{
+                                                                 {},
+                                                                 {-1, 6, 12, 16, 17, 16, 16, 15, 18},
+                                                                 {-12, -7, -2, 1, 6, 14, 17, 22, 19, 23, 21, 34, 34, 29},
+                                                                 {-15, -12, -5, -3, -4, -1, 0, 6, 3, 1, 4, 4, 7, 14, 20},
+                                                                 {35, -5, -8, -8, -6, -4, -6, -3, 1, -1, 5, 7, 6, 6, 8, 4, 2, 6, 4, 7, 17, 21, 30, 24, 41, 41, 36, 34},
+                                                                 {}
+                                                         }};
+
+const std::array<std::vector<int>, 6> mobilityEnding = {{
+                                                                {},
+                                                                {-30, 1, 4, 11, 16, 25, 23, 23, 19},
+                                                                {-22, -32, -19, -6, 5, 20, 29, 33, 42, 40, 36, 38, 28, 13},
+                                                                {-12, -12, -8, -5, 7, 16, 20, 22, 31, 42, 43, 47, 47, 47, 37},
+                                                                {-2, 5, -2, -23, -28, -29, -14, -12, -10, -3, -5, -1, 6, 14, 17, 22, 36, 34, 43, 37, 39, 33, 36, 22, 12, -4, 38, 26},
+                                                                {}
+                                                        }};
+const std::array<int, 6> attackWeight = {
+        0, 2, 2, 3, 5, 0
+};
+
 Evaluate::Evaluate(Board *b) : doubledPenaltyOpening({
                                                              36, 9, 2, 23, 18, 20, 0, 26
                                                      }), doubledPenaltyEnding({
                                                                                       46, 25, 31, 24, 21, 19, 29, 44
-                                                                              })
-{
+                                                                              }) {
     _board = b;
 }
 
@@ -100,17 +120,21 @@ int Evaluate::kingSafty(int blackKingSafety, int whiteKingSafty) {
 
 }
 
-template <bool hardwarePopcnt>
-int Evaluation::evaluate()
+int interpolateScore(int scoreOp, int scoreEd, int phase)
 {
+    return ((scoreOp * (64 - phase)) + (scoreEd * phase)) / 64;
+}
+
+template<bool hardwarePopcnt>
+int Evaluation::evaluate() {
     // IF DRAW RETURN 0
-    if (mEndgameModule.drawnEndgame(pos.getMaterialHashKey()))
-    {
+    if (mEndgameModule.drawnEndgame(pos.getMaterialHashKey())) {
         return 0;
     }
 
     std::array<int, 2> kingSafetyScore;
-    const auto phase = clamp(static_cast<int>(pos.getGamePhase()), 0, 64); // The phase can be negative in some weird cases, guard against that.
+    const auto phase = clamp(static_cast<int>(pos.getGamePhase()), 0,
+                             64); // The phase can be negative in some weird cases, guard against that.
 
     auto score = mobilityEval<hardwarePopcnt>(pos, kingSafetyScore, phase);
     score += pawnStructureEval(pos, phase);
@@ -118,10 +142,8 @@ int Evaluation::evaluate()
     score += interpolateScore(pos.getPstScoreOp(), pos.getPstScoreEd(), phase);
 
     // Bishop pair bonus.
-    for (Color c = Color::White; c <= Color::Black; ++c)
-    {
-        if (pos.getPieceCount(c, Piece::Bishop) == 2)
-        {
+    for (Color c = Color::White; c <= Color::Black; ++c) {
+        if (pos.getPieceCount(c, Piece::Bishop) == 2) {
             const auto bishopPairBonus = interpolateScore(bishopPairBonusOpening, bishopPairBonusEnding, phase);
             score += (c ? -bishopPairBonus : bishopPairBonus);
         }
@@ -131,3 +153,122 @@ int Evaluation::evaluate()
 
     return (pos.getSideToMove() ? -score : score);
 }
+
+int Evaluate::mobilityEval(std::array<int, 2> &kingSafetyScore, int phase) {
+    const auto occupied = _board->getOccupiedSquares();
+//    const auto occupied = pos.getOccupiedSquares();
+    auto scoreOp = 0, scoreEd = 0;
+
+    for (int c = 0; c <= 1; ++c) {
+
+        // king safety array access with king color and place on board
+        const auto opponentKingZone = _board->kingSafetyZone[!c][_board->getLSB(
+                _board->getBitBoard(!c, 5))]; // 5 -> king
+//        const auto targetBitboard = ~pos.getPieces(c);
+//        const auto opponentKingZone = Bitboards::kingSafetyZone(!c, Bitboards::lsb(pos.getBitboard(!c, Piece::King)));
+        auto scoreOpForColor = 0, scoreEdForColor = 0;
+        auto attackUnits = 0;
+
+        auto tempPiece = _board->getBitBoard(c, 1); // 1 -> knight
+//        auto tempPiece = pos.getBitboard(c, Piece::Knight);
+
+        while (tempPiece) {
+            const auto from = _board->popLsb(tempPiece);
+            const auto tempMove = _board->knightAttacks(from);
+            const auto count = _board->popCnt(tempMove);
+            scoreOpForColor += mobilityOpening[1][count]; // 1 -> knight
+            scoreEdForColor += mobilityEnding[1][count]; // 1 -> knight
+            attackUnits += attackWeight[1] * _board->popCnt(tempMove & opponentKingZone);
+
+//            const auto from = Bitboards::popLsb(tempPiece);
+//            const auto tempMove = Bitboards::knightAttacks(from) & targetBitboard;
+//            const auto count = Bitboards::popcnt<hardwarePopcnt>(tempMove);
+//            scoreOpForColor += mobilityOpening[Piece::Knight][count];
+//            scoreEdForColor += mobilityEnding[Piece::Knight][count];
+//            attackUnits += attackWeight[Piece::Knight] * Bitboards::popcnt<hardwarePopcnt>(tempMove & opponentKingZone);
+        }
+
+        tempPiece = _board->getBitBoard(c, 2);
+//        tempPiece = pos.getBitboard(c, Piece::Bishop);
+        while (tempPiece) {
+            const auto from = _board->popLsb(tempPiece);
+            auto tempMove = _board->bishopAttacks(from, occupied, 0); // default
+            const auto count = _board->popCnt(tempMove);
+            scoreOpForColor += mobilityOpening[2][count];
+            scoreEdForColor += mobilityEnding[2][count];
+            tempMove = _board->bishopAttacks(from, occupied ^ _board->getBitBoard(c, 4),);
+            attackUnits += attackWeight[Piece::Bishop] * _board->popcnt<hardwarePopcnt>(tempMove & opponentKingZone);
+
+//            const auto from = Bitboards::popLsb(tempPiece);
+//            auto tempMove = Bitboards::bishopAttacks(from, occupied) & targetBitboard;
+//            const auto count = Bitboards::popcnt<hardwarePopcnt>(tempMove);
+//            scoreOpForColor += mobilityOpening[Piece::Bishop][count];
+//            scoreEdForColor += mobilityEnding[Piece::Bishop][count];
+//            tempMove = Bitboards::bishopAttacks(from, occupied ^ pos.getBitboard(c, Piece::Queen)) & targetBitboard;
+//            attackUnits += attackWeight[Piece::Bishop] * Bitboards::popcnt<hardwarePopcnt>(tempMove & opponentKingZone);
+        }
+
+        tempPiece = _board->getBitBoard(c, Piece::Rook);
+//        tempPiece = pos.getBitboard(c, Piece::Rook);
+        while (tempPiece) {
+            const auto from = _board->popLsb(tempPiece);
+            auto tempMove = _board->rookAttacks(from, occupied) & targetBitboard;
+            const auto count = _board->popcnt<hardwarePopcnt>(tempMove);
+            scoreOpForColor += mobilityOpening[Piece::Rook][count];
+            scoreEdForColor += mobilityEnding[Piece::Rook][count];
+            tempMove = _board->rookAttacks(from, occupied ^ _board->getBitBoard(c, Piece::Queen) ^
+                    _board->getBitBoard(c, Piece::Rook)) & targetBitboard;
+            attackUnits += attackWeight[Piece::Rook] * _board->popcnt<hardwarePopcnt>(tempMove & opponentKingZone);
+
+            if (!(Bitboards::files[file(from)] & _board->getBitBoard(c, Piece::Pawn))) {
+                if (!(Bitboards::files[file(from)] & _board->getBitBoard(!c, Piece::Pawn))) {
+                    scoreOpForColor += 26;
+                } else {
+                    scoreOpForColor += 13;
+                }
+            }
+//            const auto from = Bitboards::popLsb(tempPiece);
+//            auto tempMove = Bitboards::rookAttacks(from, occupied) & targetBitboard;
+//            const auto count = Bitboards::popcnt<hardwarePopcnt>(tempMove);
+//            scoreOpForColor += mobilityOpening[Piece::Rook][count];
+//            scoreEdForColor += mobilityEnding[Piece::Rook][count];
+//            tempMove = Bitboards::rookAttacks(from, occupied ^ pos.getBitboard(c, Piece::Queen) ^
+//                                                    pos.getBitboard(c, Piece::Rook)) & targetBitboard;
+//            attackUnits += attackWeight[Piece::Rook] * Bitboards::popcnt<hardwarePopcnt>(tempMove & opponentKingZone);
+//
+//            if (!(Bitboards::files[file(from)] & pos.getBitboard(c, Piece::Pawn))) {
+//                if (!(Bitboards::files[file(from)] & pos.getBitboard(!c, Piece::Pawn))) {
+//                    scoreOpForColor += 26;
+//                } else {
+//                    scoreOpForColor += 13;
+//                }
+//            }
+        }
+
+        tempPiece = _board->getBitBoard(c, Piece::Queen);
+//        tempPiece = pos.getBitboard(c, Piece::Queen);
+        while (tempPiece) {
+            const auto from = _board->popLsb(tempPiece);
+            const auto tempMove = _board->queenAttacks(from, occupied) & targetBitboard;
+            const auto count = _board->popcnt<hardwarePopcnt>(tempMove);
+            scoreOpForColor += mobilityOpening[Piece::Queen][count];
+            scoreEdForColor += mobilityEnding[Piece::Queen][count];
+            attackUnits += attackWeight[Piece::Queen] * _board->popcnt<hardwarePopcnt>(tempMove & opponentKingZone);
+
+//            const auto from = Bitboards::popLsb(tempPiece);
+//            const auto tempMove = Bitboards::queenAttacks(from, occupied) & targetBitboard;
+//            const auto count = Bitboards::popcnt<hardwarePopcnt>(tempMove);
+//            scoreOpForColor += mobilityOpening[Piece::Queen][count];
+//            scoreEdForColor += mobilityEnding[Piece::Queen][count];
+//            attackUnits += attackWeight[Piece::Queen] * Bitboards::popcnt<hardwarePopcnt>(tempMove & opponentKingZone);
+        }
+
+        kingSafetyScore[c] = attackUnits;
+        scoreOp += (c ? -scoreOpForColor : scoreOpForColor);
+        scoreEd += (c ? -scoreEdForColor : scoreEdForColor);
+    }
+
+    return interpolateScore(scoreOp, scoreEd, phase);
+}
+
+
