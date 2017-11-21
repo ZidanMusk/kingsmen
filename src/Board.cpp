@@ -683,7 +683,9 @@ public:
     }
 
     ull getMSB(ull x) {
-        return __builtin_clzll(x);
+        if (!x)return 0;
+        int z = __builtin_clzll(x);
+        return 1ull << (63 - z);
     }
 
     int pawnTypeNum() {
@@ -718,26 +720,28 @@ public:
         return kingSafetyZone[pos][color];
     }
 
-    bool pawnForwardAttack(int i, int ii){
-        if(i%8+1==ii%8 && i/8+1==ii/8)return true;
-        if(i%8-1==ii%8 && i/8+1==ii/8)return true;
+    bool pawnForwardAttack(int i, int ii) {
+        if (i % 8 + 1 == ii % 8 && i / 8 + 1 == ii / 8)return true;
+        if (i % 8 - 1 == ii % 8 && i / 8 + 1 == ii / 8)return true;
         return false;
     }
-    bool pawnBackwardAttack(int i, int ii){
-        if(i%8+1==ii%8 && i/8-1==ii/8)return true;
-        if(i%8-1==ii%8 && i/8-1==ii/8)return true;
-        return false;
-    }
-    bool knightCh(int i, int ii){
-        if(i%8+1==ii%8 && i/8+2==ii/8)return true;
-        if(i%8+1==ii%8 && i/8-2==ii/8)return true;
-        if(i%8-1==ii%8 && i/8+2==ii/8)return true;
-        if(i%8-1==ii%8 && i/8-2==ii/8)return true;
 
-        if(i%8+2==ii%8 && i/8+1==ii/8)return true;
-        if(i%8+2==ii%8 && i/8-1==ii/8)return true;
-        if(i%8-2==ii%8 && i/8+1==ii/8)return true;
-        if(i%8-2==ii%8 && i/8-1==ii/8)return true;
+    bool pawnBackwardAttack(int i, int ii) {
+        if (i % 8 + 1 == ii % 8 && i / 8 - 1 == ii / 8)return true;
+        if (i % 8 - 1 == ii % 8 && i / 8 - 1 == ii / 8)return true;
+        return false;
+    }
+
+    bool knightCh(int i, int ii) {
+        if (i % 8 + 1 == ii % 8 && i / 8 + 2 == ii / 8)return true;
+        if (i % 8 + 1 == ii % 8 && i / 8 - 2 == ii / 8)return true;
+        if (i % 8 - 1 == ii % 8 && i / 8 + 2 == ii / 8)return true;
+        if (i % 8 - 1 == ii % 8 && i / 8 - 2 == ii / 8)return true;
+
+        if (i % 8 + 2 == ii % 8 && i / 8 + 1 == ii / 8)return true;
+        if (i % 8 + 2 == ii % 8 && i / 8 - 1 == ii / 8)return true;
+        if (i % 8 - 2 == ii % 8 && i / 8 + 1 == ii / 8)return true;
+        if (i % 8 - 2 == ii % 8 && i / 8 - 1 == ii / 8)return true;
         return false;
     }
 
@@ -884,7 +888,7 @@ public:
                 else if (specialEvent == PROMOTEROOK)
                     refRooks ^= to, key ^= squareZKey(to, 'r');
                 else if (specialEvent == PROMOTEQUEEN)
-                    refRooks ^= to, key ^= squareZKey(to, 'q');
+                    refQueens ^= to, key ^= squareZKey(to, 'q');
                 break;
             case 1:
                 refKnights ^= moveXor;
@@ -901,7 +905,7 @@ public:
                 key ^= ZMove(from, to, 'r');
                 break;
             case 4:
-                refRooks ^= moveXor;
+                refQueens ^= moveXor;
                 key ^= ZMove(from, to, 'q');
                 break;
             case 5:
@@ -918,7 +922,7 @@ public:
                 break;
         }
 
-        refColorPieces = refPawns | refKnights | refBishops | refRooks | refKing | refRooks;
+        refColorPieces = refPawns | refKnights | refBishops | refRooks | refKing | refQueens;
 
         if (capture) {
             if (locExist(refOtherPawns, 1ull << to)) {
@@ -1763,7 +1767,7 @@ public:
             wp -= (wp & -wp);
             if (ind >= 8 && ind <= 15) {//move two squares forward --> +16
                 int newInd = ind + 16;
-                if ( (newInd >= 0 && newInd <= 63) && !(allPieces & (1ull << newInd)) &&
+                if ((newInd >= 0 && newInd <= 63) && !(allPieces & (1ull << newInd)) &&
                     !(allPieces & (1ull << (newInd - 8)))) {
                     //new valid move from ind to newInd
                     int flag = 0;
@@ -1776,7 +1780,7 @@ public:
             }
             //move one square forward --> +8
             int newInd = ind + 8;
-            if ( (newInd >= 0 && newInd <= 63) && !(allPieces & (1ull << newInd))) {
+            if ((newInd >= 0 && newInd <= 63) && !(allPieces & (1ull << newInd))) {
                 //new valid move from ind to newInd
                 if (newInd > 55) {
                     int move = makeMoveMask(0, 0, pawnTypeNum(), ind, newInd, 0);
@@ -1872,7 +1876,7 @@ public:
             wp -= (wp & -wp);
             if (ind >= 48 && ind <= 55) {//move two squares forward --> +16
                 int newInd = ind - 16;
-                if ( (newInd >= 0 && newInd <= 63) && !(allPieces & (1ull << newInd)) &&
+                if ((newInd >= 0 && newInd <= 63) && !(allPieces & (1ull << newInd)) &&
                     !(allPieces & (1ull << (newInd + 8)))) {
                     //new valid move from ind to newInd
                     int flag = 0;
@@ -1884,7 +1888,7 @@ public:
             }
             //move one square forward --> +8
             int newInd = ind - 8;
-            if ( (newInd >= 0 && newInd <= 63) && !(allPieces & (1ull << newInd))) {
+            if ((newInd >= 0 && newInd <= 63) && !(allPieces & (1ull << newInd))) {
                 //new valid move from ind to newInd
                 if (newInd < 8) {
                     int move = makeMoveMask(0, 0, pawnTypeNum(), ind, newInd, 1);
@@ -2184,7 +2188,7 @@ public:
         vector<int> ret;
         ull tmpRooks = mask;
 
-        ull target = color ? blackRooks : whiteRooks;
+        ull target = color ? blackPieces : whitePieces;
 
         while (tmpRooks) {
             ull locRaisedPow = getLSB(tmpRooks);
@@ -2203,14 +2207,14 @@ public:
 
                 for (int j = loc + dx[i]; j < lim[i] && (j < firstCollisionCell || noCollision); j += dx[i]) {
                     int moveMask = makeMoveMask(0, 0, type, loc, j, color);
-                    if (isValid(color, moveMask))
+                    if (isValid(!color, moveMask))
                         ret.push_back(moveMask), threat[j] = key;
                 }
                 if (!noCollision) {
                     threat[firstCollisionCell] = key;
                     if (locExist(target, firstCollision)) {
                         int moveMask = makeMoveMask(0, 1, type, loc, firstCollisionCell, color);
-                        if (isValid(color, moveMask))
+                        if (isValid(!color, moveMask))
                             ret.push_back(makeMoveMask(0, 1, type, loc, firstCollisionCell, color));
                     }
                 }
@@ -2226,13 +2230,13 @@ public:
 
                 for (int j = loc + dx[i]; j > lim[i] && (j > firstCollisionCell || noCollision); j += dx[i]) {
                     int moveMask = makeMoveMask(0, 0, type, loc, j, color);
-                    if (isValid(color, moveMask))
+                    if (isValid(!color, moveMask))
                         ret.push_back(makeMoveMask(0, 0, type, loc, j, color)), threat[j] = key;
                 }
                 if (!noCollision) {
                     threat[firstCollisionCell] = key;
                     int moveMask = makeMoveMask(0, 1, type, loc, firstCollisionCell, color);
-                    if (locExist(target, firstCollision) && isValid(color, moveMask))
+                    if (locExist(target, firstCollision) && isValid(!color, moveMask))
                         ret.push_back(makeMoveMask(0, 1, type, loc, firstCollisionCell, color));
                 }
             }
@@ -2246,7 +2250,7 @@ public:
         vector<int> ret;
         ull tmpBishops = mask;
 
-        ull target = color ? blackBishops : whiteBishops;
+        ull target = color ? blackPieces : whitePieces;
 
         while (tmpBishops) {
             ull locRaisedPow = getLSB(tmpBishops);
@@ -2270,13 +2274,13 @@ public:
                      (j < firstCollisionCell || noCollision) && inBoundaries(x2,
                                                                              y2); j += di[i], x2 += dx[i], y2 += dy[i]) {
                     int moveMask = makeMoveMask(0, 0, type, loc, j, color);
-                    if (isValid(color, moveMask))
+                    if (isValid(!color, moveMask))
                         ret.push_back(makeMoveMask(0, 0, type, loc, j, color)), threat[j] = key;
                 }
                 if (!noCollision) {
                     threat[firstCollisionCell] = key;
                     int moveMask = makeMoveMask(0, 1, type, loc, firstCollisionCell, color);
-                    if (locExist(target, firstCollision) && isValid(color, moveMask))
+                    if (locExist(target, firstCollision) && isValid(!color, moveMask))
                         ret.push_back(makeMoveMask(0, 1, type, loc, firstCollisionCell, color));
                 }
             }
@@ -2293,13 +2297,13 @@ public:
                      (j > firstCollisionCell || noCollision) && inBoundaries(x2,
                                                                              y2); j += di[i], x2 += dx[i], y2 += dy[i]) {
                     int moveMask = makeMoveMask(0, 0, type, loc, j, color);
-                    if (isValid(color, moveMask))
+                    if (isValid(!color, moveMask))
                         ret.push_back(makeMoveMask(0, 0, type, loc, j, color)), threat[j] = key;
                 }
                 if (!noCollision) {
                     threat[firstCollisionCell] = key;
                     int moveMask = makeMoveMask(0, 1, type, loc, firstCollisionCell, color);
-                    if (locExist(target, firstCollision) && isValid(color, moveMask))
+                    if (locExist(target, firstCollision) && isValid(!color, moveMask))
                         ret.push_back(makeMoveMask(0, 1, type, loc, firstCollisionCell, color));
                 }
             }
@@ -2309,8 +2313,8 @@ public:
 
 // generating queen moves
     vector<int> queenMoves(int color) {
-        vector<int> ret = bishopMoves(color ? whiteQueens : blackQueens, queenTypeNum(), color);
-        vector<int> tmp = rookMoves(color ? whiteQueens : blackQueens, queenTypeNum(), color);
+        vector<int> ret = bishopMoves(!color ? whiteQueens : blackQueens, queenTypeNum(), color);
+        vector<int> tmp = rookMoves(!color ? whiteQueens : blackQueens, queenTypeNum(), color);
 
         for (auto m:tmp)ret.push_back(m);
 
