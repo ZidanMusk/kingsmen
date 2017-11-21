@@ -13,9 +13,8 @@ class Evaluate {
 
     const int doubledPenaltyEnding[8];
 
-    ull files[];
-
-    ull ranks[];
+    ull files[8];
+    ull ranks[8];
 
     // These two have to be annoyingly static, as we use them in position.cpp to incrementally update the PST eval.
     static std::array<std::array<short, 64>, 12> mPieceSquareTableOpening;
