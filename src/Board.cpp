@@ -1201,9 +1201,13 @@ public:
             return blackKing;
     }
 
-    ull popLsb(ull bitBoard) {
+
+    int popLsb(int &bitBoard) {
         //get LS 1 in the board and toggle itpop
-        return (bitBoard & -bitBoard) ^ bitBoard;
+        ull z  = (log2(bitBoard & -bitBoard) + EPS);
+        bitBoard = ((bitBoard & -bitBoard) ^ bitBoard);
+
+        return z ;
     }
 
 //KNIGHT ATTAKS===============================================
@@ -1270,8 +1274,7 @@ public:
         if (tmpW.size()) {
             for (int i = 0; i < tmpW.size(); i++) {
 
-                if (((tmpW[i] & 8064) >> 7) ==
-                    square) {//check if this move of a piece of my wanted square(from == square)
+                if (((tmpW[i] & 8064) >> 7) == square) {//check if this move of a piece of my wanted square(from == square)
                     //Oring with destination to mark it with 1 (<<to)
                     ans |= (1ull << ((tmpW[i] & 516096) >> 13));
                 }
