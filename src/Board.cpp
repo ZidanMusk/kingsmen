@@ -281,70 +281,70 @@ public:
                               4665729213955833856};
 
 
-    ull kingSafetyZone[64][2] = {{197122,               514},
-                                 {460036,               1284},
-                                 {920074,               2570},
-                                 {1840148,              5140},
-                                 {3680296,              10280},
-                                 {7360592,              20560},
-                                 {14721184,             41120},
-                                 {12599360,             16448},
-                                 {50463234,             131586},
-                                 {117769478,            328966},
-                                 {235538958,            657934},
-                                 {471077916,            1315868},
-                                 {942155832,            2631736},
-                                 {1884311664,           5263472},
-                                 {3768623328,           10526944},
-                                 {3225436352,           4210880},
-                                 {12918588160,          33686274},
-                                 {30148986624,          84215556},
-                                 {60297973248,          168431114},
-                                 {120595946496,         336862228},
-                                 {241191892992,         673724456},
-                                 {482383785984,         1347448912},
-                                 {964767571968,         2694897824},
-                                 {825711706112,         1077985344},
-                                 {3307158568960,        8623686144},
-                                 {7718140575744,        21559182592},
-                                 {15436281151488,       43118365184},
-                                 {30872562302976,       86236730368},
-                                 {61745124605952,       172473460736},
-                                 {123490249211904,      344946921472},
-                                 {246980498423808,      689893842944},
-                                 {211382196764672,      275964248064},
-                                 {846632593653760,      2207663652864},
-                                 {1975843987390464,     5519150743552},
-                                 {3951687974780928,     11038301487104},
-                                 {7903375949561856,     22076602974208},
-                                 {15806751899123712,    44153205948416},
-                                 {31613503798247424,    88306411896832},
-                                 {63227007596494848,    176612823793664},
-                                 {54113842371756032,    70646847504384},
-                                 {216737943975362560,   565161895133184},
-                                 {505816060771958784,   1412902590349312},
-                                 {1011632121543917568,  2825805180698624},
-                                 {2023264243087835136,  5651610361397248},
-                                 {4046528486175670272,  11303220722794496},
-                                 {8093056972351340544,  22606441445588992},
-                                 {16186113944702681088, 45212882891177984},
-                                 {13853143647169544192, 18085592961122304},
-                                 {144681436564160512,   144681445154095104},
-                                 {361703041654587392,   361703063129423872},
-                                 {723406083309174784,   723406126258847744},
-                                 {1446812166618349568,  1446812252517695488},
-                                 {2893624333236699136,  2893624505035390976},
-                                 {5787248666473398272,  5787249010070781952},
-                                 {11574497332946796544, 11574498020141563904},
-                                 {4629911523169402880,  4629911798047309824},
-                                 {144959613005987840,   144961812029243392},
-                                 {362258295026614272,   362263792584753152},
-                                 {724516590053228544,   724527585169506304},
-                                 {1449033180106457088,  1449055170339012608},
-                                 {2898066360212914176,  2898110340678025216},
-                                 {5796132720425828352,  5796220681356050432},
-                                 {11592265440851656704, 11592441362712100864},
-                                 {4665729213955833856,  4665799582700011520}
+    ull kingSafetyZone[64][2] = {{197378,               770},
+                                 {460548,               1796},
+                                 {921098,               3594},
+                                 {1842196,              7188},
+                                 {3684392,              14376},
+                                 {7368784,              28752},
+                                 {14737568,             57504},
+                                 {12632128,             49216},
+                                 {50528770,             197122},
+                                 {117900550,            460038},
+                                 {235801102,            920078},
+                                 {471602204,            1840156},
+                                 {943204408,            3680312},
+                                 {1886408816,           7360624},
+                                 {3772817632,           14721248},
+                                 {3233824960,           12599488},
+                                 {12935365376,          50463490},
+                                 {30182541056,          117769990},
+                                 {60365082112,          235539982},
+                                 {120730164224,         471079964},
+                                 {241460328448,         942159928},
+                                 {482920656896,         1884319856},
+                                 {965841313792,         3768639712},
+                                 {827859189760,         3225469120},
+                                 {3311453536256,        12918653696},
+                                 {7726730510336,        30149117696},
+                                 {15453461020672,       60298235392},
+                                 {30906922041344,       120596470784},
+                                 {61813844082688,       241192941568},
+                                 {123627688165376,      482385883136},
+                                 {247255376330752,      964771766272},
+                                 {211931952578560,      825720094720},
+                                 {847732105281536,      3307175346176},
+                                 {1978043010646016,     7718174130176},
+                                 {3956086021292032,     15436348260352},
+                                 {7912172042584064,     30872696520704},
+                                 {15824344085168128,    61745393041408},
+                                 {31648688170336256,    123490786082816},
+                                 {63297376340672512,    246981572165632},
+                                 {54254579860111360,    211384344248320},
+                                 {217019418952073216,   846636888621056},
+                                 {506379010725380096,   1975852577325056},
+                                 {1012758021450760192,  3951705154650112},
+                                 {2025516042901520384,  7903410309300224},
+                                 {4051032085803040768,  15806820618600448},
+                                 {8102064171606081536,  31613641237200896},
+                                 {16204128343212163072, 63227282474401792},
+                                 {13889172444188508160, 54114392127569920},
+                                 {216739030602088448,   216739043486990336},
+                                 {505818229730443264,   505818259795214336},
+                                 {1011636459460886528,  1011636519590428672},
+                                 {2023272918921773056,  2023273039180857344},
+                                 {4046545837843546112,  4046546078361714688},
+                                 {8093091675687092224,  8093092156723429376},
+                                 {16186183351374184448, 16186184313446858752},
+                                 {13853283560024178688, 13853284384657899520},
+                                 {144959613005987840,   144962911540871168},
+                                 {362258295026614272,   362265991608008704},
+                                 {724516590053228544,   724531983216017408},
+                                 {1449033180106457088,  1449063966432034816},
+                                 {2898066360212914176,  2898127932864069632},
+                                 {5796132720425828352,  5796255865728139264},
+                                 {11592265440851656704, 11592511731456278528},
+                                 {4665729213955833856,  4665940320188366848}
     };
     // Zobrist keys for castling and en passant locations
     ull whiteKingSideCastling = 0x31d71dce64b2c310L;
@@ -683,6 +683,10 @@ public:
     }
 
     ull getMSB(ull x) {
+        if (!x)return 0;
+        int z = __builtin_clzll(x);
+        return 1ull << (63 - z);
+//        return __builtin_clzll(x);
         if (!x)return 0;
         int z = __builtin_clzll(x);
         return 1ull << (63 - z);
@@ -1200,47 +1204,36 @@ public:
             return blackKing;
     }
 
-    ull popLsb(ull bitBoard) {
+
+    int popLsb(int &bitBoard) {
         //get LS 1 in the board and toggle itpop
-        return (bitBoard & -bitBoard) ^ bitBoard;
+        ull z  = (log2(bitBoard & -bitBoard) + EPS);
+        bitBoard = ((bitBoard & -bitBoard) ^ bitBoard);
+
+        return z ;
     }
 
 //KNIGHT ATTAKS===============================================
-    ull knightAttacks(int square) {
+    ull knightAttacks(int square, int color) {//0-> white, 1->black
 
         //mask which marks all my attack squares
         ull ans;
 
         //vectors to get the valid moves
-        vector<int> tmpW;
-        vector<int> tmpB;
+        vector<int> tmp;
 
         //Detecing If I am white or black knight
-        ull myKnight = (1ull << square);
-
-        if (allPieces & whiteKnights)
-            tmpW = whiteKnightVMGen();
+        if (!color)
+            tmp = whiteKnightVMGen();
         else
-            tmpB = blackKnightVMGen();
+            tmp = blackKnightVMGen();
 
-        //checking if my piece is from white pieces
-        if (tmpW.size()) {
-            for (int i = 0; i < tmpW.size(); i++) {
 
-                if (((tmpW[i] & 8064) >> 7) ==
-                    square) {//check if this move of a piece of my wanted square(from == square)
-                    //Oring with destination to mark it with 1 (<<to)
-                    ans |= (1ull << ((tmpW[i] & 516096) >> 13));
-                }
-            }
-        } else {
-            //checking if my piece is from black pieces
-            for (int i = 0; i < tmpB.size(); i++) {
+        for (int i = 0; i < tmp.size(); i++) {
 
-                if (((tmpB[i] & 8064) >> 7) == square) {//check if this move of a piece of my wanted square
-                    //Oring with destination to mark it with 1
-                    ans |= (1ull << ((tmpB[i] & 516096) >> 13));
-                }
+            if (((tmp[i] & 8064) >> 7) == square) {//check if this move of a piece of my wanted square(from == square)
+                //Oring with destination to mark it with 1 (<<to)
+                ans |= (1ull << ((tmp[i] & 516096) >> 13));
             }
         }
 
@@ -1250,7 +1243,7 @@ public:
 
 //BISHOP ATTAKS===================================Normal version(default -> false)
 //Version after removing other queens
-    ull bishopAttacks(int square, ull occupied, bool version) {
+    ull bishopAttacks(int square, int color, bool version) {
 
         //mask which marks all my attack squares
         ull ans;
@@ -1262,9 +1255,7 @@ public:
         vector<int> tmpB;
 
         //Detecing If I am white or black Bishop
-        ull myBishop = (1ull << square);
-
-        if (whiteBishops & myBishop) {
+        if (!color) {
 
             if (version) {
                 //Removing white queens
@@ -1286,8 +1277,7 @@ public:
         if (tmpW.size()) {
             for (int i = 0; i < tmpW.size(); i++) {
 
-                if (((tmpW[i] & 8064) >> 7) ==
-                    square) {//check if this move of a piece of my wanted square(from == square)
+                if (((tmpW[i] & 8064) >> 7) == square) {//check if this move of a piece of my wanted square(from == square)
                     //Oring with destination to mark it with 1 (<<to)
                     ans |= (1ull << ((tmpW[i] & 516096) >> 13));
                 }
@@ -1311,7 +1301,7 @@ public:
 
 //ROOK ATTAKS================================================Normal version
 //Version after removing other rooks and queens
-    ull rookAttacks(int square, ull occupied, bool version) {
+    ull rookAttacks(int square, int color, bool version) {
 
         //mask which marks all my attack squares
         ull ans;
@@ -1328,10 +1318,10 @@ public:
         vector<int> tmpW;
         vector<int> tmpB;
 
-        //Detecing If I am white or black Bishop
         ull myRook = (1ull << square);
 
-        if (whiteRooks & myRook) {
+        //Detecing If I am white or black Bishop
+        if (!color) {
 
             if (version) {
                 //Removing all other white Rooks
@@ -1402,7 +1392,7 @@ public:
 
 //QUEEN ATTAKS================================================Normal version
 //Version after removing other queens
-    ull queenAttacks(int square, ull occupied, bool version) {
+    ull queenAttacks(int square, int color, bool version) {
 
         //mask which marks all my attack squares
         ull ans;
@@ -1415,10 +1405,10 @@ public:
         vector<int> tmpW;
         vector<int> tmpB;
 
-        //Detecing If I am white or black Queen
         ull myQueen = (1ull << square);
 
-        if (whiteQueens & myQueen) {
+        //Detecing If I am white or black Queen
+        if (!color) {
 
             if (version) {
                 //Removing all other white Queens
