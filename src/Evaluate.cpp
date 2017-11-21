@@ -4,8 +4,7 @@ Evaluate::Evaluate(Board *b) : doubledPenaltyOpening({
                                                              36, 9, 2, 23, 18, 20, 0, 26
                                                      }), doubledPenaltyEnding({
                                                                                       46, 25, 31, 24, 21, 19, 29, 44
-                                                                              })
-{
+                                                                              }) {
     _board = b;
 }
 
@@ -17,7 +16,7 @@ int Evaluate::pawnStructureEval(int color) {
     }
 }
 
-int Evaluate::kingSafty(int blackKingSafety, int whiteKingSafty) {
+int Evaluate::kingSafety(int blackKingSafety, int whiteKingSafty) {
 
     ull openFilePenalty[] = {6, 5, 4, 4, 4, 4, 5, 6},
             halfopenFilePenalty[] = {5, 4, 3, 3, 3, 3, 4, 5},
@@ -100,28 +99,28 @@ int Evaluate::kingSafty(int blackKingSafety, int whiteKingSafty) {
 
 }
 
-template <bool hardwarePopcnt>
-int Evaluation::evaluate()
-{
+template<bool hardwarePopcnt>
+int Evaluate::evaluate() {
     // IF DRAW RETURN 0
-    if (mEndgameModule.drawnEndgame(pos.getMaterialHashKey()))
-    {
+    if (mEndgameModule.drawnEndgame(pos.getMaterialHashKey())) {
         return 0;
     }
 
     std::array<int, 2> kingSafetyScore;
-    const auto phase = clamp(static_cast<int>(pos.getGamePhase()), 0, 64); // The phase can be negative in some weird cases, guard against that.
+    const auto phase = clamp(static_cast<int>(pos.getGamePhase()), 0,
+                             64); // The phase can be negative in some weird cases, guard against that.
 
     auto score = mobilityEval<hardwarePopcnt>(pos, kingSafetyScore, phase);
     score += pawnStructureEval(pos, phase);
-    score += kingSafetyEval(pos, phase, kingSafetyScore);
-    score += interpolateScore(pos.getPstScoreOp(), pos.getPstScoreEd(), phase);
+    score += kingSafety(pos, phase, kingSafetyScore);
+
+
+    //score += interpolateScore(pos.getPstScoreOp(), pos.getPstScoreEd(), phase);
+    score += getPstScore();
 
     // Bishop pair bonus.
-    for (Color c = Color::White; c <= Color::Black; ++c)
-    {
-        if (pos.getPieceCount(c, Piece::Bishop) == 2)
-        {
+    for (Color c = Color::White; c <= Color::Black; ++c) {
+        if (pos.getPieceCount(c, Piece::Bishop) == 2) {
             const auto bishopPairBonus = interpolateScore(bishopPairBonusOpening, bishopPairBonusEnding, phase);
             score += (c ? -bishopPairBonus : bishopPairBonus);
         }
@@ -130,4 +129,21 @@ int Evaluation::evaluate()
     score += (pos.getSideToMove() ? -sideToMoveBonus : sideToMoveBonus);
 
     return (pos.getSideToMove() ? -score : score);
+}
+
+int Evaluate::getPstScore() {
+
+}
+
+std::array<std::array<short, 64>, 12> Evaluation::mPieceSquareTableOpening;
+std::array<std::array<short, 64>, 12> Evaluation::mPieceSquareTableEnding;
+
+inline short Evaluation::getPieceSquareTableOp(Piece p, Square sq)
+{
+    return mPieceSquareTableOpening[p][sq];
+}
+
+inline short Evaluation::getPieceSquareTableEd(Piece p, Square sq)
+{
+    return mPieceSquareTableEnding[p][sq];
 }

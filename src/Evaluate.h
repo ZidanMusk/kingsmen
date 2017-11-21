@@ -33,17 +33,23 @@ class Evaluate {
                 0xFF00000000000000
     };
 
+    // These two have to be annoyingly static, as we use them in position.cpp to incrementally update the PST eval.
+    static std::array<std::array<short, 64>, 12> mPieceSquareTableOpening;
+    static std::array<std::array<short, 64>, 12> mPieceSquareTableEnding;
+
 
 public:
     explicit Evaluate(Board *b);
 
     int pawnStructureEval(int color);   //0 for white, 1 for black
-    int kingSafty(int blackKingSafety, int whiteKingSafty); // arguments are calculated in mobility
+    int kingSafety(int blackKingSafety, int whiteKingSafty); // arguments are calculated in mobility
 
 
     /// @brief Evaluates a given position.
     /// @return The heuristic score given to the position.
     int evaluate();
+
+    int getPstScore();
 };
 
 #endif //KINGSMEN_EVALUATE_H
