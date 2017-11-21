@@ -3,6 +3,39 @@
 typedef unsigned long long ull;
 using namespace std;
 
+
+enum Color
+{
+    White = 0, Black = 1, NoColor = 2
+};
+
+enum Piece {
+    Pawn = 0, Knight = 1, Bishop = 2, Rook = 3, Queen = 4, King = 5
+};
+
+enum Square {
+    A1, B1, C1, D1, E1, F1, G1, H1,
+    A2, B2, C2, D2, E2, F2, G2, H2,
+    A3, B3, C3, D3, E3, F3, G3, H3,
+    A4, B4, C4, D4, E4, F4, G4, H4,
+    A5, B5, C5, D5, E5, F5, G5, H5,
+    A6, B6, C6, D6, E6, F6, G6, H6,
+    A7, B7, C7, D7, E7, F7, G7, H7,
+    A8, B8, C8, D8, E8, F8, G8, H8,
+    NoSquare
+};
+
+const std::array<int8_t, 6> piecePhase = {
+        0, 3, 3, 5, 10, 0
+};
+
+const int8_t totalPhase = piecePhase[Piece::Pawn] * 16
+                          + piecePhase[Piece::Knight] * 4
+                          + piecePhase[Piece::Bishop] * 4
+                          + piecePhase[Piece::Rook] * 4
+                          + piecePhase[Piece::Queen] * 2;
+
+
 class Board {
 
 
@@ -572,11 +605,6 @@ public:
         whitePieces = whitePawns | whiteBishops | whiteKing | whiteKnights | whiteQueens | whiteRooks;
         allPieces = whitePieces | blackPieces;
         //this function is not complete yet a7ba2i fellah
-
-
-        key = ZBoard();
-        allValidMoves.clear();
-        allValidMoves = generateAllMoves();
     }
 
     // loc 0-63 counting from the bottom left corner [A1]
@@ -784,7 +812,7 @@ public:
 
     // used when it's necessary to clone the board
     void makeClone() {                  //making virtual masks clones of real masks
-        //if (whiteToMove) {
+        if (whiteToMove) {
             virWhitePawns = whitePawns;
             virWhiteKnights = whiteKnights;
             virWhiteBishops = whiteBishops;
@@ -802,7 +830,7 @@ public:
             virWhitePieces = whitePieces;
             virBlackPieces = blackPieces;
             virAllPieces = allPieces;
-        /*} else {
+        } else {
             virBlackPawns = whitePawns;
             virBlackKnights = whiteKnights;
             virBlackBishops = whiteBishops;
@@ -820,7 +848,7 @@ public:
             virBlackPieces = whitePieces;
             virWhitePieces = blackPieces;
             virAllPieces = allPieces;
-        }*/
+        }
     }
 
 
@@ -975,6 +1003,8 @@ public:
             fiftyMoveRule = 0;
 
 
+        allValidMoves.clear();
+        allValidMoves = generateAllMoves();
 
 
         //saving all of our history
@@ -989,8 +1019,6 @@ public:
 
         //switch turns
         whiteToMove = !whiteToMove;
-        allValidMoves.clear();
-        allValidMoves = generateAllMoves();
 
 
     }
@@ -1206,47 +1234,65 @@ public:
             return blackKing;
     }
 
-    ull popLsb(ull bitBoard) {
+    ull getPieceCount(int c, int p) {
+        if (c == 0 && p == 0)
+            return __builtin_popcountll(whitePawns);
+        else if (c == 0 && p == 1)
+            return __builtin_popcountll(whiteKnights);
+        else if (c == 0 && p == 2)
+            return __builtin_popcountll(whiteBishops);
+        else if (c == 0 && p == 3)
+            return __builtin_popcountll(whiteRooks);
+        else if (c == 0 && p == 4)
+            return __builtin_popcountll(whiteQueens);
+        else if (c == 0 && p == 5)
+            return __builtin_popcountll(whiteKing);
+
+        else if (c == 1 && p == 0)
+            return __builtin_popcountll(blackPawns);
+        else if (c == 1 && p == 1)
+            return __builtin_popcountll(blackKnights);
+        else if (c == 1 && p == 2)
+            return __builtin_popcountll(blackBishops);
+        else if (c == 1 && p == 3)
+            return __builtin_popcountll(blackRooks);
+        else if (c == 1 && p == 4)
+            return __builtin_popcountll(blackQueens);
+        else if (c == 1 && p == 5)
+            return __builtin_popcountll(blackKing);
+    }
+
+
+
+    int popLsb(ull &bitBoard) {
         //get LS 1 in the board and toggle itpop
-        return (bitBoard & -bitBoard) ^ bitBoard;
+        ull z  = (log2(bitBoard & -bitBoard) + EPS);
+        bitBoard = ((bitBoard & -bitBoard) ^ bitBoard);
+
+        return z ;
     }
 
 //KNIGHT ATTAKS===============================================
-    ull knightAttacks(int square) {
+    ull knightAttacks(int square, int color) {//0-> white, 1->black
 
         //mask which marks all my attack squares
         ull ans;
 
         //vectors to get the valid moves
-        vector<int> tmpW;
-        vector<int> tmpB;
+        vector<int> tmp;
 
         //Detecing If I am white or black knight
-        ull myKnight = (1ull << square);
-
-        if (allPieces & whiteKnights)
-            tmpW = whiteKnightVMGen();
+        if (!color)
+            tmp = whiteKnightVMGen();
         else
-            tmpB = blackKnightVMGen();
+            tmp = blackKnightVMGen();
 
-        //checking if my piece is from white pieces
-        if (tmpW.size()) {
-            for (int i = 0; i < tmpW.size(); i++) {
 
-                if (((tmpW[i] & 8064) >> 7) ==
-                    square) {//check if this move of a piece of my wanted square(from == square)
-                    //Oring with destination to mark it with 1 (<<to)
-                    ans |= (1ull << ((tmpW[i] & 516096) >> 13));
-                }
-            }
-        } else {
-            //checking if my piece is from black pieces
-            for (int i = 0; i < tmpB.size(); i++) {
+        for (int i = 0; i < tmp.size(); i++) {
 
-                if (((tmpB[i] & 8064) >> 7) == square) {//check if this move of a piece of my wanted square
-                    //Oring with destination to mark it with 1
-                    ans |= (1ull << ((tmpB[i] & 516096) >> 13));
-                }
+            if (((tmp[i] & 8064) >> 7) == square) {//check if this move of a piece of my wanted square(from == square)
+                //Oring with destination to mark it with 1 (<<to)
+                ans |= (1ull << ((tmp[i] & 516096) >> 13));
             }
         }
 
@@ -1256,7 +1302,7 @@ public:
 
 //BISHOP ATTAKS===================================Normal version(default -> false)
 //Version after removing other queens
-    ull bishopAttacks(int square, ull occupied, bool version) {
+    ull bishopAttacks(int square, int color, bool version) {
 
         //mask which marks all my attack squares
         ull ans;
@@ -1268,9 +1314,7 @@ public:
         vector<int> tmpB;
 
         //Detecing If I am white or black Bishop
-        ull myBishop = (1ull << square);
-
-        if (whiteBishops & myBishop) {
+        if (!color) {
 
             if (version) {
                 //Removing white queens
@@ -1292,8 +1336,7 @@ public:
         if (tmpW.size()) {
             for (int i = 0; i < tmpW.size(); i++) {
 
-                if (((tmpW[i] & 8064) >> 7) ==
-                    square) {//check if this move of a piece of my wanted square(from == square)
+                if (((tmpW[i] & 8064) >> 7) == square) {//check if this move of a piece of my wanted square(from == square)
                     //Oring with destination to mark it with 1 (<<to)
                     ans |= (1ull << ((tmpW[i] & 516096) >> 13));
                 }
@@ -1317,7 +1360,7 @@ public:
 
 //ROOK ATTAKS================================================Normal version
 //Version after removing other rooks and queens
-    ull rookAttacks(int square, ull occupied, bool version) {
+    ull rookAttacks(int square, int color, bool version) {
 
         //mask which marks all my attack squares
         ull ans;
@@ -1334,10 +1377,10 @@ public:
         vector<int> tmpW;
         vector<int> tmpB;
 
-        //Detecing If I am white or black Bishop
         ull myRook = (1ull << square);
 
-        if (whiteRooks & myRook) {
+        //Detecing If I am white or black Bishop
+        if (!color) {
 
             if (version) {
                 //Removing all other white Rooks
@@ -1408,7 +1451,7 @@ public:
 
 //QUEEN ATTAKS================================================Normal version
 //Version after removing other queens
-    ull queenAttacks(int square, ull occupied, bool version) {
+    ull queenAttacks(int square, int color, bool version) {
 
         //mask which marks all my attack squares
         ull ans;
@@ -1421,10 +1464,10 @@ public:
         vector<int> tmpW;
         vector<int> tmpB;
 
-        //Detecing If I am white or black Queen
         ull myQueen = (1ull << square);
 
-        if (whiteQueens & myQueen) {
+        //Detecing If I am white or black Queen
+        if (!color) {
 
             if (version) {
                 //Removing all other white Queens
@@ -1515,7 +1558,7 @@ public:
     // checks if there's a knight attacking the queen
     bool kingSafeKnights(bool white) {
         bool safe = true;
-        if (!white) {
+        if (white) {
             //6 10 15 17
             int kingInd = (log2(virWhiteKing & -virWhiteKing) + EPS);
             int dangerKnight = kingInd + 6;
@@ -1594,7 +1637,7 @@ public:
             if (type == bishopTypeNum())
                 target = whiteTurn ? virBlackBishops : virWhiteBishops;
             else target = whiteTurn ? virBlackQueens : virWhiteQueens;
-            ret |= (!noCollision && locExist(target, firstCollision));
+            ret |= !noCollision && locExist(target, firstCollisionCell);
         }
 
         for (int i = 1; i < 3 && !ret; ++i) {
@@ -1610,7 +1653,7 @@ public:
                 target = whiteTurn ? virBlackBishops : virWhiteBishops;
             else target = whiteTurn ? virBlackQueens : virWhiteQueens;
 
-            ret |= (!noCollision && locExist(target, firstCollision));
+            ret |= !noCollision && locExist(target, firstCollisionCell);
         }
         return !ret;
     }
@@ -1632,12 +1675,12 @@ public:
             bool noCollision = firstCollision == 0;
 
             ull target;
-            if (type == rookTypeNum())
+            if (type == bishopTypeNum())
                 target = whiteTurn ? virBlackRooks : virWhiteRooks;
             else target = whiteTurn ? virBlackQueens : virWhiteQueens;
 
 
-            ret |= (!noCollision && locExist(target, firstCollision));
+            ret |= !noCollision && locExist(target, firstCollision);
         }
 
         for (int i = 2; i < 4 && !ret; ++i) {
@@ -1648,12 +1691,12 @@ public:
             bool noCollision = firstCollision == 0;
 
             ull target;
-            if (type == rookTypeNum())
+            if (type == bishopTypeNum())
                 target = whiteTurn ? virBlackRooks : virWhiteRooks;
             else target = whiteTurn ? virBlackQueens : virWhiteQueens;
 
 
-            ret |= (!noCollision && locExist(target, firstCollision));
+            ret |= !noCollision && locExist(target, firstCollision);
         }
         return !ret;
     }
@@ -1747,10 +1790,11 @@ public:
 
         virAllPieces = virWhitePieces | virBlackPieces;
 
-        ull tmpWhiteKing = whiteTurn? virWhiteKing : virBlackKing;
+        ull tmpWhiteKing = virWhiteKing;
         ull locRaisedPowW = getLSB(tmpWhiteKing);
 
         loc = log2(locRaisedPowW) + EPS;
+
         return kingSafePawns(whiteTurn) && kingSafeKnights(whiteTurn) &&
                checkVirtualMoveBishop(whiteTurn, move, loc, bishopTypeNum()) &&
                checkVirtualMoveRook(whiteTurn, move, loc, rookTypeNum()) &&
@@ -1919,7 +1963,7 @@ public:
                     threat[newInd] = key;
                 }
             }
-            if (pawnBackwardAttack(ind, newInd) && (newInd >= 0 && newInd <= 63) && (whitePieces & (1ull << newInd))) {
+            if (pawnBackwardAttack(ind, newInd) && (newInd >= 0 && newInd <= 63) && (blackPieces & (1ull << newInd))) {
                 //new valid capture from ind to newInd
                 if (newInd < 8) {
                     int move = makeMoveMask(0, 1, pawnTypeNum(), ind, newInd, 1);
@@ -1947,7 +1991,7 @@ public:
                     threat[newInd] = key;
                 }
             }
-            if (pawnBackwardAttack(ind, newInd) && (newInd >= 0 && newInd <= 63) && (whitePieces & (1ull << newInd))) {
+            if (pawnBackwardAttack(ind, newInd) && (newInd >= 0 && newInd <= 63) && (blackPieces & (1ull << newInd))) {
                 //new valid capture from ind to newInd
                 if (newInd < 8) {
                     int move = makeMoveMask(0, 1, pawnTypeNum(), ind, newInd, 1);
@@ -2193,7 +2237,7 @@ public:
         vector<int> ret;
         ull tmpRooks = mask;
 
-        ull target = color ? blackRooks : whiteRooks;
+        ull target = color ? blackPieces : whitePieces;
 
         while (tmpRooks) {
             ull locRaisedPow = getLSB(tmpRooks);
@@ -2255,7 +2299,7 @@ public:
         vector<int> ret;
         ull tmpBishops = mask;
 
-        ull target = color ? blackBishops : whiteBishops;
+        ull target = color ? blackPieces : whitePieces;
 
         while (tmpBishops) {
             ull locRaisedPow = getLSB(tmpBishops);
@@ -2444,4 +2488,11 @@ public:
         return ret;
     }
 
+    int8_t mGamePhase;
+
+    // TODO HOW TO HANDLE THE GAME PHASE
+    int getGamePhase(){
+        return mGamePhase;
+    }
 };
+
