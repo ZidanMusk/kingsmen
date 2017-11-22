@@ -1,8 +1,7 @@
 #include "Evaluate.h"
 
-template <class T>
-T clamp(T value, T lowerBound, T upperBound)
-{
+template<class T>
+T clamp(T value, T lowerBound, T upperBound) {
     return std::max(lowerBound, std::min(value, upperBound));
 }
 
@@ -87,32 +86,29 @@ const std::array<int, 6> attackWeight = {
         0, 2, 2, 3, 5, 0
 };
 
-Evaluate::Evaluate(Board *b) : doubledPenaltyOpening{ 36, 9, 2, 23, 18, 20, 0, 26},
+Evaluate::Evaluate(Board *b) : doubledPenaltyOpening{36, 9, 2, 23, 18, 20, 0, 26},
                                doubledPenaltyEnding{46, 25, 31, 24, 21, 19, 29, 44},
-                               files {
-                                              0x0101010101010101,
-                                              0x0202020202020202,
-                                              0x0404040404040404,
-                                              0x0808080808080808,
-                                              0x1010101010101010,
-                                              0x2020202020202020,
-                                              0x4040404040404040,
-                                              0x8080808080808080
-                                      },
+                               files{
+                                       0x0101010101010101,
+                                       0x0202020202020202,
+                                       0x0404040404040404,
+                                       0x0808080808080808,
+                                       0x1010101010101010,
+                                       0x2020202020202020,
+                                       0x4040404040404040,
+                                       0x8080808080808080
+                               },
 
-                                ranks {
-                                        0x00000000000000FF,
-                                        0x000000000000FF00,
-                                        0x0000000000FF0000,
-                                        0x00000000FF000000,
-                                        0x000000FF00000000,
-                                        0x0000FF0000000000,
-                                        0x00FF000000000000,
-                                        0xFF00000000000000
-                                }
-
-
-{
+                               ranks{
+                                       0x00000000000000FF,
+                                       0x000000000000FF00,
+                                       0x0000000000FF0000,
+                                       0x00000000FF000000,
+                                       0x000000FF00000000,
+                                       0x0000FF0000000000,
+                                       0x00FF000000000000,
+                                       0xFF00000000000000
+                               } {
     _board = b;
 
     //initialize PST
@@ -352,7 +348,7 @@ int Evaluate::evaluate() {
 //        return 0;
 //    }
 
-    std::array<int, 2>kingSafetyScore;
+    std::array<int, 2> kingSafetyScore;
     const auto phase = clamp(static_cast<int>(_board->getGamePhase()), 0, 64);
 
     auto score = mobilityEval(kingSafetyScore, phase);
