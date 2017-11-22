@@ -1,12 +1,10 @@
-cmake_minimum_required(VERSION 3.8)
-project(Untitled_Folder)
+cmake_minimum_required(VERSION 3.5)
+project(kingsmen)
 
-set(CMAKE_CXX_STANDARD 11)
+set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 
 set(SOURCE_FILES
         src/Board.cpp
-        src/Evaluate.cpp
-        src/Evaluate.h
-        src/main.cpp)
+        src/main.cpp src/Evaluate.cpp src/Evaluate.h)
 
-add_executable(Untitled_Folder ${SOURCE_FILES})
+add_executable(kingsmen ${SOURCE_FILES})
