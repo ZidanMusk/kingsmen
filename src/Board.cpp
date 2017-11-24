@@ -660,6 +660,24 @@ public:
 
         return key;
     }
+    ull ZPawns() {
+        ull key = 0;
+        int pawnCnt = __builtin_popcountll(whitePawns);
+        ull wp = whitePawns;
+        while (pawnCnt--) {
+            int ind = (log2(wp & -wp) + EPS);
+            wp -= (wp & -wp);
+            key ^= squareZKey(ind, 'P');
+        }
+        pawnCnt = __builtin_popcountll(blackPawns);
+        wp = blackPawns;
+        while (pawnCnt--) {
+            int ind = (log2(wp & -wp) + EPS);
+            wp -= (wp & -wp);
+            key ^= squareZKey(ind, 'p');
+        }
+        return key;
+    }
 
     // the following functions are utility functions and their headers
     //are discriptive
@@ -2553,6 +2571,47 @@ public:
 
 
         return ret;
+    }
+    string isValid(string src, string dst){
+        string ret = "";
+        if(src.size() != 2 || dst.size() != 2){
+            return "I";
+        }
+        if(!((toupper(src[0]) >= 'A' && toupper(src[0]) <= 'H' && src[1] >= '1' && src[1] <= '8') &&
+            (toupper(dst[0]) >= 'A' && toupper(dst[0]) <= 'H' && dst[1] >= '1' && dst[1] <= '8'))){
+            return "I";
+        }
+        int srcX = src[0]-'A';
+        int srcY = src[1]-'1';
+        int dstX = dst[0]-'A';
+        int dstY = dst[1]-'1';
+
+        int srcLog = srcX*8 + (srcY);
+        int dstLog = dstX*8 + (dstY);
+        if(isMate()){
+            if(whiteToMove){
+                return "L";
+            } else{
+                return "W";
+            }
+        }
+        if(isCheck()){
+            ret += "C";
+        }
+        if(isDraw()){
+            ret += "D";
+        }
+        for (int i = 0; i < allValidMoves.size(); ++i){
+            if(getFrom(allValidMoves[i]) == srcLog && getTo(allValidMoves[i]) == dstLog){
+                if(getSpecialEvent(allValidMoves[i]) == 0) {
+                    return ret + "V";
+                }else{
+                    //should handle castling and promotion.
+                    
+                }
+            }
+        }
+
     }
 
 };
