@@ -441,6 +441,29 @@ class Evaluate {
             500, 500, 500, 522, 517, 500, 500, 500, 508, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500,
             500, 500, 500, 500, 500, 500, 500, 500, 500, 500
     };
+    const std::array<std::vector<int>, 6> mobilityOpening = {{
+                                                                     {},
+                                                                     {-1, 6, 12, 16, 17, 16, 16, 15, 18},
+                                                                     {-12, -7, -2, 1, 6, 14, 17, 22, 19, 23, 21, 34, 34,
+                                                                             29},
+                                                                     {-15, -12, -5, -3, -4, -1, 0, 6, 3, 1, 4, 4, 7, 14,
+                                                                             20},
+                                                                     {35, -5, -8, -8, -6, -4, -6, -3, 1, -1, 5, 7, 6, 6, 8,
+                                                                             4, 2, 6, 4, 7, 17, 21, 30, 24, 41, 41, 36, 34},
+                                                                     {}
+                                                             }};
+
+    const std::array<std::vector<int>, 6> mobilityEnding = {{
+                                                                    {},
+                                                                    {-30, 1, 4, 11, 16, 25, 23, 23, 19},
+                                                                    {-22, -32, -19, -6, 5, 20, 29, 33, 42, 40, 36, 38, 28, 13},
+                                                                    {-12, -12, -8, -5, 7, 16, 20, 22, 31, 42, 43, 47, 47, 47, 37},
+                                                                    {-2, 5, -2, -23, -28, -29, -14, -12, -10, -3, -5, -1, 6, 14, 17, 22, 36, 34, 43, 37, 39, 33, 36, 22, 12, -4, 38, 26},
+                                                                    {}
+                                                            }};
+    const std::array<int, 6> attackWeight = {
+            0, 2, 2, 3, 5, 0
+    };
 public:
     Evaluate(Board *b);
 
@@ -449,6 +472,8 @@ public:
 
     int kingSafty(int blackKingSafety, int whiteKingSafty, int phase); // arguments are calculated in mobility
     int interpolateScore(int scoreOp, int scoreEd, int phase);
+
+    int Evaluate::mobilityEval(std::array<int, 2> &kingSafetyScore, int phase);
 };
 
 #endif //KINGSMEN_EVALUATE_H
