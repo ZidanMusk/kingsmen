@@ -32,8 +32,8 @@ int Evaluate::pawnStructure(int phase) {
 
     for (int c = 0; c <= 1; ++c)
     {
-        const auto ownPawns = c? _board->blackPawns : _board->whitePawns;
-        const auto opponentPawns = c? _board->whitePawns : _board->blackPawns;
+        const auto ownPawns = c==1? _board->blackPawns : _board->whitePawns;
+        const auto opponentPawns = c==1? _board->whitePawns : _board->blackPawns;
         auto tempPawns = ownPawns;
         auto scoreOpForColor = 0, scoreEdForColor = 0;
 
