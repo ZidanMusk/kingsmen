@@ -7,7 +7,7 @@ class PVS : public Search{
 public:
     ll OpenedStates=0;
     bool doNull;
-    PVS(ll maxDepth,bool nulling):Search(maxDepth) {this->doNull = nulling;}
+    PVS(ll maxDepth,bool nulling):Search(maxDepth, NULL,NULL) {this->doNull = nulling;}
     void getPvPath(ll root);
 private:
     unordered_map <ll,ll> PvTable;

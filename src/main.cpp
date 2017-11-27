@@ -1,20 +1,22 @@
 #include <bits/stdc++.h>
-#include "Board.cpp"
-#include <iostream>
 #include "Search.h"
-#include "External/ExternBig.h"
-#include "MTDF.h"
-#include "PVS.h"
 #include "AlphaBeta.h"
 
+//unordered_map<ll, ll> ExternBig::SaveGetScore;
+//unordered_map<ll, vector<ll>> ExternBig::SaveGetPossibleMoves;
 
-#include <cassert>
 
-unordered_map<ll, ll> ExternBig::SaveGetScore;
-unordered_map<ll, vector<ll>> ExternBig::SaveGetPossibleMoves;
+
 
 int main() {
-    ll mtdfBest1 = 0, mtdfBest2 = 0, mtfdCorrect = 0;
+    int maxDepth = 0;
+    Board* board = new Board();
+    board->fenInterpreter();
+    Evaluate* evaluate = new Evaluate(board);
+    Search* baseline = new AlphaBeta(maxDepth,board,evaluate);
+    baseline->GetBestMove();
+
+    /*ll mtdfBest1 = 0, mtdfBest2 = 0, mtfdCorrect = 0;
     ll PvsBest1 = 0, PvsBest2 = 0, PvsCorrect = 0;
     bool pvsSa7 = false;
     bool mtdfSa7 = false;
@@ -59,6 +61,7 @@ int main() {
     cout << "MTDF 2nd no. best: " << mtdfBest2 << "/" << trials << endl;
 
 
+*/
     //Evaluate
 //    Board b;
 //    b.fenInterpreter("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR b KQkq - 0 1", 'w');
@@ -78,5 +81,6 @@ int main() {
 //    b.doo(b.allValidMoves[0]);
 //*/
 //    b.disp();
+
 }
 

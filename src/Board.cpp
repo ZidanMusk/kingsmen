@@ -552,8 +552,8 @@ public:
 **********************************************************************************************************************/
 
     // These two have to be annoyingly static, as we use them in position.cpp to incrementally update the PST eval.
-    static std::array<std::array<short, 64>, 12> mPieceSquareTableOpening;
-    static std::array<std::array<short, 64>, 12> mPieceSquareTableEnding;
+     std::array<std::array<short, 64>, 12> mPieceSquareTableOpening;
+     std::array<std::array<short, 64>, 12> mPieceSquareTableEnding;
 
     inline short getPieceSquareTableOp(Piece p, Square sq) {
         return mPieceSquareTableOpening[p][sq];

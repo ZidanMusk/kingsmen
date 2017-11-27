@@ -1,20 +1,31 @@
 #include "Search.h"
 
-Search::Search(ll maxDepth)
-{this->_MaxDepth=maxDepth;}
-void Search::GetBestMove(ll state_id) {return this->_IterativeDeepening(state_id,this->_MaxDepth);}
-ll Search::Qsearch(ll state_id,ll alpha, ll beta,bool isMax,ll MaxDepth) {
-    ll score=this->Eval.GetScore(state_id);
+Search::Search(ll maxDepth,Board* brd, Evaluate* eval) {
+    this->_MaxDepth=maxDepth;
+    this->board = brd;
+    this->evaluate = eval;
+}
+void Search::GetBestMove() {return this->_IterativeDeepening(this->_MaxDepth);}
+
+
+
+
+ll Search::Qsearch(ll alpha, ll beta,bool isMax,ll MaxDepth) {
+    ll state_id = Search::board->key;
+    ll score=Search::evaluate->evaluate();
     if(MaxDepth==0)
         return score;
     if(isMax)
     {
         if(score>=beta)
             return score;
-        alpha=max(alpha,score);
-        vector<ll>capturingMoves=this->Eval.GetCapturingMoves(state_id);
+        alpha = max(alpha,score);
+        vector <int> capturingMoves = Search::board->allValidCaptures;
+
         for (ll i = 0; i < (capturingMoves.size())&&score<beta; ++i) {
-            score=max(score,Qsearch(capturingMoves[i],alpha,beta,!isMax,MaxDepth-1));
+            Search::board->doo(capturingMoves[i]);
+            score=max(score,Qsearch(alpha,beta,!isMax,MaxDepth-1));
+            Search::board->undoo();
             alpha=max(score,alpha);
         }
         return score;
@@ -24,9 +35,11 @@ ll Search::Qsearch(ll state_id,ll alpha, ll beta,bool isMax,ll MaxDepth) {
         if(score<=alpha)
             return score;
         beta=min(beta,score);
-        vector<ll>capturingMoves=this->Eval.GetCapturingMoves(state_id);
+        vector <int> capturingMoves = Search::board->allValidCaptures;
         for (ll i = 0; i < (capturingMoves.size())&&score>alpha; ++i) {
-            score=min(score,Qsearch(capturingMoves[i],alpha,beta,!isMax,MaxDepth-1));
+            Search::board->doo(capturingMoves[i]);
+            score=min(score,Qsearch(alpha,beta,!isMax,MaxDepth-1));
+            Search::board->undoo();
             beta=min(score,beta);
         }
         return score;

@@ -8,6 +8,7 @@
 #define hashfBETA    2
 #define valUNKNOWN -oo
 
+#include "Evaluate.h"
 #include "External/ExternBig.h"
 #include <unordered_map>
 #include <map>
@@ -40,13 +41,15 @@ public:
     ll bestScore;
     ll _searchID=0;
     ExternBig Eval;
-    Search(ll maxDepth);
-    void GetBestMove(ll state_id);
+    Board* board;
+    Evaluate* evaluate;
+    Search(ll maxDepth,Board* brd, Evaluate* eval);
+    void GetBestMove();
 protected:
     ll _MaxDepth;
     map <ll,TransitionEntry> _TransitionTable;
-    virtual void _IterativeDeepening(ll rootID,ll MaxDepth)=0;
-    ll Qsearch(ll state_id,ll alpha,ll beta,bool isMax,ll MaxDepth=5);
+    virtual void _IterativeDeepening(ll MaxDepth)=0;
+    ll Qsearch(ll alpha,ll beta,bool isMax,ll MaxDepth=5);
     void _InsertlloTransitionTable(ll StateID,ll Depth,ll Value,ll HashFlag,ll BestMoveStateID);
     ll _GetFromTransitionTable(ll StateID,ll Depth, ll Alpha, ll Beta);
 };

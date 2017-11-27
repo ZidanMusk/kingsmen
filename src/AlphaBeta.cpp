@@ -3,24 +3,30 @@
 //
 
 #include "AlphaBeta.h"
-#include "Board.cpp"
 
-ll AlphaBeta::alphaBetaSearch(ll stateID, ll alpha, ll beta, ll depth, bool isMax){
+ll AlphaBeta::alphaBetaSearch(ll alpha, ll beta, ll depth, bool isMax){
+    ll stateID = Search::board->key;
+    //cout<<stateID<<endl;
     OpenedStates++;
     if( depth == 0 ) {
         this->cntr++;
+        //TODO activate Q-Search
         //return ((isMax) ? 1 : -1) * Search::Qsearch(stateID, alpha, beta, isMax);
-        return ((isMax)?1:-1)*this->Eval.GetScore(stateID);
+        return ((isMax)?1:-1)*Search::evaluate->evaluate();
     }
     //ToDo rename
-    vector<ll> nextMoves = this->Eval.GetPossibleMoves(stateID);
+    //vector<ll> nextMoves = this->Eval.GetPossibleMoves(stateID);
+    vector<int> nextMoves = Search::board->allValidMoves;
+
     ll moves = nextMoves.size();
     ll score = 0;
     for (ll i=0; i< moves;++i)  {
         //ToDO make move
-        ll nextState = nextMoves[i];
-        score = - this->alphaBetaSearch(nextState, -beta, -alpha, depth- 1, !isMax);
+        Search::board->doo(nextMoves[i]);
+        score = - this->alphaBetaSearch( -beta, -alpha, depth- 1, !isMax);
         //ToDO unmake move
+        Search::board->undoo();
+
         if( score >= beta ){
             return beta;   //  fail hard beta-cutoff
         }
@@ -45,11 +51,12 @@ void AlphaBeta::getPvPath(ll root){
     cout<<endl<<"Path length: "<<count<<endl;
 }
 
-void AlphaBeta::_IterativeDeepening(ll root_id, ll MaxDepth) {
+void AlphaBeta::_IterativeDeepening(ll MaxDepth) {
     ll nodeScore;
     clock_t tStart = clock();
-    for (ll i = 1; i <= MaxDepth; ++i) {
-        nodeScore = this->alphaBetaSearch(root_id,-oo,oo,i,true);
+    ll root_id=Search::board->key;
+    for (ll i = 0; i <= MaxDepth; ++i) {
+        nodeScore = this->alphaBetaSearch(-oo,oo,i,true);
     }
     //pair<ll,ll>baseline=make_pair(nodeScore,MoveTable[root_id]);
     this->bestScore = nodeScore;
@@ -57,7 +64,7 @@ void AlphaBeta::_IterativeDeepening(ll root_id, ll MaxDepth) {
     this->uniqueCalls = this->cntr;
     this->allCalls = this->OpenedStates;
 
-    cout<<"AlpahBeta : ["<<bestScore<<','<<bestMove<<','<<cntr<<","<<OpenedStates<<"] in "<<(clock() - tStart)<<" msec"<<endl;
+    cout<<"AlphaBeta : ["<<bestScore<<','<<bestMove<<','<<cntr<<","<<OpenedStates<<"] in "<<(clock() - tStart)<<" msec"<<endl;
 
     //MoveTable.clear();
     //return baseline;

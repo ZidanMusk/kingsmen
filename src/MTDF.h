@@ -9,7 +9,7 @@ public:
     ll EvalStates=0;
     bool doNull;
     bool useTrans;
-    MTDF(ll maxDepth, bool nulling,bool trans):Search(maxDepth) {this->doNull = nulling;this->useTrans=trans;}
+    MTDF(ll maxDepth, bool nulling,bool trans):Search(maxDepth,NULL,NULL) {this->doNull = nulling;this->useTrans=trans;}
 
 private:
     unordered_map<ll,Node>_MTDfTable;
