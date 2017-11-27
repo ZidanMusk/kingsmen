@@ -9,13 +9,13 @@
 
 
 int main() {
-    int maxDepth = 6;
+    int maxDepth = 5;
     Board* board = new Board();
     board->fenInterpreter();
     Evaluate* evaluate = new Evaluate(board);
     Search* baseline = new AlphaBeta(maxDepth,board,evaluate);
     baseline->GetBestMove();
-
+    int x=baseline->bestMove;
     /*ll mtdfBest1 = 0, mtdfBest2 = 0, mtfdCorrect = 0;
     ll PvsBest1 = 0, PvsBest2 = 0, PvsCorrect = 0;
     bool pvsSa7 = false;

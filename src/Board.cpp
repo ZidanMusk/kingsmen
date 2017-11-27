@@ -64,13 +64,13 @@ class Board {
 
 public:
 
-    int16_t mPstScoreOp, mPstScoreEd;
+    int mPstScoreOp, mPstScoreEd;
 
-    inline int16_t getPstScoreOp() const noexcept {
+    inline int getPstScoreOp() const noexcept {
         return mPstScoreOp;
     }
 
-    inline int16_t getPstScoreEd() const noexcept {
+    inline int getPstScoreEd() const noexcept {
         return mPstScoreEd;
     }
 
