@@ -9,7 +9,7 @@
 
 
 int main() {
-    int maxDepth = 6;
+    int maxDepth = 5;
     Board* board = new Board();
     board->fenInterpreter();
     Evaluate* evaluate = new Evaluate(board);

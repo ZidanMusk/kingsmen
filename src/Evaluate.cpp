@@ -1,47 +1,41 @@
 #include "Evaluate.h"
 
-template <class T>
-T clamp(T value, T lowerBound, T upperBound)
-{
+template<class T>
+T clamp(T value, T lowerBound, T upperBound) {
     return std::max(lowerBound, std::min(value, upperBound));
 }
 
-const int bishopPairBonusOpening = 42;
-const int bishopPairBonusEnding = 52;
-const int sideToMoveBonus = 1;
+int bishopPairBonusOpening = 42;
+int bishopPairBonusEnding = 52;
+int sideToMoveBonus = 1;
 
 
-Evaluate::Evaluate(Board *b)
-{
+Evaluate::Evaluate(Board *b) {
     _board = b;
     pht.setSize(4);
 }
 
-int Evaluate::interpolateScore(int scoreOp, int scoreEd, int phase)
-{
-    return ((scoreOp * (64 - phase)) + (scoreEd * phase)) / 64;
+inline int Evaluate::interpolateScore(int scoreOp, int scoreEd, int phase) {
+    return ((scoreOp * (64 - phase)) + (scoreEd * phase)) >> 6;
 }
 
 int Evaluate::pawnStructure(int phase) {
     auto scoreOp = 0, scoreEd = 0;
 
-    if (pht.probe(_board->ZPawns(), scoreOp, scoreEd))
-    {
+    if (pht.probe(_board->ZPawns(), scoreOp, scoreEd)) {
         return interpolateScore(scoreOp, scoreEd, phase);
     }
 
-    for (int c = 0; c <= 1; ++c)
-    {
-        const auto ownPawns = c==1? _board->blackPawns : _board->whitePawns;
-        const auto opponentPawns = c==1? _board->whitePawns : _board->blackPawns;
+    for (int c = 0; c <= 1; ++c) {
+        const auto ownPawns = c == 1 ? _board->blackPawns : _board->whitePawns;
+        const auto opponentPawns = c == 1 ? _board->whitePawns : _board->blackPawns;
         auto tempPawns = ownPawns;
         auto scoreOpForColor = 0, scoreEdForColor = 0;
 
-        while (tempPawns)
-        {
+        while (tempPawns) {
             const auto from = _board->popLsb(tempPawns);
-            const auto pawnFile = (from%8);
-            const auto pawnRank = (c ? 7 - (from/8) : (from/8));
+            const auto pawnFile = (from % 8);
+            const auto pawnRank = (c ? 7 - (from / 8) : (from / 8));
 
             const auto passed = !(opponentPawns & Passed[c][from]);
             const auto doubled = (ownPawns & (c ? Rays[1][from] : Rays[6][from])) != 0;
@@ -51,33 +45,29 @@ int Evaluate::pawnStructure(int phase) {
                                   && _board->getPieceAt(from + 8 - 16 * c) != 'p'
                                   && (PawnAttacks[c][from + 8 - 16 * c] & opponentPawns);
 
-            if (passed)
-            {
+            if (passed) {
                 scoreOpForColor += passedBonusOpening[pawnRank];
                 scoreEdForColor += passedBonusEnding[pawnRank];
             }
 
-            if (doubled)
-            {
+            if (doubled) {
                 scoreOpForColor -= doubledPenaltyOpening[pawnFile];
                 scoreEdForColor -= doubledPenaltyEnding[pawnFile];
             }
 
-            if (isolated)
-            {
+            if (isolated) {
                 scoreOpForColor -= isolatedPenaltyOpening[pawnFile];
                 scoreEdForColor -= isolatedPenaltyEnding[pawnFile];
             }
 
-            if (backward)
-            {
+            if (backward) {
                 scoreOpForColor -= backwardPenaltyOpening[pawnFile];
                 scoreEdForColor -= backwardPenaltyEnding[pawnFile];
             }
         }
 
-        scoreOp += (c? -scoreOpForColor : scoreOpForColor);
-        scoreEd += (c? -scoreEdForColor : scoreEdForColor);
+        scoreOp += (c ? -scoreOpForColor : scoreOpForColor);
+        scoreEd += (c ? -scoreEdForColor : scoreEdForColor);
     }
 
     pht.save(_board->ZPawns(), scoreOp, scoreEd);
@@ -135,11 +125,12 @@ int Evaluate::mobilityEval(std::array<int, 2> &kingSafetyScore, int phase) {
         // king safety array access with king color and place on board
         //cout<<_board->getBitBoard(!c, 5)<<endl;
         //cout<<_board->getLsb(_board->getBitBoard(!c, 5))<<endl;
-        const auto opponentKingZone = _board->kingSafetyZone[_board->getLsb(_board->getBitBoard(!c, 5))][!c]; // 5 -> king
+        const auto opponentKingZone = _board->kingSafetyZone[_board->getLsb(
+                _board->getBitBoard(!c, 5))][!c]; // 5 -> king
         //cout << _board->getLsb(_board->getBitBoard(!c, 5)) << endl;
         //_board->debug(opponentKingZone);
         //cout << endl;
-    //        const auto targetBitboard = ~pos.getPieces(c);
+        //        const auto targetBitboard = ~pos.getPieces(c);
 //        const auto opponentKingZone = Bitboards::kingSafetyZone(!c, Bitboards::lsb(pos.getBitboard(!c, Piece::King)));
         auto scoreOpForColor = 0, scoreEdForColor = 0;
         auto attackUnits = 0;
@@ -248,10 +239,7 @@ int Evaluate::mobilityEval(std::array<int, 2> &kingSafetyScore, int phase) {
     }
 //    cout << scoreOp << ' ' << scoreEd << ' ' << phase << endl;
     return interpolateScore(scoreOp, scoreEd, phase);
-}
-
-int Evaluate::getPstScore(int phase) {
-    return interpolateScore(_board->getPstScoreOp(), _board->getPstScoreEd(), phase);
+//    return 1;
 }
 
 int Evaluate::evaluate() {
@@ -260,9 +248,10 @@ int Evaluate::evaluate() {
 //    if () {
 //        return 0;
 //    }
+    clock_t tStart = clock();
 
-    std::array<int, 2>kingSafetyScore;
-    const auto phase = clamp(static_cast<int>(_board->getGamePhase()), 0, 64);
+    std::array<int, 2> kingSafetyScore;
+    auto phase = clamp(static_cast<int>(_board->getGamePhase()), 0, 64);
 
     auto score = mobilityEval(kingSafetyScore, phase);
     //cout<<score<<endl;
@@ -270,7 +259,7 @@ int Evaluate::evaluate() {
     //cout<<score<<endl;
     score += kingSafty(kingSafetyScore[1], kingSafetyScore[0], phase);
     //cout<<score<<endl;
-    //score += getPstScore(phase);
+    score += interpolateScore(_board->getPstScoreOp(), _board->getPstScoreEd(), phase);
 
     // Bishop pair bonus.
     for (Color c = Color::White; c <= Color::Black; ++c) {
@@ -282,5 +271,7 @@ int Evaluate::evaluate() {
     //cout<<score<<endl;
     score += (_board->whiteToMove ? sideToMoveBonus : -sideToMoveBonus);
     //cout<<score<<endl;
+    xx += (clock() - tStart);
+    xxx++;
     return score;
 }
