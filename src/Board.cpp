@@ -447,15 +447,20 @@ public:
     ull enPassantLoc;
     bool whiteToMove = true;
 
+
     vector<vector<int> > validMovesHistory;
+    vector<vector<int> > validCapturesHistory;
     vector<int> allValidMoves;
+    vector<int> allValidCaptures;
     vector<int> kingCheckers;
 
-    int moveNumber = 0;
+    int moveNumber = 1;
     int fiftyMoveRule = 0;
 
     int whiteKingMoves = 0;     //move counters
     int blackKingMoves = 0;
+
+    char me = 'w';
 
     int pawnCntInFile[2][8];       //counting number of pawns in each file (used for isolated pawns)
 
@@ -465,6 +470,7 @@ public:
 
     Board() {
         validMovesHistory.resize(MAX_GAME_LENGTH);
+        validCapturesHistory.resize(MAX_GAME_LENGTH);
     }
 
     // displaying the board in the terminal for debugging purposes
@@ -523,7 +529,8 @@ public:
     }
 
     // interpretes fen strings.
-    void fenInterpreter(string fen) {
+    void fenInterpreter(string fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1", char myColor = 'w') {
+        me = myColor;
         whiteRooks = 0;
         whiteQueens = 0;
         whiteKing = 0;
@@ -541,30 +548,54 @@ public:
         blackPieces = 0;
         allPieces = 0;
         int file = 1;
-        int rank = 8;
+        int rank = (myColor == 'w' ? 8 : 1);
+        int cas = -1;
         for (int i = 0; i < fen.size(); i++) {
-            if (fen[i] == ' ')break;
+            if (fen[i] == ' ') {
+                i++;
+                if (fen[i] == myColor)whiteToMove = true;
+                else whiteToMove = false;
+                cas = i + 2;
+                break;
+            }
             if (fen[i] == '/') {
-                if (file != 9)rank--;
+                if (file != 9)if (myColor == 'w')rank--; else rank++;
                 file = 1;
                 continue;
             }
             if (isdigit(fen[i])) { file += (fen[i] - '0') - 1; }
-            if (fen[i] == 'p') { blackPawns |= (1ull << ((rank - 1) * 8 + (file - 1))); }
-            if (fen[i] == 'n') { blackKnights |= (1ull << ((rank - 1) * 8 + (file - 1))); }
-            if (fen[i] == 'r') { blackRooks |= (1ull << ((rank - 1) * 8 + (file - 1))); }
-            if (fen[i] == 'q') { blackQueens |= (1ull << ((rank - 1) * 8 + (file - 1))); }
-            if (fen[i] == 'k') { blackKing |= (1ull << ((rank - 1) * 8 + (file - 1))); }
-            if (fen[i] == 'b') { blackBishops |= (1ull << ((rank - 1) * 8 + (file - 1))); }
+            if (myColor == 'w') {
+                if (fen[i] == 'p') { blackPawns |= (1ull << ((rank - 1) * 8 + (file - 1))); }
+                if (fen[i] == 'n') { blackKnights |= (1ull << ((rank - 1) * 8 + (file - 1))); }
+                if (fen[i] == 'r') { blackRooks |= (1ull << ((rank - 1) * 8 + (file - 1))); }
+                if (fen[i] == 'q') { blackQueens |= (1ull << ((rank - 1) * 8 + (file - 1))); }
+                if (fen[i] == 'k') { blackKing |= (1ull << ((rank - 1) * 8 + (file - 1))); }
+                if (fen[i] == 'b') { blackBishops |= (1ull << ((rank - 1) * 8 + (file - 1))); }
 
-            if (fen[i] == 'P') { whitePawns |= (1ull << ((rank - 1) * 8 + (file - 1))); }
-            if (fen[i] == 'N') { whiteKnights |= (1ull << ((rank - 1) * 8 + (file - 1))); }
-            if (fen[i] == 'R') { whiteRooks |= (1ull << ((rank - 1) * 8 + (file - 1))); }
-            if (fen[i] == 'Q') { whiteQueens |= (1ull << ((rank - 1) * 8 + (file - 1))); }
-            if (fen[i] == 'K') { whiteKing |= (1ull << ((rank - 1) * 8 + (file - 1))); }
-            if (fen[i] == 'B') { whiteBishops |= (1ull << ((rank - 1) * 8 + (file - 1))); }
+                if (fen[i] == 'P') { whitePawns |= (1ull << ((rank - 1) * 8 + (file - 1))); }
+                if (fen[i] == 'N') { whiteKnights |= (1ull << ((rank - 1) * 8 + (file - 1))); }
+                if (fen[i] == 'R') { whiteRooks |= (1ull << ((rank - 1) * 8 + (file - 1))); }
+                if (fen[i] == 'Q') { whiteQueens |= (1ull << ((rank - 1) * 8 + (file - 1))); }
+                if (fen[i] == 'K') { whiteKing |= (1ull << ((rank - 1) * 8 + (file - 1))); }
+                if (fen[i] == 'B') { whiteBishops |= (1ull << ((rank - 1) * 8 + (file - 1))); }
+            } else {
+                if (fen[i] == 'P') { blackPawns |= (1ull << ((rank - 1) * 8 + (file - 1))); }
+                if (fen[i] == 'N') { blackKnights |= (1ull << ((rank - 1) * 8 + (file - 1))); }
+                if (fen[i] == 'R') { blackRooks |= (1ull << ((rank - 1) * 8 + (file - 1))); }
+                if (fen[i] == 'Q') { blackQueens |= (1ull << ((rank - 1) * 8 + (file - 1))); }
+                if (fen[i] == 'K') { blackKing |= (1ull << ((rank - 1) * 8 + (file - 1))); }
+                if (fen[i] == 'B') { blackBishops |= (1ull << ((rank - 1) * 8 + (file - 1))); }
+
+                if (fen[i] == 'p') { whitePawns |= (1ull << ((rank - 1) * 8 + (file - 1))); }
+                if (fen[i] == 'n') { whiteKnights |= (1ull << ((rank - 1) * 8 + (file - 1))); }
+                if (fen[i] == 'r') { whiteRooks |= (1ull << ((rank - 1) * 8 + (file - 1))); }
+                if (fen[i] == 'q') { whiteQueens |= (1ull << ((rank - 1) * 8 + (file - 1))); }
+                if (fen[i] == 'k') { whiteKing |= (1ull << ((rank - 1) * 8 + (file - 1))); }
+                if (fen[i] == 'b') { whiteBishops |= (1ull << ((rank - 1) * 8 + (file - 1))); }
+
+            }
             file++;
-            if (file == 9) { rank--; }
+            if (file == 9) { if (myColor == 'w')rank--; else rank++; }
         }
 
 
@@ -572,9 +603,43 @@ public:
         whitePieces = whitePawns | whiteBishops | whiteKing | whiteKnights | whiteQueens | whiteRooks;
         allPieces = whitePieces | blackPieces;
         //this function is not complete yet a7ba2i fellah
+        for (int i = cas; i < fen.size(); ++i) {
+            if (fen[i] == ' ') {
+                i++;
+                cas = i;
+                break;
+            }
+            if (fen[i] == 'k') { blackCastleK = 1; }
+            if (fen[i] == 'K') { whiteCastleK = 1; }
+            if (fen[i] == 'q') { blackCastleQ = 1; }
+            if (fen[i] == 'Q') { whiteCastleQ = 1; }
 
-
+        }
+        if (fen[cas] == '-')cas += 2;
+        else {
+            enPassantLoc = (fen[cas + 1] - '1') * 8 + (fen[cas] - 'a') + (whiteToMove ? 8 : -8);
+            cas += 3;
+        }
+        string str = "";
+        for (; cas < fen.size(); cas++) {
+            if (fen[cas] == ' ') {
+                cas++;
+                break;
+            }
+            str += fen[cas];
+        }
+        fiftyMoveRule = stoi(str);
+        str = "";
+        for (; cas < fen.size(); cas++) {
+            if (fen[cas] == ' ') {
+                cas++;
+                break;
+            }
+            str += fen[cas];
+        }
+        int numberOfFullMoves = stoi(str);
         key = ZBoard();
+        allValidCaptures.clear();
         allValidMoves.clear();
         allValidMoves = generateAllMoves();
     }
@@ -596,7 +661,7 @@ public:
             else if (blackRooks & (1ULL << loc)) return 'r';
         }
         return 0;
-    };
+    }
 
 
     // Zobrist hash generators
@@ -660,6 +725,7 @@ public:
 
         return key;
     }
+
     ull ZPawns() {
         ull key = 0;
         int pawnCnt = __builtin_popcountll(whitePawns);
@@ -803,23 +869,23 @@ public:
     // used when it's necessary to clone the board
     void makeClone() {                  //making virtual masks clones of real masks
         //if (whiteToMove) {
-            virWhitePawns = whitePawns;
-            virWhiteKnights = whiteKnights;
-            virWhiteBishops = whiteBishops;
-            virWhiteRooks = whiteRooks;
-            virWhiteQueens = whiteQueens;
-            virWhiteKing = whiteKing;
+        virWhitePawns = whitePawns;
+        virWhiteKnights = whiteKnights;
+        virWhiteBishops = whiteBishops;
+        virWhiteRooks = whiteRooks;
+        virWhiteQueens = whiteQueens;
+        virWhiteKing = whiteKing;
 
-            virBlackPawns = blackPawns;
-            virBlackKnights = blackKnights;
-            virBlackBishops = blackBishops;
-            virBlackRooks = blackRooks;
-            virBlackQueens = blackQueens;
-            virBlackKing = blackKing;
+        virBlackPawns = blackPawns;
+        virBlackKnights = blackKnights;
+        virBlackBishops = blackBishops;
+        virBlackRooks = blackRooks;
+        virBlackQueens = blackQueens;
+        virBlackKing = blackKing;
 
-            virWhitePieces = whitePieces;
-            virBlackPieces = blackPieces;
-            virAllPieces = allPieces;
+        virWhitePieces = whitePieces;
+        virBlackPieces = blackPieces;
+        virAllPieces = allPieces;
         /*} else {
             virBlackPawns = whitePawns;
             virBlackKnights = whiteKnights;
@@ -966,7 +1032,7 @@ public:
             } else if (locExist(refOtherQueens, 1ull << to)) {
                 unsetBit(refOtherQueens, 1ull << to);
                 key ^= squareZKey(to, 'Q');
-            }else if (locExist(refOtherRooks, 1ull << to)) {
+            } else if (locExist(refOtherRooks, 1ull << to)) {
                 unsetBit(refOtherRooks, 1ull << to);
                 key ^= squareZKey(to, 'R');
             }
@@ -1011,6 +1077,7 @@ public:
         //switch turns
         whiteToMove = !whiteToMove;
         allValidMoves.clear();
+        allValidCaptures.clear();
         allValidMoves = generateAllMoves();
 
 
@@ -1041,7 +1108,7 @@ public:
         enPassantLocHistory[moveNumber] = enPassantLoc;
 
         whiteToMoveHistory[moveNumber] = whiteToMove;
-        validMovesHistory[moveNumber] = allValidMoves; //assigning 2 vectors
+        validCapturesHistory[moveNumber] = allValidCaptures; //assigning 2 vectors
         whiteCastleKHistory[moveNumber] = whiteCastleK;
         whiteCastleQHistory[moveNumber] = whiteCastleQ;
         blackCastleKHistory[moveNumber] = blackCastleK;
@@ -1064,6 +1131,7 @@ public:
         moveNumber--;
 
         allValidMoves = validMovesHistory[moveNumber]; //assigning 2 vectors
+        allValidCaptures = validCapturesHistory[moveNumber]; //assigning 2 vectors
         whiteToMove = whiteToMoveHistory[moveNumber];
 
         whitePawns = whitePawnHistory[moveNumber];
@@ -1093,7 +1161,6 @@ public:
         blackCastleQ = blackCastleQHistory[moveNumber];
 
         key = keyHistory[moveNumber];
-        allValidMoves = validMovesHistory[moveNumber];
 
     }
 
@@ -1149,7 +1216,7 @@ public:
 //        }
 
 
-        return  !isValid(whiteToMove,  0);
+        return !isValid(whiteToMove, 0);
 
     }
 
@@ -1188,6 +1255,7 @@ public:
             key ^= passantColumn[getColumn(enPassantLoc)];
         enPassantLoc = -1;
         whiteToMove = !whiteToMove;
+        allValidMoves = generateAllMoves();
         key ^= whiteMove;
     }
 
@@ -1265,13 +1333,12 @@ public:
     }
 
 
-
     int popLsb(ull &bitBoard) {
         //get LS 1 in the board and toggle itpop
-        ull z  = (log2(bitBoard & -bitBoard) + EPS);
+        ull z = (log2(bitBoard & -bitBoard) + EPS);
         bitBoard = ((bitBoard & -bitBoard) ^ bitBoard);
 
-        return z ;
+        return z;
     }
 
 //KNIGHT ATTAKS===============================================
@@ -1338,7 +1405,8 @@ public:
         if (tmpW.size()) {
             for (int i = 0; i < tmpW.size(); i++) {
 
-                if (((tmpW[i] & 8064) >> 7) == square) {//check if this move of a piece of my wanted square(from == square)
+                if (((tmpW[i] & 8064) >> 7) ==
+                    square) {//check if this move of a piece of my wanted square(from == square)
                     //Oring with destination to mark it with 1 (<<to)
                     ans |= (1ull << ((tmpW[i] & 516096) >> 13));
                 }
@@ -1732,27 +1800,26 @@ public:
                 if (specialEvent == PROMOTEBISHOP || specialEvent == PROMOTEKNIGHT ||
                     specialEvent == PROMOTEQUEEN ||
                     specialEvent == PROMOTEROOK)
-                    if(whiteTurn)
+                    if (whiteTurn)
                         virWhitePawns ^= from;
                     else
                         virBlackPawns ^= from;
+                else if (whiteTurn)
+                    virWhitePawns ^= moveXor;
                 else
-                    if(whiteTurn)
-                        virWhitePawns ^= moveXor;
-                    else
-                        virBlackPawns ^= moveXor;
+                    virBlackPawns ^= moveXor;
                 if (specialEvent == PROMOTEBISHOP)
-                    if(whiteTurn)
+                    if (whiteTurn)
                         virWhiteBishops ^= to;
                     else
                         virBlackBishops ^= to;
                 else if (specialEvent == PROMOTEKNIGHT)
-                    if(whiteTurn)
+                    if (whiteTurn)
                         virWhiteKnights ^= to;
                     else
                         virBlackKnights ^= to;
                 else if (specialEvent == PROMOTEROOK)
-                    if(whiteTurn)
+                    if (whiteTurn)
                         virWhiteRooks ^= to;
                     else
                         virBlackRooks ^= to;
@@ -1765,55 +1832,57 @@ public:
                 }
                 break;
             case 1:
-                if(whiteTurn)
+                if (whiteTurn)
                     virWhiteKnights ^= moveXor;
                 else
                     virBlackKnights ^= moveXor;
 
                 break;
             case 2:
-                if(whiteTurn)
+                if (whiteTurn)
                     virWhiteBishops ^= moveXor;
                 else
                     virBlackBishops ^= moveXor;
                 break;
             case 3:
-                if(whiteTurn)
+                if (whiteTurn)
                     virWhiteRooks ^= moveXor;
                 else
                     virBlackRooks ^= moveXor;
                 break;
             case 4:
-                if(whiteTurn)
+                if (whiteTurn)
                     virWhiteQueens ^= moveXor;
                 else
                     virBlackQueens ^= moveXor;
                 break;
             case 5:
-                virWhiteKing ^= moveXor;
+                if (whiteTurn)
+                    virWhiteKing ^= moveXor;
+                else virBlackKing ^= moveXor;
                 if (specialEvent == CASTLEKINGSIDE)
-                    if(whiteTurn)
+                    if (whiteTurn)
                         virWhiteRooks ^= 160;
-                    else virWhiteRooks ^= 160ull<<(7*8);
+                    else virWhiteRooks ^= 160ull << (7 * 8);
                 else if (specialEvent == CASTLEQUEENSIDE)
-                    if(whiteTurn)
+                    if (whiteTurn)
                         virWhiteRooks ^= 9;
                     else
-                        virWhiteRooks ^= 9ull << (7*8);
+                        virWhiteRooks ^= 9ull << (7 * 8);
                 break;
             default:
                 break;
         }
 
-        if(whiteTurn)
+        if (whiteTurn)
             virWhitePieces =
                     virWhitePawns | virWhiteKnights | virWhiteBishops | virWhiteQueens | virWhiteKing | virWhiteRooks;
         else
             virBlackPieces =
-                             virBlackPawns | virBlackKnights | virBlackBishops | virBlackQueens | virBlackKing | virBlackRooks;
+                    virBlackPawns | virBlackKnights | virBlackBishops | virBlackQueens | virBlackKing | virBlackRooks;
 
         if (capture) {
-            if(whiteTurn){
+            if (whiteTurn) {
                 if (locExist(virBlackPawns, 1ull << to)) {
                     unsetBit(virBlackPawns, 1ull << to);
                 } else if (~enPassantLoc && type == 0 && to == enPassantLoc + 40 &&
@@ -1831,7 +1900,7 @@ public:
                 virBlackPieces = virBlackPawns | virBlackKnights | virBlackBishops | virBlackQueens | virBlackKing |
                                  virBlackRooks;
 
-            }else{
+            } else {
                 if (locExist(virWhitePawns, 1ull << to)) {
                     unsetBit(virWhitePawns, 1ull << to);
                 } else if (~enPassantLoc && type == 0 && to == enPassantLoc + 40 &&
@@ -1854,7 +1923,7 @@ public:
 
         virAllPieces = virWhitePieces | virBlackPieces;
 
-        ull tmpWhiteKing = whiteTurn? virWhiteKing : virBlackKing;
+        ull tmpWhiteKing = whiteTurn ? virWhiteKing : virBlackKing;
         ull locRaisedPowW = getLSB(tmpWhiteKing);
 
         loc = log2(locRaisedPowW) + EPS;
@@ -2463,9 +2532,8 @@ public:
                 if (cellInBoard(locW + di[i]) && threat[locW + di[i]] != key)
                     if (!((resW >> (locW + di[i])) & 1ull)) {
                         int move = (makeMoveMask(0, 0, kingTypeNum(), locW, locW + di[i], 0));
-                        if(isValid(whiteToMove, move))ret.push_back(move);
-                    }
-                    else {
+                        if (isValid(whiteToMove, move))ret.push_back(move);
+                    } else {
                         if (locExist(blackPieces, 1ull << (locW + di[i]))) {
                             int move = (makeMoveMask(0, 1, kingTypeNum(), locW, locW + di[i], 0));
                             if (isValid(whiteToMove, move))ret.push_back(move);
@@ -2476,12 +2544,12 @@ public:
             if (!check) {
                 if (threat[5] != key && threat[6] != key && !(allPieces & 96) && whiteCastleK) {
                     int move = (makeMoveMask(CASTLEKINGSIDE, 0, kingTypeNum(), 4, 7, 0));
-                    if(isValid(whiteToMove, move))ret.push_back(move);
+                    if (isValid(whiteToMove, move))ret.push_back(move);
 
                 }
                 if (threat[1] != key && threat[2] != key && threat[3] != key && !(allPieces & 14) && whiteCastleQ) {
                     int move = (makeMoveMask(CASTLEQUEENSIDE, 0, kingTypeNum(), 4, 0, 0));
-                    if(isValid(whiteToMove, move))ret.push_back(move);
+                    if (isValid(whiteToMove, move))ret.push_back(move);
 
                 }
             }
@@ -2492,28 +2560,29 @@ public:
                 if (cellInBoard(locB + di[i]) && threat[locB + di[i]] != key)
                     if (!((resB >> (locB + di[i])) & 1ull)) {
                         int move = (makeMoveMask(0, 0, kingTypeNum(), locB, locB + di[i], 1));
-                        if(isValid(whiteToMove, move))ret.push_back(move);
+                        if (isValid(whiteToMove, move))ret.push_back(move);
 
-                    }
-                    else {
+                    } else {
                         if (locExist(whitePieces, 1ull << (locB + di[i]))) {
                             int move = (makeMoveMask(0, 1, kingTypeNum(), locB, locB + di[i], 1));
-                            if(isValid(whiteToMove, move))ret.push_back(move);
+                            if (isValid(whiteToMove, move))ret.push_back(move);
 
                         }
                     }
             }
             bool check = isCheck();
             if (!check) {
-                if (threat[61] != key && threat[62] != key && !((allPieces & (1ull << 61)) | (allPieces & ( 1ull << 62))) && blackCastleK) {
+                if (threat[61] != key && threat[62] != key &&
+                    !((allPieces & (1ull << 61)) | (allPieces & (1ull << 62))) && blackCastleK) {
                     int move = (makeMoveMask(CASTLEKINGSIDE, 0, kingTypeNum(), 60, 63, 1));
-                    if(isValid(whiteToMove, move))ret.push_back(move);
+                    if (isValid(whiteToMove, move))ret.push_back(move);
 
                 }
                 if (threat[57] != key && threat[58] != key && threat[59] != key &&
-                    !(((allPieces & (1ull << 57)) | (allPieces & (1ull << 58)) | (allPieces & (1ull << 59)))) && blackCastleQ) {
+                    !(((allPieces & (1ull << 57)) | (allPieces & (1ull << 58)) | (allPieces & (1ull << 59)))) &&
+                    blackCastleQ) {
                     int move = (makeMoveMask(CASTLEQUEENSIDE, 0, kingTypeNum(), 60, 56, 1));
-                    if(isValid(whiteToMove, move))ret.push_back(move);
+                    if (isValid(whiteToMove, move))ret.push_back(move);
 
                 }
             }
@@ -2527,91 +2596,147 @@ public:
         vector<int> ret;
         vector<int> m;
         m = kingMoves();
-        ret.insert(ret.end(), m.begin(), m.end());
+        for (auto mm:m){ret.push_back(mm); if(getCapture(mm) == 1)allValidCaptures.push_back(mm);}
         if (!color) {
             m = whitePawnVMGen();
-            ret.insert(ret.end(), m.begin(), m.end());
+            for (auto mm:m){ret.push_back(mm); if(getCapture(mm) == 1)allValidCaptures.push_back(mm);}
         }
         if (color) {
             m = blackPawnVMGen();
-            ret.insert(ret.end(), m.begin(), m.end());
+            for (auto mm:m){ret.push_back(mm); if(getCapture(mm) == 1)allValidCaptures.push_back(mm);}
         }
         if (!color) {
             m = whiteKnightVMGen();
-            ret.insert(ret.end(), m.begin(), m.end());
+            for (auto mm:m){ret.push_back(mm); if(getCapture(mm) == 1)allValidCaptures.push_back(mm);}
         }
         if (color) {
             m = blackKnightVMGen();
-            ret.insert(ret.end(), m.begin(), m.end());
+            for (auto mm:m){ret.push_back(mm); if(getCapture(mm) == 1)allValidCaptures.push_back(mm);}
         }
         if (!color) {
             m = bishopMoves(whiteBishops, bishopTypeNum(), 0);
-            ret.insert(ret.end(), m.begin(), m.end());
+            for (auto mm:m){ret.push_back(mm); if(getCapture(mm) == 1)allValidCaptures.push_back(mm);}
         }
         if (color) {
             m = bishopMoves(blackBishops, bishopTypeNum(), 1);
-            ret.insert(ret.end(), m.begin(), m.end());
+            for (auto mm:m){ret.push_back(mm); if(getCapture(mm) == 1)allValidCaptures.push_back(mm);}
         }
         if (!color) {
             m = rookMoves(whiteRooks, rookTypeNum(), 0);
-            ret.insert(ret.end(), m.begin(), m.end());
+            for (auto mm:m){ret.push_back(mm); if(getCapture(mm) == 1)allValidCaptures.push_back(mm);}
         }
         if (color) {
             m = rookMoves(blackRooks, rookTypeNum(), 1);
-            ret.insert(ret.end(), m.begin(), m.end());
+            for (auto mm:m){ret.push_back(mm); if(getCapture(mm) == 1)allValidCaptures.push_back(mm);}
         }
         if (!color) {
             m = queenMoves(0);
-            ret.insert(ret.end(), m.begin(), m.end());
+            for (auto mm:m){ret.push_back(mm); if(getCapture(mm) == 1)allValidCaptures.push_back(mm);}
         }
         if (color) {
             m = queenMoves(1);
-            ret.insert(ret.end(), m.begin(), m.end());
+            for (auto mm:m){ret.push_back(mm); if(getCapture(mm) == 1)allValidCaptures.push_back(mm);}
         }
 
 
         return ret;
     }
-    string isValid(string src, string dst){
-        string ret = "";
-        if(src.size() != 2 || dst.size() != 2){
-            return "I";
-        }
-        if(!((toupper(src[0]) >= 'A' && toupper(src[0]) <= 'H' && src[1] >= '1' && src[1] <= '8') &&
-            (toupper(dst[0]) >= 'A' && toupper(dst[0]) <= 'H' && dst[1] >= '1' && dst[1] <= '8'))){
-            return "I";
-        }
-        int srcX = src[0]-'A';
-        int srcY = src[1]-'1';
-        int dstX = dst[0]-'A';
-        int dstY = dst[1]-'1';
 
-        int srcLog = srcX*8 + (srcY);
-        int dstLog = dstX*8 + (dstY);
-        if(isMate()){
-            if(whiteToMove){
-                return "L";
-            } else{
-                return "W";
+    char gui_isValid(string src, string dst, int promotion) {
+        if (src.size() != 2 || dst.size() != 2 || (promotion < 0 && promotion > 8)) {
+            return 'I';
+        }
+        if (!((toupper(src[0]) >= 'A' && toupper(src[0]) <= 'H' && src[1] >= '1' && src[1] <= '8') &&
+              (toupper(dst[0]) >= 'A' && toupper(dst[0]) <= 'H' && dst[1] >= '1' && dst[1] <= '8'))) {
+            return 'I';
+        }
+        int srcX = toupper(src[0]) - 'A';
+        int srcY = src[1] - '1';
+        int dstX = toupper(dst[0]) - 'A';
+        int dstY = dst[1] - '1';
+
+        if (me == 'b') srcY = 7 - srcY;
+        if (me == 'b') dstY = 7 - dstY;
+
+        int srcLoc = srcX + (srcY) * 8;
+        int dstLoc = dstX + (dstY) * 8;
+        int curKingLoc = whiteToMove ? (log2(whiteKing) + EPS) : (log2(blackKing) + EPS);
+
+        for (int i = 0; i < allValidMoves.size(); ++i) {
+            //casteling
+            if (getSpecialEvent(allValidMoves[i]) == CASTLEKINGSIDE && srcLoc == curKingLoc && dstLoc == srcLoc + 2) {
+                doo(allValidMoves[i]);
+                return 'k';
             }
-        }
-        if(isCheck()){
-            ret += "C";
-        }
-        if(isDraw()){
-            ret += "D";
-        }
-        for (int i = 0; i < allValidMoves.size(); ++i){
-            if(getFrom(allValidMoves[i]) == srcLog && getTo(allValidMoves[i]) == dstLog){
-                if(getSpecialEvent(allValidMoves[i]) == 0) {
-                    return ret + "V";
-                }else{
-                    //should handle castling and promotion.
-                    
+            if (getSpecialEvent(allValidMoves[i]) == CASTLEQUEENSIDE && srcLoc == curKingLoc && dstLoc == srcLoc - 2) {
+                doo(allValidMoves[i]);
+                return 'q';
+            }
+            if (getFrom(allValidMoves[i]) == srcLoc && getTo(allValidMoves[i]) == dstLoc) {
+                if (getSpecialEvent(allValidMoves[i]) == promotion || getSpecialEvent(allValidMoves[i]) == ENPASSANT) {
+                    //ordinary move or promotion
+                    doo(allValidMoves[i]);
+                    return 'v';
                 }
+
+            }
+
+        }
+        return 'I';
+
+    }
+
+    char gui_gameState() {
+        if (isDraw())return 'd';
+        if (isMate() && whiteToMove)return 'l';
+        if (isMate() && !whiteToMove)return 'w';
+        if (isCheck() && (!whiteToMove || true))return 'c';
+        if (isCheck() && whiteToMove)return 'C';
+        return '-';
+    }
+
+    char gui_getPieceAt(string pos) {
+        if (pos.size() != 2) {
+            return 'I';
+        }
+        if (!((toupper(pos[0]) >= 'A' && toupper(pos[0]) <= 'H' && pos[1] >= '1' && pos[1] <= '8'))) {
+            return 'I';
+        }
+        int posX = toupper(pos[0]) - 'A';
+        int posY = pos[1] - '1';
+
+        if (me == 'b') posY = 7 - posY;
+
+        int loc = posX + (posY) * 8;
+        if (allPieces & (1ULL << loc)) {
+            if (me == 'w') {
+                if (whitePawns & (1ULL << loc)) return 'P';
+                else if (whiteBishops & (1ULL << loc)) return 'B';
+                else if (whiteKing & (1ULL << loc)) return 'K';
+                else if (whiteKnights & (1ULL << loc)) return 'N';
+                else if (whiteQueens & (1ULL << loc)) return 'Q';
+                else if (whiteRooks & (1ULL << loc)) return 'R';
+                else if (blackPawns & (1ULL << loc)) return 'p';
+                else if (blackBishops & (1ULL << loc)) return 'b';
+                else if (blackKing & (1ULL << loc)) return 'k';
+                else if (blackKnights & (1ULL << loc)) return 'n';
+                else if (blackQueens & (1ULL << loc)) return 'q';
+                else if (blackRooks & (1ULL << loc)) return 'r';
+            } else {
+                if (whitePawns & (1ULL << loc)) return 'p';
+                else if (whiteBishops & (1ULL << loc)) return 'b';
+                else if (whiteKing & (1ULL << loc)) return 'k';
+                else if (whiteKnights & (1ULL << loc)) return 'n';
+                else if (whiteQueens & (1ULL << loc)) return 'q';
+                else if (whiteRooks & (1ULL << loc)) return 'r';
+                else if (blackPawns & (1ULL << loc)) return 'P';
+                else if (blackBishops & (1ULL << loc)) return 'B';
+                else if (blackKing & (1ULL << loc)) return 'K';
+                else if (blackKnights & (1ULL << loc)) return 'N';
+                else if (blackQueens & (1ULL << loc)) return 'Q';
+                else if (blackRooks & (1ULL << loc)) return 'R';
             }
         }
-
     }
 
 };
