@@ -63,11 +63,36 @@ const std::array<std::array<short, 64>, 6> endingPST = {{
                                                                 }
                                                         }};
 
-Evaluate::Evaluate(Board *b)
-{
-    _board = b;
-    pht.setSize(4);
+const std::array<std::vector<int>, 6> mobilityOpening = {{
+                                                                 {},
+                                                                 {-1, 6, 12, 16, 17, 16, 16, 15, 18},
+                                                                 {-12, -7, -2, 1, 6, 14, 17, 22, 19, 23, 21, 34, 34,
+                                                                         29},
+                                                                 {-15, -12, -5, -3, -4, -1, 0, 6, 3, 1, 4, 4, 7, 14,
+                                                                         20},
+                                                                 {35, -5, -8, -8, -6, -4, -6, -3, 1, -1, 5, 7, 6, 6, 8,
+                                                                         4, 2, 6, 4, 7, 17, 21, 30, 24, 41, 41, 36, 34},
+                                                                 {}
+                                                         }};
 
+const std::array<std::vector<int>, 6> mobilityEnding = {{
+                                                                {},
+                                                                {-30, 1, 4, 11, 16, 25, 23, 23, 19},
+                                                                {-22, -32, -19, -6, 5, 20, 29, 33, 42, 40, 36, 38, 28, 13},
+                                                                {-12, -12, -8, -5, 7, 16, 20, 22, 31, 42, 43, 47, 47, 47, 37},
+                                                                {-2, 5, -2, -23, -28, -29, -14, -12, -10, -3, -5, -1, 6, 14, 17, 22, 36, 34, 43, 37, 39, 33, 36, 22, 12, -4, 38, 26},
+                                                                {}
+                                                        }};
+const std::array<int, 6> attackWeight = {
+        0, 2, 2, 3, 5, 0
+};
+
+Evaluate::Evaluate(Board *b) : doubledPenaltyOpening({
+                                                             36, 9, 2, 23, 18, 20, 0, 26
+                                                     }), doubledPenaltyEnding({
+                                                                                      46, 25, 31, 24, 21, 19, 29, 44
+                                                                              }) {
+    _board = b;
 
     //initialize PST
     for (Piece p = Piece::Pawn; p <= Piece::King; ++p) {
@@ -81,75 +106,47 @@ Evaluate::Evaluate(Board *b)
     }
 }
 
-int Evaluate::interpolateScore(int scoreOp, int scoreEd, int phase)
-{
-    return ((scoreOp * (64 - phase)) + (scoreEd * phase)) / 64;
+int Evaluate::pawnStructureEval(int color) {
+    ull tmpPawns = color ? _board->blackPawns : _board->whitePawns;
+
+    while (tmpPawns) {
+        int loc = _board->getLSB(tmpPawns);
+    }
 }
 
-int Evaluate::pawnStructure(int phase) {
-    auto scoreOp = 0, scoreEd = 0;
+int Evaluate::kingSafety(int blackKingSafety, int whiteKingSafty) {
 
-    if (pht.probe(_board->ZPawns(), scoreOp, scoreEd))
-    {
-        return interpolateScore(scoreOp, scoreEd, phase);
-    }
-
-    for (int c = 0; c <= 1; ++c)
-    {
-        const auto ownPawns = c? _board->blackPawns : _board->whitePawns;
-        const auto opponentPawns = c? _board->whitePawns : _board->blackPawns;
-        auto tempPawns = ownPawns;
-        auto scoreOpForColor = 0, scoreEdForColor = 0;
-
-        while (tempPawns)
-        {
-            const auto from = _board->popLsb(tempPawns);
-            const auto pawnFile = (from%8);
-            const auto pawnRank = (c ? 7 - (from/8) : (from/8));
-
-            const auto passed = !(opponentPawns & Passed[c][from]);
-            const auto doubled = (ownPawns & (c ? Rays[1][from] : Rays[6][from])) != 0;
-            const auto isolated = !(ownPawns & Isolated[from]);
-            const auto backward = !(ownPawns & Backward[c][from])
-                                  && _board->getPieceAt(from + 8 - 16 * c) != 'P'
-                                  && _board->getPieceAt(from + 8 - 16 * c) != 'p'
-                                  && (PawnAttacks[c][from + 8 - 16 * c] & opponentPawns);
-
-            if (passed)
-            {
-                scoreOpForColor += passedBonusOpening[pawnRank];
-                scoreEdForColor += passedBonusEnding[pawnRank];
-            }
-
-            if (doubled)
-            {
-                scoreOpForColor -= doubledPenaltyOpening[pawnFile];
-                scoreEdForColor -= doubledPenaltyEnding[pawnFile];
-            }
-
-            if (isolated)
-            {
-                scoreOpForColor -= isolatedPenaltyOpening[pawnFile];
-                scoreEdForColor -= isolatedPenaltyEnding[pawnFile];
-            }
-
-            if (backward)
-            {
-                scoreOpForColor -= backwardPenaltyOpening[pawnFile];
-                scoreEdForColor -= backwardPenaltyEnding[pawnFile];
-            }
-        }
-
-        scoreOp += (c? -scoreOpForColor : scoreOpForColor);
-        scoreEd += (c? -scoreEdForColor : scoreEdForColor);
-    }
-
-    pht.save(_board->ZPawns(), scoreOp, scoreEd);
-
-    return interpolateScore(scoreOp, scoreEd, phase);
-}
-
-int Evaluate::kingSafty(int blackKingSafety, int whiteKingSafty, int phase) {
+    ull openFilePenalty[] = {6, 5, 4, 4, 4, 4, 5, 6},
+            halfopenFilePenalty[] = {5, 4, 3, 3, 3, 3, 4, 5},
+            pawnStormPenalty[] = {0, 0, 0, 1, 2, 3, 0, 0},
+            piecePhase[] = {0, 3, 3, 5, 10, 0},
+            files[] = {
+            0x0101010101010101,
+            0x0202020202020202,
+            0x0404040404040404,
+            0x0808080808080808,
+            0x1010101010101010,
+            0x2020202020202020,
+            0x4040404040404040,
+            0x8080808080808080
+    },
+            ranks[] = {
+            0x00000000000000FF,
+            0x000000000000FF00,
+            0x0000000000FF0000,
+            0x00000000FF000000,
+            0x000000FF00000000,
+            0x0000FF0000000000,
+            0x00FF000000000000,
+            0xFF00000000000000
+    },
+            kingSafetyTable[] = {
+            21, 7, 11, 7, 7, 9, 5, 7, 10, 14, 15, 20, 19, 20, 25, 22, 28, 40, 45, 47, 46, 60, 56, 82, 86, 102, 98,
+            109, 107, 117, 125, 132, 159, 168, 181, 188, 211, 213, 234, 216, 265, 276, 288, 272, 308, 339, 351, 355,
+            374, 354, 370, 412, 420, 481, 439, 457, 478, 478, 441, 509, 494, 431, 517, 569, 562, 499, 500, 531, 523,
+            500, 500, 500, 522, 517, 500, 500, 500, 508, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500,
+            500, 500, 500, 500, 500, 500, 500, 500, 500, 500
+    };
     //evaluate white pawn shelter
     int penalty = 0;
     int kingFile = min(1, max(6, _board->getColumn(log2(_board->whiteKing) + _board->EPS)));
@@ -176,6 +173,19 @@ int Evaluate::kingSafty(int blackKingSafety, int whiteKingSafty, int phase) {
                                                               8)] : 0;
     }
     int blackPawnShelterPenalty = penalty;
+    int phase = piecePhase[_board->pawnTypeNum()] * 16 + piecePhase[_board->knightTypeNum()] * 4
+                + piecePhase[_board->bishopTypeNum()] * 4 + piecePhase[_board->rookTypeNum()] * 4
+                + piecePhase[_board->queenTypeNum()] * 2;
+    phase -=
+            (__builtin_popcountll(_board->whiteKnights) + __builtin_popcountll(_board->blackKnights)) *
+            piecePhase[_board->knightTypeNum()];
+    phase -=
+            (__builtin_popcountll(_board->whiteBishops) + __builtin_popcountll(_board->blackBishops)) *
+            piecePhase[_board->bishopTypeNum()];
+    phase -= (__builtin_popcountll(_board->whiteRooks) + __builtin_popcountll(_board->blackRooks)) *
+             piecePhase[_board->rookTypeNum()];
+    phase -= (__builtin_popcountll(_board->whiteQueens) + __builtin_popcountll(_board->blackQueens)) *
+             piecePhase[_board->queenTypeNum()];
 
     whiteKingSafty += whitePawnShelterPenalty;
     blackKingSafety += blackPawnShelterPenalty;
@@ -185,6 +195,10 @@ int Evaluate::kingSafty(int blackKingSafety, int whiteKingSafty, int phase) {
     int score = kingSafetyTable[whiteKingSafty] - kingSafetyTable[blackKingSafety];
     return ((score * (64 - phase)) / 64);
 
+}
+
+int Evaluate::interpolateScore(int scoreOp, int scoreEd, int phase) {
+    return ((scoreOp * (64 - phase)) + (scoreEd * phase)) / 64;
 }
 
 int Evaluate::mobilityEval(std::array<int, 2> &kingSafetyScore, int phase) {
@@ -303,8 +317,9 @@ int Evaluate::mobilityEval(std::array<int, 2> &kingSafetyScore, int phase) {
     return interpolateScore(scoreOp, scoreEd, phase);
 }
 
-int Evaluate::getPstScore(int phase) {
-    return interpolateScore(_board->getPstScoreOp(), _board->getPstScoreEd(), phase);
+int Evaluate::getPstScore() {
+    // TODO
+    return interpolateScore(pos.getPstScoreOp(), pos.getPstScoreEd(), phase);
 }
 
 int Evaluate::evaluate() {
@@ -319,9 +334,12 @@ int Evaluate::evaluate() {
 
     auto score = mobilityEval(kingSafetyScore, phase);
 
-    score += pawnStructure(phase);
-    score += kingSafty(kingSafetyScore[1], kingSafetyScore[0], phase);
-    score += getPstScore(phase);
+    //score += pawnStructureEval(pos, phase);
+    //score += kingSafety(pos, phase, kingSafetyScore);
+
+
+    //score += interpolateScore(pos.getPstScoreOp(), pos.getPstScoreEd(), phase);
+    score += getPstScore();
 
     // Bishop pair bonus.
     for (Color c = Color::White; c <= Color::Black; ++c) {
@@ -335,3 +353,6 @@ int Evaluate::evaluate() {
 
     return score;
 }
+
+
+

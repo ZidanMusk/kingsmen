@@ -3,10 +3,59 @@
 typedef unsigned long long ull;
 using namespace std;
 
+enum Color
+{
+    White = 0, Black = 1, NoColor = 2
+};
+
+enum Piece {
+    Pawn = 0, Knight = 1, Bishop = 2, Rook = 3, Queen = 4, King = 5
+};
+
+enum Square {
+    A1, B1, C1, D1, E1, F1, G1, H1,
+    A2, B2, C2, D2, E2, F2, G2, H2,
+    A3, B3, C3, D3, E3, F3, G3, H3,
+    A4, B4, C4, D4, E4, F4, G4, H4,
+    A5, B5, C5, D5, E5, F5, G5, H5,
+    A6, B6, C6, D6, E6, F6, G6, H6,
+    A7, B7, C7, D7, E7, F7, G7, H7,
+    A8, B8, C8, D8, E8, F8, G8, H8,
+    NoSquare
+};
+
+const std::array<int8_t, 6> piecePhase = {
+        0, 3, 3, 5, 10, 0
+};
+
+const int8_t totalPhase = piecePhase[Piece::Pawn] * 16
+                          + piecePhase[Piece::Knight] * 4
+                          + piecePhase[Piece::Bishop] * 4
+                          + piecePhase[Piece::Rook] * 4
+                          + piecePhase[Piece::Queen] * 2;
+
 class Board {
 
 
 public:
+
+    int8_t mGamePhase;
+    std::array<int8_t, 12> mPieceCounts;
+    int16_t mPstScoreOp, mPstScoreEd;
+
+    int getGamePhase(){
+        return mGamePhase;
+    }
+
+    inline int16_t getPstScoreOp() const noexcept
+    {
+        return mPstScoreOp;
+    }
+
+    inline int16_t getPstScoreEd() const noexcept
+    {
+        return mPstScoreEd;
+    }
 
     unordered_map<ull, int> zobristTable;
 
@@ -465,6 +514,13 @@ public:
 
     Board() {
         validMovesHistory.resize(MAX_GAME_LENGTH);
+
+        // Calculate the phase of the game.
+        mGamePhase = totalPhase;
+        for (Piece p = Piece::Knight; p < Piece::King; ++p)
+        {
+            mGamePhase -= (mPieceCounts[Color::White + p] + mPieceCounts[Color::Black * 6 + p]) * piecePhase[p];
+        }
     }
 
     // displaying the board in the terminal for debugging purposes
@@ -2613,5 +2669,6 @@ public:
         }
 
     }
+
 
 };
