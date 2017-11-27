@@ -461,7 +461,7 @@ class Evaluate {
                                                                     {-2, 5, -2, -23, -28, -29, -14, -12, -10, -3, -5, -1, 6, 14, 17, 22, 36, 34, 43, 37, 39, 33, 36, 22, 12, -4, 38, 26},
                                                                     {}
                                                             }};
-    const std::array<int, 6> attackWeight = {
+    const int  attackWeight[6] = {
             0, 2, 2, 3, 5, 0
     };
 
