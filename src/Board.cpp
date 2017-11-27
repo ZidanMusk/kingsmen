@@ -1158,12 +1158,6 @@ public:
         // rook 3
         // queen 4
         // king 5
-        int ex = locExist(whitePieces, (1ull<<from))?type:type+6;
-        mPstScoreOp -= mPieceSquareTableOpening[ex][from];
-        mPstScoreEd -= mPieceSquareTableEnding[ex][from];
-        mPstScoreOp += mPieceSquareTableOpening[ex][to];
-        mPstScoreEd += mPieceSquareTableEnding[ex][to];
-
 
 
 
@@ -1195,7 +1189,7 @@ public:
                     mPstScoreOp += mPieceSquareTableOpening[ex][to];
                     mPstScoreEd += mPieceSquareTableEnding[ex][to];
 
-
+                    mGamePhase -= piecePhase[Piece::Bishop];
                 }
                 else if (specialEvent == PROMOTEKNIGHT) {
                     refKnights ^= (1ull << to), key ^= squareZKey(to, 'n');
@@ -1205,6 +1199,7 @@ public:
                     ex = locExist(whitePieces, (1ull<<from))?knightTypeNum():knightTypeNum()+6;
                     mPstScoreOp += mPieceSquareTableOpening[ex][to];
                     mPstScoreEd += mPieceSquareTableEnding[ex][to];
+                    mGamePhase -= piecePhase[Piece::Knight];
 
                 }
                 else if (specialEvent == PROMOTEROOK) {
@@ -1215,6 +1210,7 @@ public:
                     ex = locExist(whitePieces, (1ull<<from))?rookTypeNum():rookTypeNum()+6;
                     mPstScoreOp += mPieceSquareTableOpening[ex][to];
                     mPstScoreEd += mPieceSquareTableEnding[ex][to];
+                    mGamePhase -= piecePhase[Piece::Rook];
 
                 }
                 else if (specialEvent == PROMOTEQUEEN) {
@@ -1225,6 +1221,7 @@ public:
                     ex = locExist(whitePieces, (1ull<<from))?queenTypeNum():queenTypeNum()+6;
                     mPstScoreOp += mPieceSquareTableOpening[ex][to];
                     mPstScoreEd += mPieceSquareTableEnding[ex][to];
+                    mGamePhase -= piecePhase[Piece::Queen];
 
                 }
                 break;
@@ -1253,15 +1250,11 @@ public:
                 if (refCastleQ && from == 1 << 0)refCastleQ = 0;
                 refRooks ^= moveXor;
                 key ^= ZMove(from, to, 'r');
-
-
-
-
-
-
-
-
-
+                ex = locExist(whitePieces, (1ull<<from))?type:type+6;
+                mPstScoreOp -= mPieceSquareTableOpening[ex][from];
+                mPstScoreEd -= mPieceSquareTableEnding[ex][from];
+                mPstScoreOp += mPieceSquareTableOpening[ex][to];
+                mPstScoreEd += mPieceSquareTableEnding[ex][to];
 
                 break;
             case 4:
@@ -1278,13 +1271,41 @@ public:
                 refKingMoves++;
                 refCastleK = refCastleQ = 0;
                 refKing ^= moveXor;
-                if (specialEvent == CASTLEKINGSIDE)
-                    refRooks ^= 160, key ^= kingSideCastling;
-                else if (specialEvent == CASTLEQUEENSIDE)
-                    refRooks ^= 9, key ^= queenSideCastling;
+                if (specialEvent == CASTLEKINGSIDE) {
+                    ull x = whiteToMove?160ull:160ull<<(7*8);
+                    refRooks ^= x, key ^= kingSideCastling;
+
+                    int fromx = from + 3;
+                    int tox = to - 1;
+                    ex = locExist(whitePieces, (1ull<<from))?rookTypeNum():rookTypeNum()+6;
+                    mPstScoreOp -= mPieceSquareTableOpening[ex][fromx];
+                    mPstScoreEd -= mPieceSquareTableEnding[ex][fromx];
+                    mPstScoreOp += mPieceSquareTableOpening[ex][tox];
+                    mPstScoreEd += mPieceSquareTableEnding[ex][tox];
+
+
+                }
+                else if (specialEvent == CASTLEQUEENSIDE) {
+                    ull x = whiteToMove?9ull:9ull<<(7*8);
+                    refRooks ^= x, key ^= queenSideCastling;
+
+                    int fromx = from - 4;
+                    int tox = to + 1;
+                    ex = locExist(whitePieces, (1ull<<from))?rookTypeNum():rookTypeNum()+6;
+                    mPstScoreOp -= mPieceSquareTableOpening[ex][fromx];
+                    mPstScoreEd -= mPieceSquareTableEnding[ex][fromx];
+                    mPstScoreOp += mPieceSquareTableOpening[ex][tox];
+                    mPstScoreEd += mPieceSquareTableEnding[ex][tox];
+
+                }
                 key ^= ZMove(from, to, 'k');
 
 
+                ex = locExist(whitePieces, (1ull<<from))?type:type+6;
+                mPstScoreOp -= mPieceSquareTableOpening[ex][from];
+                mPstScoreEd -= mPieceSquareTableEnding[ex][from];
+                mPstScoreOp += mPieceSquareTableOpening[ex][to];
+                mPstScoreEd += mPieceSquareTableEnding[ex][to];
 
 
 
@@ -1409,8 +1430,10 @@ public:
                 unsetBit(refOtherPawns, 1ull << to);
                 key ^= squareZKey(to, 'P');
 
-
-
+                int capture = getColumn(to) + getRow(from)*8;
+                int ex = locExist(whitePieces, (1ull<<capture))?pawnTypeNum():pawnTypeNum()+6;
+                mPstScoreOp -= mPieceSquareTableOpening[ex][capture];
+                mPstScoreEd -= mPieceSquareTableEnding[ex][capture];
 
 
 
