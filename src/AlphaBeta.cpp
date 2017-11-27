@@ -3,6 +3,7 @@
 //
 
 #include "AlphaBeta.h"
+#include "Board.cpp"
 
 ll AlphaBeta::alphaBetaSearch(ll stateID, ll alpha, ll beta, ll depth, bool isMax){
     OpenedStates++;
