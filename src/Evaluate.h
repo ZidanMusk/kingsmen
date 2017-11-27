@@ -464,16 +464,34 @@ class Evaluate {
     const std::array<int, 6> attackWeight = {
             0, 2, 2, 3, 5, 0
     };
+
+    // These two have to be annoyingly static, as we use them in position.cpp to incrementally update the PST eval.
+    static std::array<std::array<short, 64>, 12> mPieceSquareTableOpening;
+    static std::array<std::array<short, 64>, 12> mPieceSquareTableEnding;
+
 public:
     Evaluate(Board *b);
+
+    inline short getPieceSquareTableOp(Piece p, Square sq) {
+        return mPieceSquareTableOpening[p][sq];
+    }
+
+    inline short getPieceSquareTableEd(Piece p, Square sq) {
+        return mPieceSquareTableEnding[p][sq];
+    }
 
 
     int pawnStructure(int phase);
 
-    int kingSafty(int myKingSafety, int hisKingSafty, int phase); // arguments are calculated in mobility
+    int kingSafty(int blackKingSafety, int whiteKingSafty, int phase); // arguments are calculated in mobility
     int interpolateScore(int scoreOp, int scoreEd, int phase);
 
-    int Evaluate::mobilityEval(std::array<int, 2> &kingSafetyScore, int phase);
+    int mobilityEval(std::array<int, 2> &kingSafetyScore, int phase);
+
+    int getPstScore(int phase);
+
+    int evaluate();
+
 };
 
 #endif //KINGSMEN_EVALUATE_H
