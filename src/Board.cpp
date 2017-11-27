@@ -4,6 +4,10 @@
 typedef unsigned long long ull;
 using namespace std;
 
+
+std::array<std::array<short, 64>, 12> Board::mPieceSquareTableOpening;
+std::array<std::array<short, 64>, 12> Board::mPieceSquareTableEnding;
+
 const std::array<int8_t, 6> piecePhase = {
         0, 3, 3, 5, 10, 0
 };
