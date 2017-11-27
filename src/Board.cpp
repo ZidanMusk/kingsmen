@@ -445,7 +445,7 @@ public:
     bool blackCastleK = 1;
     bool blackCastleQ = 1;
     ull enPassantLoc;
-    bool whiteToMove = true;
+    bool whiteToMove = true; //True-> myWhiteTurn, False -> blackTurn
 
 
     vector<vector<int> > validMovesHistory;
@@ -527,6 +527,8 @@ public:
             cout << endl;
         }
     }
+
+
 
     // interpretes fen strings.
     void fenInterpreter(string fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1", char myColor = 'w') {
@@ -642,6 +644,50 @@ public:
         allValidCaptures.clear();
         allValidMoves.clear();
         allValidMoves = generateAllMoves();
+        //mPstScore
+        int pawnCnt = __builtin_popcountll(allPieces);
+        ull wp = allPieces;
+        while (pawnCnt--) {
+            int ind = (log2(wp & -wp) + EPS);
+            wp -= (wp & -wp);
+            if((1ull << ind) & whitePawns){
+
+            }
+            if((1ull << ind) & whiteKnights){
+
+            }
+            if((1ull << ind) & whiteRooks){
+
+            }
+            if((1ull << ind) & whiteBishops){
+
+            }
+            if((1ull << ind) & whiteQueens){
+
+            }
+            if((1ull << ind) & whiteKing){
+
+            }
+            if((1ull << ind) & blackPawns){
+
+            }
+            if((1ull << ind) & blackKnights){
+
+            }
+            if((1ull << ind) & blackRooks){
+
+            }
+            if((1ull << ind) & blackBishops){
+
+            }
+            if((1ull << ind) & blackQueens){
+
+            }
+            if((1ull << ind) & blackKing){
+
+            }
+        }
+
     }
 
     // loc 0-63 counting from the bottom left corner [A1]
