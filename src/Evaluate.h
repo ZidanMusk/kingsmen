@@ -465,21 +465,10 @@ class Evaluate {
             0, 2, 2, 3, 5, 0
     };
 
-    // These two have to be annoyingly static, as we use them in position.cpp to incrementally update the PST eval.
-    static std::array<std::array<short, 64>, 12> mPieceSquareTableOpening;
-    static std::array<std::array<short, 64>, 12> mPieceSquareTableEnding;
+
 
 public:
     Evaluate(Board *b);
-
-    inline short getPieceSquareTableOp(Piece p, Square sq) {
-        return mPieceSquareTableOpening[p][sq];
-    }
-
-    inline short getPieceSquareTableEd(Piece p, Square sq) {
-        return mPieceSquareTableEnding[p][sq];
-    }
-
 
     int pawnStructure(int phase);
 
