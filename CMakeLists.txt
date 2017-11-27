@@ -12,7 +12,6 @@ set(SOURCE_FILES
         src/MTDF.h src/PVS.cpp src/PVS.h src/External/Extern.h
         src/External/Extern.cpp src/External/Tree.txt src/External/TreeRand.txt src/External/ExternBig.cpp src/External/ExternBig.h
         src/AlphaBeta.h src/AlphaBeta.cpp
-        src/main_search.cpp
         src/enumss.hpp)
 
 add_executable(kingsmen ${SOURCE_FILES})
