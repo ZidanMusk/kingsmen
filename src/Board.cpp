@@ -2699,9 +2699,11 @@ public:
         if (pos.size() != 2) {
             return 'I';
         }
+
         if (!((toupper(pos[0]) >= 'A' && toupper(pos[0]) <= 'H' && pos[1] >= '1' && pos[1] <= '8'))) {
             return 'I';
         }
+
         int posX = toupper(pos[0]) - 'A';
         int posY = pos[1] - '1';
 
@@ -2722,7 +2724,9 @@ public:
                 else if (blackKnights & (1ULL << loc)) return 'n';
                 else if (blackQueens & (1ULL << loc)) return 'q';
                 else if (blackRooks & (1ULL << loc)) return 'r';
-            } else {
+            }
+            else
+            {
                 if (whitePawns & (1ULL << loc)) return 'p';
                 else if (whiteBishops & (1ULL << loc)) return 'b';
                 else if (whiteKing & (1ULL << loc)) return 'k';
