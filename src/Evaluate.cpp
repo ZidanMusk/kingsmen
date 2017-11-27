@@ -131,8 +131,8 @@ int Evaluate::mobilityEval(std::array<int, 2> &kingSafetyScore, int phase) {
     for (int c = 0; c <= 1; ++c) {
 
         // king safety array access with king color and place on board
-        //cout<<_board->getBitBoard(!c, 5)<<endl;
-        //cout<<_board->getLsb(_board->getBitBoard(!c, 5))<<endl;
+        cout<<_board->getBitBoard(!c, 5)<<endl;
+        cout<<_board->getLsb(_board->getBitBoard(!c, 5))<<endl;
         const auto opponentKingZone = _board->kingSafetyZone[!c][_board->getLsb(_board->getBitBoard(!c, 5))]; // 5 -> king
 //        const auto targetBitboard = ~pos.getPieces(c);
 //        const auto opponentKingZone = Bitboards::kingSafetyZone(!c, Bitboards::lsb(pos.getBitboard(!c, Piece::King)));
@@ -236,7 +236,7 @@ int Evaluate::mobilityEval(std::array<int, 2> &kingSafetyScore, int phase) {
         scoreOp += (c ? -scoreOpForColor : scoreOpForColor);
         scoreEd += (c ? -scoreEdForColor : scoreEdForColor);
     }
-
+    cout << scoreOp << ' ' << scoreEd << ' ' << phase << endl;
     return interpolateScore(scoreOp, scoreEd, phase);
 }
 
@@ -255,9 +255,11 @@ int Evaluate::evaluate() {
     const auto phase = clamp(static_cast<int>(_board->getGamePhase()), 0, 64);
 
     auto score = mobilityEval(kingSafetyScore, phase);
-
+    cout<<score<<endl;
     score += pawnStructure(phase);
+    cout<<score<<endl;
     score += kingSafty(kingSafetyScore[1], kingSafetyScore[0], phase);
+    cout<<score<<endl;
     //score += getPstScore(phase);
 
     // Bishop pair bonus.
@@ -267,8 +269,8 @@ int Evaluate::evaluate() {
             score += (c ? -bishopPairBonus : bishopPairBonus);
         }
     }
-
+    cout<<score<<endl;
     score += (_board->whiteToMove ? sideToMoveBonus : -sideToMoveBonus);
-
+    cout<<score<<endl;
     return score;
 }
