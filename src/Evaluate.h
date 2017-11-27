@@ -483,7 +483,7 @@ public:
 
     int pawnStructure(int phase);
 
-    int kingSafty(int myKingSafety, int hisKingSafty, int phase); // arguments are calculated in mobility
+    int kingSafty(int blackKingSafety, int whiteKingSafty, int phase); // arguments are calculated in mobility
     int interpolateScore(int scoreOp, int scoreEd, int phase);
 
     int mobilityEval(std::array<int, 2> &kingSafetyScore, int phase);
