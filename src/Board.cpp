@@ -24,28 +24,12 @@ enum Square {
     NoSquare
 };
 
-const std::array<int8_t, 6> piecePhase = {
-        0, 3, 3, 5, 10, 0
-};
-
-const int8_t totalPhase = piecePhase[Piece::Pawn] * 16
-                          + piecePhase[Piece::Knight] * 4
-                          + piecePhase[Piece::Bishop] * 4
-                          + piecePhase[Piece::Rook] * 4
-                          + piecePhase[Piece::Queen] * 2;
-
 class Board {
 
 
 public:
 
-    int8_t mGamePhase;
-    std::array<int8_t, 12> mPieceCounts;
     int16_t mPstScoreOp, mPstScoreEd;
-
-    int getGamePhase(){
-        return mGamePhase;
-    }
 
     inline int16_t getPstScoreOp() const noexcept
     {
@@ -513,6 +497,26 @@ public:
 
     int pawnCntInFile[2][8];       //counting number of pawns in each file (used for isolated pawns)
 
+
+    //===========================================gamePhase Handler
+    int mGamePhase;
+    int mGamePhaseHistory[MAX_GAME_LENGTH];
+
+    int getGamePhase(){
+        return mGamePhase;
+    }
+
+    //Evaluating gamePhase
+    const int piecePhase[6] = {
+            0, 3, 3, 5, 10, 0
+    // pawn 0 // knight 1 // bishop 2 // rook 3 // queen 4 // king 5
+    };
+
+    const int totalPhase = piecePhase[0] * 16 + piecePhase[1] * 4 + piecePhase[2] * 4 + piecePhase[3] * 4 + piecePhase[4] * 2;
+
+
+
+
 /**********************************************************************************************************************
 *                                               Optimization functions                                                 *
 **********************************************************************************************************************/
@@ -525,7 +529,16 @@ public:
         mGamePhase = totalPhase;
         for (Piece p = Piece::Knight; p < Piece::King; ++p)
         {
-            mGamePhase -= (mPieceCounts[Color::White + p] + mPieceCounts[Color::Black * 6 + p]) * piecePhase[p];
+            if(p == Piece::Knight)
+                mGamePhase -= (getPieceCount(Color::White, Piece::Knight) + getPieceCount(Color::Black, Piece::Knight))* piecePhase[p];
+            else if(p == Piece::Bishop)
+                mGamePhase -= (getPieceCount(Color::White, Piece::Bishop) + getPieceCount(Color::Black, Piece::Bishop))* piecePhase[p];
+            else if(p == Piece::Rook)
+                mGamePhase -= (getPieceCount(Color::White, Piece::Rook) + getPieceCount(Color::Black, Piece::Rook))* piecePhase[p];
+            else if(p == Piece::Queen)
+                mGamePhase -= (getPieceCount(Color::White, Piece::Queen) + getPieceCount(Color::Black, Piece::Queen))* piecePhase[p];
+
+
         }
     }
 
@@ -1082,6 +1095,7 @@ public:
             } else if (locExist(refOtherKnights, 1ull << to)) {
                 unsetBit(refOtherKnights, 1ull << to);
                 key ^= squareZKey(to, 'N');
+
             } else if (locExist(refOtherBishops, 1ull << to)) {
                 unsetBit(refOtherBishops, 1ull << to);
                 key ^= squareZKey(to, 'B');
@@ -1171,6 +1185,8 @@ public:
         blackCastleQHistory[moveNumber] = blackCastleQ;
         keyHistory[moveNumber] = key;
         validMovesHistory[moveNumber] = allValidMoves;
+
+        mGamePhaseHistory[moveNumber] = mGamePhase;
     }
 
     // reverts the previous move, for search
@@ -1215,6 +1231,8 @@ public:
         whiteCastleQ = whiteCastleQHistory[moveNumber];
         blackCastleK = blackCastleKHistory[moveNumber];
         blackCastleQ = blackCastleQHistory[moveNumber];
+
+        mGamePhase = mGamePhaseHistory[moveNumber];
 
         key = keyHistory[moveNumber];
 
@@ -1391,17 +1409,18 @@ public:
 
     int popLsb(ull &bitBoard) {
         //get LS 1 in the board and toggle itpop
-        ull z = (log2(bitBoard & -bitBoard) + EPS);
+        int z = (log2(bitBoard & -bitBoard) + EPS);
         bitBoard = ((bitBoard & -bitBoard) ^ bitBoard);
 
         return z;
     }
 
+
 //KNIGHT ATTAKS===============================================
     ull knightAttacks(int square, int color) {//0-> white, 1->black
 
         //mask which marks all my attack squares
-        ull ans;
+        ull ans = 0;
 
         //vectors to get the valid moves
         vector<int> tmp;
@@ -1430,7 +1449,7 @@ public:
     ull bishopAttacks(int square, int color, bool version) {
 
         //mask which marks all my attack squares
-        ull ans;
+        ull ans = 0;
 
         //tmp variables
         ull currentBoard = allPieces;
@@ -1489,7 +1508,7 @@ public:
     ull rookAttacks(int square, int color, bool version) {
 
         //mask which marks all my attack squares
-        ull ans;
+        ull ans = 0;
 
         //tmp variables
         ull currentBoard = allPieces;
@@ -1580,7 +1599,7 @@ public:
     ull queenAttacks(int square, int color, bool version) {
 
         //mask which marks all my attack squares
-        ull ans;
+        ull ans = 0;
 
         //tmp variables
         ull currentBoard = allPieces;
