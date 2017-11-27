@@ -86,6 +86,8 @@ int Evaluate::pawnStructure(int phase) {
 }
 
 int Evaluate::kingSafty(int blackKingSafety, int whiteKingSafty, int phase) {
+    //cout<<blackKingSafety<<" BLACK"<<endl;
+    //cout<<whiteKingSafty<<" WHITE"<<endl;
     //evaluate white pawn shelter
     int penalty = 0;
     int kingFile = min(1, max(6, _board->getColumn(log2(_board->whiteKing) + _board->EPS)));
@@ -131,10 +133,13 @@ int Evaluate::mobilityEval(std::array<int, 2> &kingSafetyScore, int phase) {
     for (int c = 0; c <= 1; ++c) {
 
         // king safety array access with king color and place on board
-        cout<<_board->getBitBoard(!c, 5)<<endl;
-        cout<<_board->getLsb(_board->getBitBoard(!c, 5))<<endl;
-        const auto opponentKingZone = _board->kingSafetyZone[!c][_board->getLsb(_board->getBitBoard(!c, 5))]; // 5 -> king
-//        const auto targetBitboard = ~pos.getPieces(c);
+        //cout<<_board->getBitBoard(!c, 5)<<endl;
+        //cout<<_board->getLsb(_board->getBitBoard(!c, 5))<<endl;
+        const auto opponentKingZone = _board->kingSafetyZone[_board->getLsb(_board->getBitBoard(!c, 5))][!c]; // 5 -> king
+        //cout << _board->getLsb(_board->getBitBoard(!c, 5)) << endl;
+        //_board->debug(opponentKingZone);
+        //cout << endl;
+    //        const auto targetBitboard = ~pos.getPieces(c);
 //        const auto opponentKingZone = Bitboards::kingSafetyZone(!c, Bitboards::lsb(pos.getBitboard(!c, Piece::King)));
         auto scoreOpForColor = 0, scoreEdForColor = 0;
         auto attackUnits = 0;
@@ -144,14 +149,15 @@ int Evaluate::mobilityEval(std::array<int, 2> &kingSafetyScore, int phase) {
 
         while (tempPiece) {
             const auto from = _board->popLsb(tempPiece);
-            const auto tempMove = _board->knightAttacks(from, c);
+            const ull tempMove = _board->knightAttacks(from, c);
             const auto count = _board->popCnt(tempMove);
             scoreOpForColor += mobilityOpening[1][count];
             scoreEdForColor += mobilityEnding[1][count];
             attackUnits += attackWeight[1] * _board->popCnt(tempMove & opponentKingZone);
-
+            //_board->debug(tempMove);
+            //cout << "popCnt1 " << tempMove << endl;
 //            const auto from = Bitboards::popLsb(tempPiece);
-//            const auto tempMove = Bitboards::knightAttacks(from) & targetBitboard;
+//            const ull tempMove = Bitboards::knightAttacks(from) & targetBitboard;
 //            const auto count = Bitboards::popcnt<hardwarePopcnt>(tempMove);
 //            scoreOpForColor += mobilityOpening[Piece::Knight][count];
 //            scoreEdForColor += mobilityEnding[Piece::Knight][count];
@@ -162,15 +168,16 @@ int Evaluate::mobilityEval(std::array<int, 2> &kingSafetyScore, int phase) {
 //        tempPiece = pos.getBitboard(c, Piece::Bishop);
         while (tempPiece) {
             const auto from = _board->popLsb(tempPiece);
-            auto tempMove = _board->bishopAttacks(from, c, 0); // default
+            ull tempMove = _board->bishopAttacks(from, c, 0); // default
             const auto count = _board->popCnt(tempMove);
             scoreOpForColor += mobilityOpening[2][count];
             scoreEdForColor += mobilityEnding[2][count];
-            tempMove = _board->bishopAttacks(from, c, 1); // turn off queens
+            tempMove = _board->bishopAttacks(from, c, 0); // turn off queens
             attackUnits += attackWeight[2] * _board->popCnt(tempMove & opponentKingZone);
-
+            //_board->debug(tempMove);
+            //cout << "popCnt2 " << tempMove << endl;
 //            const auto from = Bitboards::popLsb(tempPiece);
-//            auto tempMove = Bitboards::bishopAttacks(from, occupied) & targetBitboard;
+//            ull tempMove = Bitboards::bishopAttacks(from, occupied) & targetBitboard;
 //            const auto count = Bitboards::popcnt<hardwarePopcnt>(tempMove);
 //            scoreOpForColor += mobilityOpening[Piece::Bishop][count];
 //            scoreEdForColor += mobilityEnding[Piece::Bishop][count];
@@ -182,13 +189,14 @@ int Evaluate::mobilityEval(std::array<int, 2> &kingSafetyScore, int phase) {
 //        tempPiece = pos.getBitboard(c, Piece::Rook);
         while (tempPiece) {
             const auto from = _board->popLsb(tempPiece);
-            auto tempMove = _board->rookAttacks(from, c, 0);
+            ull tempMove = _board->rookAttacks(from, c, 0);
             const auto count = _board->popCnt(tempMove);
             scoreOpForColor += mobilityOpening[3][count];
             scoreEdForColor += mobilityEnding[3][count];
-            tempMove = _board->rookAttacks(from, c, 1);
+            tempMove = _board->rookAttacks(from, c, 0);
             attackUnits += attackWeight[3] * _board->popCnt(tempMove & opponentKingZone);
-
+            //_board->debug(tempMove);
+            //cout << "popCnt3 " << tempMove << endl;
             if (!(files[_board->getColumn(from)] & _board->getBitBoard(c, 0))) { // 0 -> pawn
                 if (!(files[_board->getColumn(from)] & _board->getBitBoard(!c, 0))) { // 0 -> pawn
                     scoreOpForColor += 26;
@@ -197,7 +205,7 @@ int Evaluate::mobilityEval(std::array<int, 2> &kingSafetyScore, int phase) {
                 }
             }
 //            const auto from = Bitboards::popLsb(tempPiece);
-//            auto tempMove = Bitboards::rookAttacks(from, occupied) & targetBitboard;
+//            ull tempMove = Bitboards::rookAttacks(from, occupied) & targetBitboard;
 //            const auto count = Bitboards::popcnt<hardwarePopcnt>(tempMove);
 //            scoreOpForColor += mobilityOpening[Piece::Rook][count];
 //            scoreEdForColor += mobilityEnding[Piece::Rook][count];
@@ -218,14 +226,15 @@ int Evaluate::mobilityEval(std::array<int, 2> &kingSafetyScore, int phase) {
 //        tempPiece = pos.getBitboard(c, Piece::Queen);
         while (tempPiece) {
             const auto from = _board->popLsb(tempPiece);
-            const auto tempMove = _board->queenAttacks(from, c, 0);
+            const ull tempMove = _board->queenAttacks(from, c, 0);
             const auto count = _board->popCnt(tempMove);
             scoreOpForColor += mobilityOpening[4][count];
             scoreEdForColor += mobilityEnding[4][count];
             attackUnits += attackWeight[4] * _board->popCnt(tempMove & opponentKingZone);
-
+            //_board->debug(tempMove);
+            //cout << "popCnt4 " << tempMove << endl;
 //            const auto from = Bitboards::popLsb(tempPiece);
-//            const auto tempMove = Bitboards::queenAttacks(from, occupied) & targetBitboard;
+//            const ull tempMove = Bitboards::queenAttacks(from, occupied) & targetBitboard;
 //            const auto count = Bitboards::popcnt<hardwarePopcnt>(tempMove);
 //            scoreOpForColor += mobilityOpening[Piece::Queen][count];
 //            scoreEdForColor += mobilityEnding[Piece::Queen][count];
@@ -233,10 +242,11 @@ int Evaluate::mobilityEval(std::array<int, 2> &kingSafetyScore, int phase) {
         }
 
         kingSafetyScore[c] = attackUnits;
+//        //cout << "111 " << attackUnits << endl;
         scoreOp += (c ? -scoreOpForColor : scoreOpForColor);
         scoreEd += (c ? -scoreEdForColor : scoreEdForColor);
     }
-    cout << scoreOp << ' ' << scoreEd << ' ' << phase << endl;
+//    cout << scoreOp << ' ' << scoreEd << ' ' << phase << endl;
     return interpolateScore(scoreOp, scoreEd, phase);
 }
 
@@ -255,11 +265,11 @@ int Evaluate::evaluate() {
     const auto phase = clamp(static_cast<int>(_board->getGamePhase()), 0, 64);
 
     auto score = mobilityEval(kingSafetyScore, phase);
-    cout<<score<<endl;
+    //cout<<score<<endl;
     score += pawnStructure(phase);
-    cout<<score<<endl;
+    //cout<<score<<endl;
     score += kingSafty(kingSafetyScore[1], kingSafetyScore[0], phase);
-    cout<<score<<endl;
+    //cout<<score<<endl;
     //score += getPstScore(phase);
 
     // Bishop pair bonus.
@@ -269,8 +279,8 @@ int Evaluate::evaluate() {
             score += (c ? -bishopPairBonus : bishopPairBonus);
         }
     }
-    cout<<score<<endl;
+    //cout<<score<<endl;
     score += (_board->whiteToMove ? sideToMoveBonus : -sideToMoveBonus);
-    cout<<score<<endl;
+    //cout<<score<<endl;
     return score;
 }

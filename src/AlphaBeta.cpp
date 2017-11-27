@@ -55,7 +55,7 @@ void AlphaBeta::_IterativeDeepening(ll MaxDepth) {
     ll nodeScore;
     clock_t tStart = clock();
     ll root_id=Search::board->key;
-    for (ll i = 0; i <= MaxDepth; ++i) {
+    for (ll i = 1; i <= MaxDepth; ++i) {
         nodeScore = this->alphaBetaSearch(-oo,oo,i,true);
     }
     //pair<ll,ll>baseline=make_pair(nodeScore,MoveTable[root_id]);
@@ -64,7 +64,7 @@ void AlphaBeta::_IterativeDeepening(ll MaxDepth) {
     this->uniqueCalls = this->cntr;
     this->allCalls = this->OpenedStates;
 
-    cout<<"AlphaBeta : ["<<bestScore<<','<<bestMove<<','<<cntr<<","<<OpenedStates<<"] in "<<(clock() - tStart)<<" msec"<<endl;
+    cout<<"AlphaBeta : ["<<bestScore<<','<<bestMove<<','<<cntr<<","<<OpenedStates<<"] in "<<(clock() - tStart)/1000000.0<<" sec"<<endl;
 
     //MoveTable.clear();
     //return baseline;

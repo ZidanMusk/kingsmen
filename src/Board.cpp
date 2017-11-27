@@ -1226,13 +1226,15 @@ public:
             case 0:
                 if (specialEvent == PROMOTEBISHOP || specialEvent == PROMOTEKNIGHT || specialEvent == PROMOTEQUEEN ||
                     specialEvent == PROMOTEROOK) {
-                    refPawns ^= (1ull << from); key ^= squareZKey(from, 'p');
+                    refPawns ^= (1ull << from);
+                    key ^= squareZKey(from, 'p');
                     ex = locExist(whitePieces, (1ull << from)) ? type : type + 6;
                     mPstScoreOp -= mPieceSquareTableOpening[ex][from];
                     mPstScoreEd -= mPieceSquareTableEnding[ex][from];
 
                 } else {
-                    refPawns ^= moveXor; key ^= ZMove(from, to, 'p');
+                    refPawns ^= moveXor;
+                    key ^= ZMove(from, to, 'p');
                     ex = locExist(whitePieces, (1ull << from)) ? type : type + 6;
                     mPstScoreOp -= mPieceSquareTableOpening[ex][from];
                     mPstScoreEd -= mPieceSquareTableEnding[ex][from];
@@ -1241,7 +1243,8 @@ public:
 
                 }
                 if (specialEvent == PROMOTEBISHOP) {
-                    refBishops ^= (1ull << to); key ^= squareZKey(to, 'b');
+                    refBishops ^= (1ull << to);
+                    key ^= squareZKey(to, 'b');
                     ex = locExist(whitePieces, (1ull << from)) ? type : type + 6;
                     mPstScoreOp -= mPieceSquareTableOpening[ex][from];
                     mPstScoreEd -= mPieceSquareTableEnding[ex][from];
@@ -1251,7 +1254,8 @@ public:
 
                     mGamePhase -= piecePhase[Piece::Bishop];
                 } else if (specialEvent == PROMOTEKNIGHT) {
-                    refKnights ^= (1ull << to); key ^= squareZKey(to, 'n');
+                    refKnights ^= (1ull << to);
+                    key ^= squareZKey(to, 'n');
                     ex = locExist(whitePieces, (1ull << from)) ? type : type + 6;
                     mPstScoreOp -= mPieceSquareTableOpening[ex][from];
                     mPstScoreEd -= mPieceSquareTableEnding[ex][from];
@@ -1261,7 +1265,8 @@ public:
                     mGamePhase -= piecePhase[Piece::Knight];
 
                 } else if (specialEvent == PROMOTEROOK) {
-                    refRooks ^= (1ull << to); key ^= squareZKey(to, 'r');
+                    refRooks ^= (1ull << to);
+                    key ^= squareZKey(to, 'r');
                     ex = locExist(whitePieces, (1ull << from)) ? type : type + 6;
                     mPstScoreOp -= mPieceSquareTableOpening[ex][from];
                     mPstScoreEd -= mPieceSquareTableEnding[ex][from];
@@ -1271,7 +1276,8 @@ public:
                     mGamePhase -= piecePhase[Piece::Rook];
 
                 } else if (specialEvent == PROMOTEQUEEN) {
-                    refQueens ^= (1ull << to); key ^= squareZKey(to, 'q');
+                    refQueens ^= (1ull << to);
+                    key ^= squareZKey(to, 'q');
                     ex = locExist(whitePieces, (1ull << from)) ? type : type + 6;
                     mPstScoreOp -= mPieceSquareTableOpening[ex][from];
                     mPstScoreEd -= mPieceSquareTableEnding[ex][from];
@@ -1330,7 +1336,8 @@ public:
                 refKing ^= moveXor;
                 if (specialEvent == CASTLEKINGSIDE) {
                     ull x = whiteToMove ? 160ull : 160ull << (7 * 8);
-                    refRooks ^= x; key ^= kingSideCastling;
+                    refRooks ^= x;
+                    key ^= kingSideCastling;
 
                     int fromx = from + 3;
                     int tox = to - 1;
@@ -1343,7 +1350,8 @@ public:
 
                 } else if (specialEvent == CASTLEQUEENSIDE) {
                     ull x = whiteToMove ? 9ull : 9ull << (7 * 8);
-                    refRooks ^= x; key ^= queenSideCastling;
+                    refRooks ^= x;
+                    key ^= queenSideCastling;
 
                     int fromx = from - 4;
                     int tox = to + 1;
@@ -1804,17 +1812,22 @@ public:
 
     int popLsb(ull &bitBoard) {
         //get LS 1 in the board and toggle itpop
-        ull z = (log2(bitBoard & -bitBoard) + EPS);
+        int z = (log2(bitBoard & -bitBoard) + EPS);
         bitBoard = ((bitBoard & -bitBoard) ^ bitBoard);
 
         return z;
+    }
+
+    int getLsb(ull bitBoard) {
+        //get LS 1 in the board and toggle itpop
+        return (int) (log2(bitBoard & -bitBoard) + EPS);
     }
 
 //KNIGHT ATTAKS===============================================
     ull knightAttacks(int square, int color) {//0-> white, 1->black
 
         //mask which marks all my attack squares
-        ull ans;
+        ull ans = 0;
 
         //vectors to get the valid moves
         vector<int> tmp;
@@ -1826,11 +1839,14 @@ public:
             tmp = blackKnightVMGen();
 
 
+//        cout << square << ' ' << debug(tmp);
         for (int i = 0; i < tmp.size(); i++) {
 
-            if (((tmp[i] & 8064) >> 7) == square) {//check if this move of a piece of my wanted square(from == square)
+            if (getFrom(tmp[i]) == square) {//check if this move of a piece of my wanted square(from == square)
                 //Oring with destination to mark it with 1 (<<to)
-                ans |= (1ull << ((tmp[i] & 516096) >> 13));
+                //cout<<getFrom(tmp[i])<< ' ' <<getTo(tmp[i])<<endl;
+
+                ans |= (1ull << getTo(tmp[i]));
             }
         }
 
@@ -1843,7 +1859,7 @@ public:
     ull bishopAttacks(int square, int color, bool version) {
 
         //mask which marks all my attack squares
-        ull ans;
+        ull ans = 0;
 
         //tmp variables
         ull currentBoard = allPieces;
@@ -1902,7 +1918,7 @@ public:
     ull rookAttacks(int square, int color, bool version) {
 
         //mask which marks all my attack squares
-        ull ans;
+        ull ans = 0;
 
         //tmp variables
         ull currentBoard = allPieces;
@@ -1993,7 +2009,7 @@ public:
     ull queenAttacks(int square, int color, bool version) {
 
         //mask which marks all my attack squares
-        ull ans;
+        ull ans = 0;
 
         //tmp variables
         ull currentBoard = allPieces;
@@ -3240,6 +3256,26 @@ public:
                 else if (blackQueens & (1ULL << loc)) return 'Q';
                 else if (blackRooks & (1ULL << loc)) return 'R';
             }
+        }
+    }
+
+    void debug(ull xx) {
+        int arr[8][8] = {0};
+        for (int i = 7; i >= 0; i--) {
+            for (int j = 0; j < 8; j++) {
+                if (xx & 1)
+                    arr[i][j] = 1;
+                xx >>= 1;
+            }
+        }
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
+                if (arr[i][j])
+                    cout << "1 ";
+                else
+                    cout << "0 ";
+            }
+            cout << endl;
         }
     }
 
