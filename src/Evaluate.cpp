@@ -131,8 +131,9 @@ int Evaluate::mobilityEval(std::array<int, 2> &kingSafetyScore, int phase) {
     for (int c = 0; c <= 1; ++c) {
 
         // king safety array access with king color and place on board
-        const auto opponentKingZone = _board->kingSafetyZone[!c][_board->getLSB(
-                _board->getBitBoard(!c, 5))]; // 5 -> king
+        //cout<<_board->getBitBoard(!c, 5)<<endl;
+        //cout<<_board->getLsb(_board->getBitBoard(!c, 5))<<endl;
+        const auto opponentKingZone = _board->kingSafetyZone[!c][_board->getLsb(_board->getBitBoard(!c, 5))]; // 5 -> king
 //        const auto targetBitboard = ~pos.getPieces(c);
 //        const auto opponentKingZone = Bitboards::kingSafetyZone(!c, Bitboards::lsb(pos.getBitboard(!c, Piece::King)));
         auto scoreOpForColor = 0, scoreEdForColor = 0;
@@ -257,7 +258,7 @@ int Evaluate::evaluate() {
 
     score += pawnStructure(phase);
     score += kingSafty(kingSafetyScore[1], kingSafetyScore[0], phase);
-    score += getPstScore(phase);
+    //score += getPstScore(phase);
 
     // Bishop pair bonus.
     for (Color c = Color::White; c <= Color::Black; ++c) {

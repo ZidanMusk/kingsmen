@@ -1494,7 +1494,7 @@ public:
 
     int popLsb(ull &bitBoard) {
         //get LS 1 in the board and toggle itpop
-        ull z = (log2(bitBoard & -bitBoard) + EPS);
+        int z = (log2(bitBoard & -bitBoard) + EPS);
         bitBoard = ((bitBoard & -bitBoard) ^ bitBoard);
 
         return z;
@@ -2900,6 +2900,13 @@ public:
                 else if (blackRooks & (1ULL << loc)) return 'R';
             }
         }
+    }
+
+    int getLsb(ull bitBoard) {
+        //get LS 1 in the board and toggle itpop
+        int z = (log2(bitBoard & -bitBoard) + EPS);
+
+        return z;
     }
 
 };
