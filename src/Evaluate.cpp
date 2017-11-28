@@ -116,27 +116,19 @@ int Evaluate::kingSafty(int blackKingSafety, int whiteKingSafty, int phase) {
 }
 
 int Evaluate::mobilityEval(std::array<int, 2> &kingSafetyScore, int phase) {
-//    const auto occupied = _board->getOccupiedSquares();
-//    const auto occupied = pos.getOccupiedSquares();
+
     auto scoreOp = 0, scoreEd = 0;
 
     for (int c = 0; c <= 1; ++c) {
 
         // king safety array access with king color and place on board
-        //cout<<_board->getBitBoard(!c, 5)<<endl;
-        //cout<<_board->getLsb(_board->getBitBoard(!c, 5))<<endl;
-        const auto opponentKingZone = _board->kingSafetyZone[_board->getLsb( _board->getBitBoard(!c, 5))][!c]; // 5 -> king
-        //cout << _board->getLsb(_board->getBitBoard(!c, 5)) << endl;
-        //_board->debug(opponentKingZone);
-        //cout << endl;
-        //        const auto targetBitboard = ~pos.getPieces(c);
-//        const auto opponentKingZone = Bitboards::kingSafetyZone(!c, Bitboards::lsb(pos.getBitboard(!c, Piece::King)));
+
+        const auto opponentKingZone = _board->kingSafetyZone[_board->getLsb(
+                _board->getBitBoard(!c, 5))][!c]; // 5 -> king
         auto scoreOpForColor = 0, scoreEdForColor = 0;
         auto attackUnits = 0;
 
         auto tempPiece = _board->getBitBoard(c, 1); // 1 -> knight
-//        auto tempPiece = pos.getBitboard(c, Piece::Knight);
-
         while (tempPiece) {
             const auto from = _board->popLsb(tempPiece);
             const ull tempMove = _board->knightAttacks(from, c);
@@ -144,49 +136,29 @@ int Evaluate::mobilityEval(std::array<int, 2> &kingSafetyScore, int phase) {
             scoreOpForColor += mobilityOpening[1][count];
             scoreEdForColor += mobilityEnding[1][count];
             attackUnits += attackWeight[1] * _board->popCnt(tempMove & opponentKingZone);
-            //_board->debug(tempMove);
-            //cout << "popCnt1 " << tempMove << endl;
-//            const auto from = Bitboards::popLsb(tempPiece);
-//            const ull tempMove = Bitboards::knightAttacks(from) & targetBitboard;
-//            const auto count = Bitboards::popcnt<hardwarePopcnt>(tempMove);
-//            scoreOpForColor += mobilityOpening[Piece::Knight][count];
-//            scoreEdForColor += mobilityEnding[Piece::Knight][count];
-//            attackUnits += attackWeight[Piece::Knight] * Bitboards::popcnt<hardwarePopcnt>(tempMove & opponentKingZone);
         }
 
         tempPiece = _board->getBitBoard(c, 2); // 2 -> Bishop
-//        tempPiece = pos.getBitboard(c, Piece::Bishop);
         while (tempPiece) {
             const auto from = _board->popLsb(tempPiece);
             ull tempMove = _board->bishopAttacks(from, c, 0); // default
             const auto count = _board->popCnt(tempMove);
             scoreOpForColor += mobilityOpening[2][count];
             scoreEdForColor += mobilityEnding[2][count];
-            tempMove = _board->bishopAttacks(from, c, 0); // turn off queens
+            tempMove = _board->bishopAttacks(from, c, 1); // turn off queens
             attackUnits += attackWeight[2] * _board->popCnt(tempMove & opponentKingZone);
-            //_board->debug(tempMove);
-            //cout << "popCnt2 " << tempMove << endl;
-//            const auto from = Bitboards::popLsb(tempPiece);
-//            ull tempMove = Bitboards::bishopAttacks(from, occupied) & targetBitboard;
-//            const auto count = Bitboards::popcnt<hardwarePopcnt>(tempMove);
-//            scoreOpForColor += mobilityOpening[Piece::Bishop][count];
-//            scoreEdForColor += mobilityEnding[Piece::Bishop][count];
-//            tempMove = Bitboards::bishopAttacks(from, occupied ^ pos.getBitboard(c, Piece::Queen)) & targetBitboard;
-//            attackUnits += attackWeight[Piece::Bishop] * Bitboards::popcnt<hardwarePopcnt>(tempMove & opponentKingZone);
         }
 
         tempPiece = _board->getBitBoard(c, 3); // 3 -> rook
-//        tempPiece = pos.getBitboard(c, Piece::Rook);
         while (tempPiece) {
             const auto from = _board->popLsb(tempPiece);
             ull tempMove = _board->rookAttacks(from, c, 0);
             const auto count = _board->popCnt(tempMove);
             scoreOpForColor += mobilityOpening[3][count];
             scoreEdForColor += mobilityEnding[3][count];
-            tempMove = _board->rookAttacks(from, c, 0);
+            tempMove = _board->rookAttacks(from, c, 1);
             attackUnits += attackWeight[3] * _board->popCnt(tempMove & opponentKingZone);
-            //_board->debug(tempMove);
-            //cout << "popCnt3 " << tempMove << endl;
+
             if (!(files[_board->getColumn(from)] & _board->getBitBoard(c, 0))) { // 0 -> pawn
                 if (!(files[_board->getColumn(from)] & _board->getBitBoard(!c, 0))) { // 0 -> pawn
                     scoreOpForColor += 26;
@@ -194,26 +166,9 @@ int Evaluate::mobilityEval(std::array<int, 2> &kingSafetyScore, int phase) {
                     scoreOpForColor += 13;
                 }
             }
-//            const auto from = Bitboards::popLsb(tempPiece);
-//            ull tempMove = Bitboards::rookAttacks(from, occupied) & targetBitboard;
-//            const auto count = Bitboards::popcnt<hardwarePopcnt>(tempMove);
-//            scoreOpForColor += mobilityOpening[Piece::Rook][count];
-//            scoreEdForColor += mobilityEnding[Piece::Rook][count];
-//            tempMove = Bitboards::rookAttacks(from, occupied ^ pos.getBitboard(c, Piece::Queen) ^
-//                                                    pos.getBitboard(c, Piece::Rook)) & targetBitboard;
-//            attackUnits += attackWeight[Piece::Rook] * Bitboards::popcnt<hardwarePopcnt>(tempMove & opponentKingZone);
-//
-//            if (!(Bitboards::files[file(from)] & pos.getBitboard(c, Piece::Pawn))) {
-//                if (!(Bitboards::files[file(from)] & pos.getBitboard(!c, Piece::Pawn))) {
-//                    scoreOpForColor += 26;
-//                } else {
-//                    scoreOpForColor += 13;
-//                }
-//            }
         }
 
         tempPiece = _board->getBitBoard(c, 4); // 4 -> Queen
-//        tempPiece = pos.getBitboard(c, Piece::Queen);
         while (tempPiece) {
             const auto from = _board->popLsb(tempPiece);
             const ull tempMove = _board->queenAttacks(from, c, 0);
@@ -221,24 +176,13 @@ int Evaluate::mobilityEval(std::array<int, 2> &kingSafetyScore, int phase) {
             scoreOpForColor += mobilityOpening[4][count];
             scoreEdForColor += mobilityEnding[4][count];
             attackUnits += attackWeight[4] * _board->popCnt(tempMove & opponentKingZone);
-            //_board->debug(tempMove);
-            //cout << "popCnt4 " << tempMove << endl;
-//            const auto from = Bitboards::popLsb(tempPiece);
-//            const ull tempMove = Bitboards::queenAttacks(from, occupied) & targetBitboard;
-//            const auto count = Bitboards::popcnt<hardwarePopcnt>(tempMove);
-//            scoreOpForColor += mobilityOpening[Piece::Queen][count];
-//            scoreEdForColor += mobilityEnding[Piece::Queen][count];
-//            attackUnits += attackWeight[Piece::Queen] * Bitboards::popcnt<hardwarePopcnt>(tempMove & opponentKingZone);
         }
 
         kingSafetyScore[c] = attackUnits;
-//        //cout << "111 " << attackUnits << endl;
         scoreOp += (c ? -scoreOpForColor : scoreOpForColor);
         scoreEd += (c ? -scoreEdForColor : scoreEdForColor);
     }
-//    cout << scoreOp << ' ' << scoreEd << ' ' << phase << endl;
     return interpolateScore(scoreOp, scoreEd, phase);
-//    return 1;
 }
 
 int Evaluate::evaluate() {
