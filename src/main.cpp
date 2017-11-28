@@ -63,12 +63,28 @@ int main() {
     //cout<<b.gui_isValid("b8", "a6", 0)<<endl;
 
     //b.undoo();
-    b.gui_isValid("b1", "c3", 0);
-    b.gui_isValid("h7", "h6", 0);
-    b.gui_isValid("c3", "d5", 0);
-    b.gui_isValid("h6", "h5", 0);
-    cout<<b.gui_isValid("d5", "c7", 0)<<endl;
 
+    b.gui_isValid("e2", "e4", 0);
+
+    b.gui_isValid("g8", "f6", 0);
+
+    b.gui_isValid("a2", "a3", 0);
+
+    b.gui_isValid("f6", "e4", 0);
+
+    b.gui_isValid("d2", "d3", 0);
+
+    b.gui_isValid("a7", "a6", 0);
+
+    b.gui_isValid("c1", "g5", 0);
+
+    b.gui_isValid("a6", "a5", 0);
+
+    b.gui_isValid("g5", "e7", 0);
+
+    b.gui_isValid("e8", "e7", 0);
+    b.gui_isValid("d1", "e2", 0);
+    b.gui_isValid("e4", "c3", 0);
     b.disp();
 
 //    cout<<b.gui_getPieceAt("a8")<<endl;
