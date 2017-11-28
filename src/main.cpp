@@ -64,10 +64,11 @@ int main() {
 */
     //Evaluate
     Board b;
-    b.fenInterpreter("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR b KQkq - 0 1", 'w');
-    b.gui_isValid("b8", "a6", 0);
-    b.disp();
-    b.undoo();
+    b.fenInterpreter("rnbqkbnr/ppppp1pp/5p2/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1", true);
+    //cout<<b.gui_isValid("b8", "a6", 0)<<endl;
+
+    //b.undoo();
+    cout<<b.toFen()<<endl;
     b.disp();
 
 //    cout<<b.gui_getPieceAt("a8")<<endl;
