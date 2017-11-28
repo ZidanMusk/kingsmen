@@ -1,13 +1,8 @@
 #include <bits/stdc++.h>
 #include "Search.h"
 #include "AlphaBeta.h"
-
-//unordered_map<ll, ll> ExternBig::SaveGetScore;
-//unordered_map<ll, vector<ll>> ExternBig::SaveGetPossibleMoves;
-
-
-
-
+#include "MTDF.h"
+#include "PVS.h"
 int main() {
 //    int maxDepth = 5;
 //    Board* board = new Board();
