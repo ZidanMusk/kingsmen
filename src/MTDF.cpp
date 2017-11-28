@@ -5,8 +5,8 @@
 #include "MTDF.h"
 
 
-vector<ll> MTDF::_GetSortedPossibleMoves(ll state_id,ll IsMax) {
-    vector<ll> Pmoves=Search::Eval.GetPossibleMoves(state_id);
+vector<int> MTDF::_GetSortedPossibleMoves(ll state_id,ll IsMax) {
+    vector<int> Pmoves=Search::board->allValidMoves;
     if(this->useTrans==false)
         return Pmoves;
     ll BestMoveID=-1;
@@ -35,22 +35,24 @@ void MTDF::_UpdateNode(ll state_id, ll g, ll alpha, ll beta) {
     if(g >= beta)
         _MTDfTable[state_id].lowerbound=g;
 }
-void MTDF::_IterativeDeepening(ll root_id,ll MaxDepth)
+void MTDF::_IterativeDeepening(ll MaxDepth)
 {
     clock_t tStart = clock();
     ll firstguess = 0;
+    //TODO
+    ll root_id=Search::board->key;
     for (ll d = 1;d<=MaxDepth; d++) {
-        firstguess = this->_MTDF(root_id, firstguess, d);
+        firstguess = this->_MTDF(firstguess, d);
     }
     this->bestScore =  firstguess;
     this->bestMove = Search::_TransitionTable[root_id].BestMoveStateID;
     this->uniqueCalls = this->EvalStates;
     this->allCalls = this->OpenedStates;
     _MTDfTable.clear();
-    cout<<"MTDF      : ["<<bestScore<<','<<bestMove<<','<<EvalStates<<","<<OpenedStates<<"] in "<<(clock() - tStart)<<" msec"<<endl;
+    cout<<"MTDF      : ["<<bestScore<<','<<bestMove<<','<<EvalStates<<","<<OpenedStates<<"] in "<<(clock() - tStart)/CLOCKS_PER_SEC<<" sec"<<endl;
 
 }
-ll MTDF::_MTDF(ll root_id, ll f, ll d)
+ll MTDF::_MTDF(ll f, ll d)
 {
     ll g = f;
     ll lowerbound = -oo;
@@ -58,7 +60,7 @@ ll MTDF::_MTDF(ll root_id, ll f, ll d)
     this->_MTDfTable.clear();
     while (lowerbound < upperbound) {
         ll beta = (g == lowerbound) ? g + 1 : g;
-        g = this->_AlphaBetaWithMemory(root_id, beta - 1, beta, d,true,d, true);
+        g = this->_AlphaBetaWithMemory(beta - 1, beta, d,true,d, true);
         if (g < beta) {
             upperbound = g;
         } else {
@@ -68,8 +70,10 @@ ll MTDF::_MTDF(ll root_id, ll f, ll d)
     Search::_searchID++;
     return g;
 }
-ll MTDF::_AlphaBetaWithMemory(ll state_id, ll alpha, ll beta,ll d,bool IsMax,ll MaxDepth,bool DoNull) {
+ll MTDF::_AlphaBetaWithMemory(ll alpha, ll beta,ll d,bool IsMax,ll MaxDepth,bool DoNull) {
 
+    ll state_id=Search::board->key;
+    //cout<<state_id<<endl;
     Node entry;
 
     ll g,_g,a,b;
@@ -92,14 +96,18 @@ ll MTDF::_AlphaBetaWithMemory(ll state_id, ll alpha, ll beta,ll d,bool IsMax,ll 
         return g;
     
     OpenedStates++;
-    if (d <= 0 || Search::Eval.IsGameFinished() || Search::Eval.hasTime() == false) {
+    //ToDo IsGameFinished()
+    //Todo hasTime()
+    if (d <= 0) {
         /* leaf node */
         if(_MTDfTable[state_id].value!=-oo)
             g=_MTDfTable[state_id].value;
         else
         {
             EvalStates++;
-            g = Search::Qsearch(state_id,alpha,beta,IsMax);
+            //ToDo Qsearch
+            //g = Search::Qsearch(state_id,alpha,beta,IsMax);
+            g = Search::evaluate->evaluate();
         }
         this->_UpdateNode(state_id,g,alpha,beta);
         if(this->useTrans)
@@ -107,17 +115,18 @@ ll MTDF::_AlphaBetaWithMemory(ll state_id, ll alpha, ll beta,ll d,bool IsMax,ll 
         return g;
     }
 
-    vector<ll>Pmoves=this->_GetSortedPossibleMoves(state_id,IsMax);
+    vector<int>Pmoves=this->_GetSortedPossibleMoves(state_id,IsMax);
     ll BestMoveID=-1;
     ll BestMoveScore;
     if(IsMax)
     {
         //Null Move
+        //ToDo Null Move Pass
         if(this->doNull && !Search::Eval.IsCheck() && IsMax && (d >=4)&& (d <9)){
 
             this->doNull = false;
             ll R = d > 6 ? MAX_R : MIN_R ;
-            ll scorey = this->_AlphaBetaWithMemory(state_id, alpha, beta, d-R-1, !IsMax,MaxDepth, true);
+            ll scorey = this->_AlphaBetaWithMemory(alpha, beta, d-R-1, !IsMax,MaxDepth, true);
             if (scorey >= beta) {
                 if(this->useTrans)
                     Search::_InsertlloTransitionTable(state_id,d,beta,hashfBETA,valUNKNOWN);
@@ -132,8 +141,9 @@ ll MTDF::_AlphaBetaWithMemory(ll state_id, ll alpha, ll beta,ll d,bool IsMax,ll 
         a = alpha;
         BestMoveScore=-oo;
         for (ll i = 0; (i < Pmoves.size())&&(g<beta); ++i) {
-
-            _g=_AlphaBetaWithMemory(Pmoves[i], a, beta, d-1,!IsMax,MaxDepth,true);
+            Search::board->doo(Pmoves[i]);
+            _g=_AlphaBetaWithMemory(a, beta, d-1,!IsMax,MaxDepth,true);
+            Search::board->undoo();
 
             if(_g>BestMoveScore)
             {
@@ -155,9 +165,9 @@ ll MTDF::_AlphaBetaWithMemory(ll state_id, ll alpha, ll beta,ll d,bool IsMax,ll 
         g = +oo;
         b = beta;
         for (ll i = 0; (i < Pmoves.size())&&(g>alpha); ++i) {
-
-            _g=_AlphaBetaWithMemory(Pmoves[i], alpha, b, d-1,!IsMax,MaxDepth,true);
-
+            Search::board->doo(Pmoves[i]);
+            _g=_AlphaBetaWithMemory(alpha, b, d-1,!IsMax,MaxDepth,true);
+            Search::board->undoo();
             if(_g<BestMoveScore)
             {
                 BestMoveID=Pmoves[i];
