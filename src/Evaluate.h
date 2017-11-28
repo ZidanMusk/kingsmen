@@ -470,14 +470,15 @@ class Evaluate {
 public:
     Evaluate(Board *b);
 
+    long double xx = 0;
+    long double xxx = 0;
+
     int pawnStructure(int phase);
 
     int kingSafty(int blackKingSafety, int whiteKingSafty, int phase); // arguments are calculated in mobility
     int interpolateScore(int scoreOp, int scoreEd, int phase);
 
     int mobilityEval(std::array<int, 2> &kingSafetyScore, int phase);
-
-    int getPstScore(int phase);
 
     int evaluate();
 
