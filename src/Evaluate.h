@@ -434,7 +434,7 @@ class Evaluate {
             0x00FF000000000000,
             0xFF00000000000000
     };
-    ull kingSafetyTable[100] = {
+    int kingSafetyTable[100] = {
             21, 7, 11, 7, 7, 9, 5, 7, 10, 14, 15, 20, 19, 20, 25, 22, 28, 40, 45, 47, 46, 60, 56, 82, 86, 102, 98,
             109, 107, 117, 125, 132, 159, 168, 181, 188, 211, 213, 234, 216, 265, 276, 288, 272, 308, 339, 351, 355,
             374, 354, 370, 412, 420, 481, 439, 457, 478, 478, 441, 509, 494, 431, 517, 569, 562, 499, 500, 531, 523,
@@ -461,25 +461,14 @@ class Evaluate {
                                                                     {-2, 5, -2, -23, -28, -29, -14, -12, -10, -3, -5, -1, 6, 14, 17, 22, 36, 34, 43, 37, 39, 33, 36, 22, 12, -4, 38, 26},
                                                                     {}
                                                             }};
-    const std::array<int, 6> attackWeight = {
+    const int  attackWeight[6] = {
             0, 2, 2, 3, 5, 0
     };
 
-    // These two have to be annoyingly static, as we use them in position.cpp to incrementally update the PST eval.
-    static std::array<std::array<short, 64>, 12> mPieceSquareTableOpening;
-    static std::array<std::array<short, 64>, 12> mPieceSquareTableEnding;
+
 
 public:
     Evaluate(Board *b);
-
-    inline short getPieceSquareTableOp(Piece p, Square sq) {
-        return mPieceSquareTableOpening[p][sq];
-    }
-
-    inline short getPieceSquareTableEd(Piece p, Square sq) {
-        return mPieceSquareTableEnding[p][sq];
-    }
-
 
     int pawnStructure(int phase);
 

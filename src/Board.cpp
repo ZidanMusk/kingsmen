@@ -1,28 +1,61 @@
 #include <bits/stdc++.h>
+#include "enumss.hpp"
 
 typedef unsigned long long ull;
 using namespace std;
 
-enum Color
-{
-    White = 0, Black = 1, NoColor = 2
+
+
+const std::array<short, 6> pieceValuesOpening = {
+        79, 248, 253, 355, 847, 0
 };
 
-enum Piece {
-    Pawn = 0, Knight = 1, Bishop = 2, Rook = 3, Queen = 4, King = 5
+const std::array<short, 6> pieceValuesEnding = {
+        127, 275, 292, 526, 939, 0
 };
 
-enum Square {
-    A1, B1, C1, D1, E1, F1, G1, H1,
-    A2, B2, C2, D2, E2, F2, G2, H2,
-    A3, B3, C3, D3, E3, F3, G3, H3,
-    A4, B4, C4, D4, E4, F4, G4, H4,
-    A5, B5, C5, D5, E5, F5, G5, H5,
-    A6, B6, C6, D6, E6, F6, G6, H6,
-    A7, B7, C7, D7, E7, F7, G7, H7,
-    A8, B8, C8, D8, E8, F8, G8, H8,
-    NoSquare
-};
+const std::array<std::array<short, 64>, 6> openingPST = {{
+                                                                 {
+                                                                         0, 0, 0, 0, 0, 0, 0, 0, -35, -28, -32, -38, -17, -3, -4, -39, -35, -23, -31, -25, -11, -1, -10, -26, -31, -17, -16, -7, 2, 1, -18, -21, -22, -6, -9, 6, 20, 14, -1, -15, 4, -7, 27, 27, 52, 60, 51, 15, 55, 44, 89, 100, 87, 64, -11, -24, 0, 0, 0, 0, 0, 0, 0, 0
+                                                                 },
+                                                                 {
+                                                                         -76, -28, -41, -37, -24, -19, -16, -48, -34, -34, -21, -5, -9, 0, -12, -16, -25, -14, 0, 24, 21, 6, 9, -14, -20, 6, 10, 13, 27, 25, 26, -8, 3, 3, 26, 47, 25, 40, 26, 30, 4, 21, 60, 77, 100, 87, 48, 20, 9, -5, 37, 71, 52, 61, 3, 26, -105, -37, 16, 40, -4, -20, -35, -63
+                                                                 },
+                                                                 {
+                                                                         -9, 7, -11, -15, -10, -4, -10, -10, 3, -6, 10, -12, -3, 0, 11, -13, -16, 10, -3, 4, -2, -2, 4, -1, -4, -7, 3, 3, 15, -7, -7, 11, -12, -2, 10, 37, 7, 31, 0, -5, -2, 14, 16, 16, 35, 63, 60, 11, -13, -4, -2, -12, -12, 20, -27, 2, -38, -78, -29, -34, -63, -24, -7, -25
+                                                                 },
+                                                                 {
+                                                                         -14, -9, -3, 3, 4, 3, 6, -17, -29, -22, -8, -9, -13, -21, -1, -38, -44, -23, -14, -5, 0, -16, -4, -9, -38, -20, -35, -6, -13, -17, 18, -29, -21, -7, -13, 14, 5, 7, 37, 24, -8, 17, 5, 19, 56, 56, 66, 29, -14, 7, 31, 49, 47, 72, 27, 69, 23, 19, 26, 13, 19, 43, 59, 66
+                                                                 },
+                                                                 {
+                                                                         7, -2, 10, 8, 15, -4, -15, 1, -7, 11, 6, 14, 12, 20, 19, 11, 0, 1, 13, -6, 11, 7, 9, 10, -9, -9, -11, -10, -6, 4, 6, -7, -3, 0, 4, -12, -6, -31, -33, -10, 3, -19, -5, -1, 7, 34, 13, 1, -6, -30, 10, -3, -16, -4, 3, 52, -22, 14, -6, -10, -6, 28, 46, 32
+                                                                 },
+                                                                 {
+                                                                         17, 45, 6, -54, -12, -35, 17, 9, 56, 22, 0, -20, -22, -10, 17, 1, -15, 41, 12, -44, -16, -29, -24, -48, -34, 7, 6, -16, -13, -29, -38, -79, -28, -4, -4, -43, -13, -3, 7, -45, -55, 29, 12, -43, -35, 15, 28, -10, -3, 16, 4, -20, -17, 4, 19, -20, -11, -6, -18, -11, -34, 7, 9, -47
+                                                                 }
+                                                         }};
+
+const std::array<std::array<short, 64>, 6> endingPST = {{
+                                                                {
+                                                                        0, 0, 0, 0, 0, 0, 0, 0, -12, -3, -10, 0, 4, -9, -13, -20, -19, -8, -17, -16, -16, -19, -14, -22, -11, -3, -21, -29, -24, -19, -10, -20, 9, 0, -6, -26, -21, -15, 1, -5, 42, 44, 11, 7, -7, 10, 31, 20, 56, 71, 62, 14, 52, 17, 16, 42, 0, 0, 0, 0, 0, 0, 0, 0
+                                                                },
+                                                                {
+                                                                        -38, -42, -15, -8, -12, -26, -46, -29, -15, -2, 1, -6, 8, 1, -16, -15, -27, 3, 12, 27, 30, 2, -8, 4, -6, 22, 45, 39, 45, 30, 21, -2, 21, 25, 45, 53, 50, 46, 26, 16, -6, 24, 34, 31, 29, 40, 44, 9, -20, 22, 10, 32, 32, 8, 27, 1, -43, 14, 12, 5, 0, 6, 7, -23
+                                                                },
+                                                                {
+                                                                        -18, -10, -10, -3, -10, 2, -17, -40, -10, -16, -7, -2, 0, -12, -5, -13, -1, 15, 10, 13, 14, 1, 0, -1, 4, 14, 14, 15, 16, 9, -4, -18, 9, 14, 9, 19, 22, 6, -1, 6, 14, 17, 6, 1, 14, 5, 15, 23, 3, 13, -1, 18, -1, 0, 9, -17, 21, 27, 35, 5, 34, 3, 16, -9
+                                                                },
+                                                                {
+                                                                        -10, -12, -7, -8, -17, -13, -21, -15, -1, -14, -3, -10, -15, -16, -25, 1, 9, 0, -4, -10, -14, -6, -8, -7, 26, 10, 20, 4, 6, 14, 5, 18, 33, 28, 28, 19, 8, 18, 6, 1, 30, 25, 26, 24, 14, 17, 13, 14, 28, 32, 28, 30, 33, 9, 21, 1, 17, 15, 16, 24, 32, 20, 12, 10
+                                                                },
+                                                                {
+                                                                        -24, -25, -23, -2, -26, -47, -50, -28, -8, -25, -12, -3, -13, -41, -44, -56, -20, -12, -8, -1, 0, 4, 0, -19, -11, 2, 11, 39, 20, 2, -12, -5, -3, 15, 26, 51, 47, 46, 27, -11, 2, 38, 33, 42, 52, 42, 34, 28, 12, 35, 25, 53, 51, 29, 15, 36, 17, 18, 10, 5, 24, 34, 36, 13
+                                                                },
+                                                                {
+                                                                        -67, -22, -20, -28, -36, -26, -37, -75, -32, -10, -2, 1, 3, -5, -18, -33, -5, -3, 15, 24, 22, 8, -1, -26, 7, 26, 36, 43, 37, 34, 15, -11, 11, 47, 51, 49, 48, 48, 32, 17, 28, 61, 76, 66, 48, 76, 61, 25, -17, 51, 56, 58, 66, 61, 51, 4, 10, 31, 51, 51, 58, 51, 41, -49
+                                                                }
+                                                        }};
+
 
 class Board {
 
@@ -30,6 +63,8 @@ class Board {
 public:
 
     int16_t mPstScoreOp, mPstScoreEd;
+    std::array<std::array<short, 64>, 12> mPieceSquareTableOpening;
+    std::array<std::array<short, 64>, 12> mPieceSquareTableEnding;
 
     inline int16_t getPstScoreOp() const noexcept
     {
@@ -477,8 +512,8 @@ public:
     bool whiteCastleQ = 1;
     bool blackCastleK = 1;
     bool blackCastleQ = 1;
-    ull enPassantLoc;
-    bool whiteToMove = true;
+    int enPassantLoc = -1;
+    bool whiteToMove = true; //True-> myWhiteTurn, False -> blackTurn
 
 
     vector<vector<int> > validMovesHistory;
@@ -487,7 +522,7 @@ public:
     vector<int> allValidCaptures;
     vector<int> kingCheckers;
 
-    int moveNumber = 1;
+    int moveNumber = -1;
     int fiftyMoveRule = 0;
 
     int whiteKingMoves = 0;     //move counters
@@ -497,6 +532,8 @@ public:
 
     int pawnCntInFile[2][8];       //counting number of pawns in each file (used for isolated pawns)
 
+    int mPstScoreOpHist[MAX_GAME_LENGTH];
+    int mPstScoreEdHist[MAX_GAME_LENGTH];
 
     //===========================================gamePhase Handler
     int mGamePhase;
@@ -509,36 +546,39 @@ public:
     //Evaluating gamePhase
     const int piecePhase[6] = {
             0, 3, 3, 5, 10, 0
-    // pawn 0 // knight 1 // bishop 2 // rook 3 // queen 4 // king 5
+            // pawn 0 // knight 1 // bishop 2 // rook 3 // queen 4 // king 5
     };
 
     const int totalPhase = piecePhase[0] * 16 + piecePhase[1] * 4 + piecePhase[2] * 4 + piecePhase[3] * 4 + piecePhase[4] * 2;
-
-
-
 
 /**********************************************************************************************************************
 *                                               Optimization functions                                                 *
 **********************************************************************************************************************/
 
+    // These two have to be annoyingly static, as we use them in position.cpp to incrementally update the PST eval.
+
+    inline short getPieceSquareTableOp(Piece p, Square sq) {
+        return mPieceSquareTableOpening[p][sq];
+    }
+
+    inline short getPieceSquareTableEd(Piece p, Square sq) {
+        return mPieceSquareTableEnding[p][sq];
+    }
+
     Board() {
         validMovesHistory.resize(MAX_GAME_LENGTH);
         validCapturesHistory.resize(MAX_GAME_LENGTH);
 
-        // Calculate the phase of the game.
-        mGamePhase = totalPhase;
-        for (Piece p = Piece::Knight; p < Piece::King; ++p)
-        {
-            if(p == Piece::Knight)
-                mGamePhase -= (getPieceCount(Color::White, Piece::Knight) + getPieceCount(Color::Black, Piece::Knight))* piecePhase[p];
-            else if(p == Piece::Bishop)
-                mGamePhase -= (getPieceCount(Color::White, Piece::Bishop) + getPieceCount(Color::Black, Piece::Bishop))* piecePhase[p];
-            else if(p == Piece::Rook)
-                mGamePhase -= (getPieceCount(Color::White, Piece::Rook) + getPieceCount(Color::Black, Piece::Rook))* piecePhase[p];
-            else if(p == Piece::Queen)
-                mGamePhase -= (getPieceCount(Color::White, Piece::Queen) + getPieceCount(Color::Black, Piece::Queen))* piecePhase[p];
 
+        //initialize PST
+        for (Piece p = Piece::Pawn; p <= Piece::King; ++p) {
+            for (Square sq = Square::A1; sq <= Square::H8; ++sq) {
+                mPieceSquareTableOpening[p][sq] = openingPST[p][sq] + pieceValuesOpening[p];
+                mPieceSquareTableEnding[p][sq] = endingPST[p][sq] + pieceValuesEnding[p];
 
+                mPieceSquareTableOpening[p + Color::Black * 6][sq ^ 56] = -(openingPST[p][sq] + pieceValuesOpening[p]);
+                mPieceSquareTableEnding[p + Color::Black * 6][sq ^ 56] = -(endingPST[p][sq] + pieceValuesEnding[p]);
+            }
         }
     }
 
@@ -597,8 +637,21 @@ public:
         }
     }
 
+
+
     // interpretes fen strings.
-    void fenInterpreter(string fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1", char myColor = 'w') {
+    void fenInterpreter(string fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1", bool start = true) {
+        char myColor;
+        for(int j = 0; j < fen.size(); ++j){
+            if(fen[j] == ' '){
+                if(start){
+                    myColor = fen[j + 1];
+                }else{
+                    myColor = fen[j + 1] == 'w'? 'b' : 'w';
+                }
+                break;
+            }
+        }
         me = myColor;
         whiteRooks = 0;
         whiteQueens = 0;
@@ -711,6 +764,89 @@ public:
         allValidCaptures.clear();
         allValidMoves.clear();
         allValidMoves = generateAllMoves();
+        //mPstScore
+        int pawnCnt = __builtin_popcountll(allPieces);
+        ull wp = allPieces;
+        while (pawnCnt--) {
+            int ind = (log2(wp & -wp) + EPS);
+            wp -= (wp & -wp);
+            if((1ull << ind) & whitePawns){
+                mPstScoreOp += mPieceSquareTableOpening[Piece::Pawn][ind];
+                mPstScoreEd += mPieceSquareTableEnding[Piece::Pawn][ind];
+
+            }
+            if((1ull << ind) & whiteKnights){
+                mPstScoreOp += mPieceSquareTableOpening[Piece::Knight][ind];
+                mPstScoreEd += mPieceSquareTableEnding[Piece::Knight][ind];
+
+            }
+            if((1ull << ind) & whiteRooks){
+                mPstScoreOp += mPieceSquareTableOpening[Piece::Rook][ind];
+                mPstScoreEd += mPieceSquareTableEnding[Piece::Rook][ind];
+
+            }
+            if((1ull << ind) & whiteBishops){
+                mPstScoreOp += mPieceSquareTableOpening[Piece::Bishop][ind];
+                mPstScoreEd += mPieceSquareTableEnding[Piece::Bishop][ind];
+
+            }
+            if((1ull << ind) & whiteQueens){
+                mPstScoreOp += mPieceSquareTableOpening[Piece::Queen][ind];
+                mPstScoreEd += mPieceSquareTableEnding[Piece::Queen][ind];
+
+            }
+            if((1ull << ind) & whiteKing){
+                mPstScoreOp += mPieceSquareTableOpening[Piece::King][ind];
+                mPstScoreEd += mPieceSquareTableEnding[Piece::King][ind];
+
+            }
+            if((1ull << ind) & blackPawns){
+                mPstScoreOp += mPieceSquareTableOpening[Piece::Pawn+6][ind];
+                mPstScoreEd += mPieceSquareTableEnding[Piece::Pawn+6][ind];
+
+            }
+            if((1ull << ind) & blackKnights){
+                mPstScoreOp += mPieceSquareTableOpening[Piece::Knight+6][ind];
+                mPstScoreEd += mPieceSquareTableEnding[Piece::Knight+6][ind];
+
+            }
+            if((1ull << ind) & blackRooks){
+                mPstScoreOp += mPieceSquareTableOpening[Piece::Rook+6][ind];
+                mPstScoreEd += mPieceSquareTableEnding[Piece::Rook+6][ind];
+
+            }
+            if((1ull << ind) & blackBishops){
+                mPstScoreOp += mPieceSquareTableOpening[Piece::Bishop+6][ind];
+                mPstScoreEd += mPieceSquareTableEnding[Piece::Bishop+6][ind];
+
+            }
+            if((1ull << ind) & blackQueens){
+                mPstScoreOp += mPieceSquareTableOpening[Piece::Queen+6][ind];
+                mPstScoreEd += mPieceSquareTableEnding[Piece::Queen+6][ind];
+
+            }
+            if((1ull << ind) & blackKing){
+                mPstScoreOp += mPieceSquareTableOpening[Piece::King+6][ind];
+                mPstScoreEd += mPieceSquareTableEnding[Piece::King+6][ind];
+
+            }
+        }
+
+
+        // Calculate the phase of the game.
+        mGamePhase = totalPhase;
+        for (Piece p = Piece::Knight; p < Piece::King; ++p)
+        {
+            if(p == Piece::Knight)
+                mGamePhase -= (getPieceCount(Color::White, Piece::Knight) + getPieceCount(Color::Black, Piece::Knight))* piecePhase[p];
+            else if(p == Piece::Bishop)
+                mGamePhase -= (getPieceCount(Color::White, Piece::Bishop) + getPieceCount(Color::Black, Piece::Bishop))* piecePhase[p];
+            else if(p == Piece::Rook)
+                mGamePhase -= (getPieceCount(Color::White, Piece::Rook) + getPieceCount(Color::Black, Piece::Rook))* piecePhase[p];
+            else if(p == Piece::Queen)
+                mGamePhase -= (getPieceCount(Color::White, Piece::Queen) + getPieceCount(Color::Black, Piece::Queen))* piecePhase[p];
+        }
+        saveHistory();
     }
 
     // loc 0-63 counting from the bottom left corner [A1]
@@ -1033,69 +1169,289 @@ public:
         // queen 4
         // king 5
 
+int ex;
+
         switch (type) {
+
             case 0:
                 if (specialEvent == PROMOTEBISHOP || specialEvent == PROMOTEKNIGHT || specialEvent == PROMOTEQUEEN ||
-                    specialEvent == PROMOTEROOK)
-                    refPawns ^= (1ull << from), key ^= squareZKey(from, 'p');
-                else
-                    refPawns ^= moveXor, key ^= ZMove(from, to, 'p');
-                if (specialEvent == PROMOTEBISHOP)
-                    refBishops ^= (1ull << to), key ^= squareZKey(to, 'b');
-                else if (specialEvent == PROMOTEKNIGHT)
-                    refKnights ^= (1ull << to), key ^= squareZKey(to, 'n');
-                else if (specialEvent == PROMOTEROOK)
-                    refRooks ^= (1ull << to), key ^= squareZKey(to, 'r');
-                else if (specialEvent == PROMOTEQUEEN)
-                    refQueens ^= (1ull << to), key ^= squareZKey(to, 'q');
+                    specialEvent == PROMOTEROOK) {
+                    refPawns ^= (1ull << from); key ^= squareZKey(from, 'p');
+                    int ex = locExist(whitePieces, (1ull<<from))?type:type+6;
+                    mPstScoreOp -= mPieceSquareTableOpening[ex][from];
+                    mPstScoreEd -= mPieceSquareTableEnding[ex][from];
+
+                }
+                else {
+                    refPawns ^= moveXor; key ^= ZMove(from, to, 'p');
+                    int ex = locExist(whitePieces, (1ull<<from))?type:type+6;
+                    mPstScoreOp -= mPieceSquareTableOpening[ex][from];
+                    mPstScoreEd -= mPieceSquareTableEnding[ex][from];
+                    mPstScoreOp += mPieceSquareTableOpening[ex][to];
+                    mPstScoreEd += mPieceSquareTableEnding[ex][to];
+
+                }
+                if (specialEvent == PROMOTEBISHOP) {
+                    refBishops ^= (1ull << to); key ^= squareZKey(to, 'b');
+                    int ex = locExist(whitePieces, (1ull<<from))?type:type+6;
+                    mPstScoreOp -= mPieceSquareTableOpening[ex][from];
+                    mPstScoreEd -= mPieceSquareTableEnding[ex][from];
+                    ex = locExist(whitePieces, (1ull<<from))?bishopTypeNum():bishopTypeNum()+6;
+                    mPstScoreOp += mPieceSquareTableOpening[ex][to];
+                    mPstScoreEd += mPieceSquareTableEnding[ex][to];
+
+                    mGamePhase -= piecePhase[Piece::Bishop];
+                }
+                else if (specialEvent == PROMOTEKNIGHT) {
+                    refKnights ^= (1ull << to); key ^= squareZKey(to, 'n');
+                    int ex = locExist(whitePieces, (1ull<<from))?type:type+6;
+                    mPstScoreOp -= mPieceSquareTableOpening[ex][from];
+                    mPstScoreEd -= mPieceSquareTableEnding[ex][from];
+                    ex = locExist(whitePieces, (1ull<<from))?knightTypeNum():knightTypeNum()+6;
+                    mPstScoreOp += mPieceSquareTableOpening[ex][to];
+                    mPstScoreEd += mPieceSquareTableEnding[ex][to];
+                    mGamePhase -= piecePhase[Piece::Knight];
+
+                }
+                else if (specialEvent == PROMOTEROOK) {
+                    refRooks ^= (1ull << to); key ^= squareZKey(to, 'r');
+                    int ex = locExist(whitePieces, (1ull<<from))?type:type+6;
+                    mPstScoreOp -= mPieceSquareTableOpening[ex][from];
+                    mPstScoreEd -= mPieceSquareTableEnding[ex][from];
+                    ex = locExist(whitePieces, (1ull<<from))?rookTypeNum():rookTypeNum()+6;
+                    mPstScoreOp += mPieceSquareTableOpening[ex][to];
+                    mPstScoreEd += mPieceSquareTableEnding[ex][to];
+                    mGamePhase -= piecePhase[Piece::Rook];
+
+                }
+                else if (specialEvent == PROMOTEQUEEN) {
+                    refQueens ^= (1ull << to); key ^= squareZKey(to, 'q');
+                    int ex = locExist(whitePieces, (1ull<<from))?type:type+6;
+                    mPstScoreOp -= mPieceSquareTableOpening[ex][from];
+                    mPstScoreEd -= mPieceSquareTableEnding[ex][from];
+                    ex = locExist(whitePieces, (1ull<<from))?queenTypeNum():queenTypeNum()+6;
+                    mPstScoreOp += mPieceSquareTableOpening[ex][to];
+                    mPstScoreEd += mPieceSquareTableEnding[ex][to];
+                    mGamePhase -= piecePhase[Piece::Queen];
+
+                }
                 break;
             case 1:
                 refKnights ^= moveXor;
                 key ^= ZMove(from, to, 'n');
+                ex = locExist(whitePieces, (1ull<<from))?type:type+6;
+                mPstScoreOp -= mPieceSquareTableOpening[ex][from];
+                mPstScoreEd -= mPieceSquareTableEnding[ex][from];
+                mPstScoreOp += mPieceSquareTableOpening[ex][to];
+                mPstScoreEd += mPieceSquareTableEnding[ex][to];
+
                 break;
             case 2:
                 refBishops ^= moveXor;
                 key ^= ZMove(from, to, 'b');
+                ex = locExist(whitePieces, (1ull<<from))?type:type+6;
+                mPstScoreOp -= mPieceSquareTableOpening[ex][from];
+                mPstScoreEd -= mPieceSquareTableEnding[ex][from];
+                mPstScoreOp += mPieceSquareTableOpening[ex][to];
+                mPstScoreEd += mPieceSquareTableEnding[ex][to];
+
                 break;
             case 3:
                 if (refCastleK && from == 1 << 7)refCastleK = 0;
                 if (refCastleQ && from == 1 << 0)refCastleQ = 0;
                 refRooks ^= moveXor;
                 key ^= ZMove(from, to, 'r');
+                ex = locExist(whitePieces, (1ull<<from))?type:type+6;
+                mPstScoreOp -= mPieceSquareTableOpening[ex][from];
+                mPstScoreEd -= mPieceSquareTableEnding[ex][from];
+                mPstScoreOp += mPieceSquareTableOpening[ex][to];
+                mPstScoreEd += mPieceSquareTableEnding[ex][to];
+
                 break;
             case 4:
                 refQueens ^= moveXor;
                 key ^= ZMove(from, to, 'q');
+                ex = locExist(whitePieces, (1ull<<from))?type:type+6;
+                mPstScoreOp -= mPieceSquareTableOpening[ex][from];
+                mPstScoreEd -= mPieceSquareTableEnding[ex][from];
+                mPstScoreOp += mPieceSquareTableOpening[ex][to];
+                mPstScoreEd += mPieceSquareTableEnding[ex][to];
+
                 break;
             case 5:
                 refKingMoves++;
                 refCastleK = refCastleQ = 0;
                 refKing ^= moveXor;
-                if (specialEvent == CASTLEKINGSIDE)
-                    refRooks ^= 160, key ^= kingSideCastling;
-                else if (specialEvent == CASTLEQUEENSIDE)
-                    refRooks ^= 9, key ^= queenSideCastling;
+                if (specialEvent == CASTLEKINGSIDE) {
+                    ull x = whiteToMove?160ull:160ull<<(7*8);
+                    refRooks ^= x; key ^= kingSideCastling;
+
+                    int fromx = from + 3;
+                    int tox = to - 1;
+                    ex = locExist(whitePieces, (1ull<<from))?rookTypeNum():rookTypeNum()+6;
+                    mPstScoreOp -= mPieceSquareTableOpening[ex][fromx];
+                    mPstScoreEd -= mPieceSquareTableEnding[ex][fromx];
+                    mPstScoreOp += mPieceSquareTableOpening[ex][tox];
+                    mPstScoreEd += mPieceSquareTableEnding[ex][tox];
+
+
+                }
+                else if (specialEvent == CASTLEQUEENSIDE) {
+                    ull x = whiteToMove?9ull:9ull<<(7*8);
+                    refRooks ^= x; key ^= queenSideCastling;
+
+                    int fromx = from - 4;
+                    int tox = to + 1;
+                    ex = locExist(whitePieces, (1ull<<from))?rookTypeNum():rookTypeNum()+6;
+                    mPstScoreOp -= mPieceSquareTableOpening[ex][fromx];
+                    mPstScoreEd -= mPieceSquareTableEnding[ex][fromx];
+                    mPstScoreOp += mPieceSquareTableOpening[ex][tox];
+                    mPstScoreEd += mPieceSquareTableEnding[ex][tox];
+
+                }
                 key ^= ZMove(from, to, 'k');
+
+
+                ex = locExist(whitePieces, (1ull<<from))?type:type+6;
+                mPstScoreOp -= mPieceSquareTableOpening[ex][from];
+                mPstScoreEd -= mPieceSquareTableEnding[ex][from];
+                mPstScoreOp += mPieceSquareTableOpening[ex][to];
+                mPstScoreEd += mPieceSquareTableEnding[ex][to];
+
+
+
+
+
+
+
+
+
+
+
                 break;
             default:
                 break;
         }
 
         refColorPieces = refPawns | refKnights | refBishops | refRooks | refKing | refQueens;
+/*
+ *
 
+ *         mPstScoreOp -= mPieceSquareTableOpening[ex][from];
+        mPstScoreEd -= mPieceSquareTableEnding[ex][from];
+
+ * */
         if (capture) {
+
+
+            int capType;
+            if(locExist(allPieces, (1ull << to))) {
+                if ((1ull << to) & whitePawns) {
+                    mPstScoreOp -= mPieceSquareTableOpening[Piece::Pawn][to];
+                    mPstScoreEd -= mPieceSquareTableEnding[Piece::Pawn][to];
+
+                    mGamePhase += piecePhase[Piece::Pawn];
+
+                }
+                if ((1ull << to) & whiteKnights) {
+                    mPstScoreOp -= mPieceSquareTableOpening[Piece::Knight][to];
+                    mPstScoreEd -= mPieceSquareTableEnding[Piece::Knight][to];
+
+                    mGamePhase += piecePhase[Piece::Knight];
+
+                }
+                if ((1ull << to) & whiteRooks) {
+                    mPstScoreOp -= mPieceSquareTableOpening[Piece::Rook][to];
+                    mPstScoreEd -= mPieceSquareTableEnding[Piece::Rook][to];
+
+                    mGamePhase += piecePhase[Piece::Rook];
+
+                }
+                if ((1ull << to) & whiteBishops) {
+                    mPstScoreOp -= mPieceSquareTableOpening[Piece::Bishop][to];
+                    mPstScoreEd -= mPieceSquareTableEnding[Piece::Bishop][to];
+
+                    mGamePhase += piecePhase[Piece::Bishop];
+
+                }
+                if ((1ull << to) & whiteQueens) {
+                    mPstScoreOp -= mPieceSquareTableOpening[Piece::Queen][to];
+                    mPstScoreEd -= mPieceSquareTableEnding[Piece::Queen][to];
+
+                    mGamePhase += piecePhase[Piece::Queen];
+
+                }
+                if ((1ull << to) & whiteKing) {
+                    mPstScoreOp -= mPieceSquareTableOpening[Piece::King][to];
+                    mPstScoreEd -= mPieceSquareTableEnding[Piece::King][to];
+
+                }
+                if((1ull << to) & blackPawns){
+                    mPstScoreOp -= mPieceSquareTableOpening[Piece::Pawn+6][to];
+                    mPstScoreEd -= mPieceSquareTableEnding[Piece::Pawn+6][to];
+
+                    mGamePhase += piecePhase[Piece::Pawn];
+
+
+                }
+                if((1ull << to) & blackKnights){
+                    mPstScoreOp -= mPieceSquareTableOpening[Piece::Knight+6][to];
+                    mPstScoreEd -= mPieceSquareTableEnding[Piece::Knight+6][to];
+
+                    mGamePhase += piecePhase[Piece::Knight];
+
+
+                }
+                if((1ull << to) & blackRooks){
+                    mPstScoreOp -= mPieceSquareTableOpening[Piece::Rook+6][to];
+                    mPstScoreEd -= mPieceSquareTableEnding[Piece::Rook+6][to];
+
+                    mGamePhase += piecePhase[Piece::Rook];
+
+
+                }
+                if((1ull << to) & blackBishops){
+                    mPstScoreOp -= mPieceSquareTableOpening[Piece::Bishop+6][to];
+                    mPstScoreEd -= mPieceSquareTableEnding[Piece::Bishop+6][to];
+
+                    mGamePhase += piecePhase[Piece::Bishop];
+
+
+                }
+                if((1ull << to) & blackQueens){
+                    mPstScoreOp -= mPieceSquareTableOpening[Piece::Queen+6][to];
+                    mPstScoreEd -= mPieceSquareTableEnding[Piece::Queen+6][to];
+
+                    mGamePhase += piecePhase[Piece::Queen];
+
+
+                }
+                if((1ull << to) & blackKing){
+                    mPstScoreOp -= mPieceSquareTableOpening[Piece::King+6][to];
+                    mPstScoreEd -= mPieceSquareTableEnding[Piece::King+6][to];
+
+                }
+            }
             if (locExist(refOtherPawns, 1ull << to)) {
                 unsetBit(refOtherPawns, 1ull << to);
                 key ^= squareZKey(to, 'P');
-            } else if (~enPassantLoc && type == 0 && to == enPassantLoc + 40 &&
-                       isCellInRow(4, from) &&
-                       (getColumn(from) == enPassantLoc - 1 || getColumn(from) == enPassantLoc + 1)) {
-                unsetBit(refOtherPawns, 1ull << to);
+            } else if (~enPassantLoc && type == 0 && getColumn(to) == getColumn(enPassantLoc) && getRow(from) == getRow(enPassantLoc)) {
+                unsetBit(refOtherPawns, 1ull << (whiteToMove?to-8:to+8));
+
                 key ^= squareZKey(to, 'P');
+
+                int capture = getColumn(to) + getRow(from)*8;
+                int ex = locExist(whitePieces, (1ull<<capture))?pawnTypeNum():pawnTypeNum()+6;
+                mPstScoreOp -= mPieceSquareTableOpening[ex][capture];
+                mPstScoreEd -= mPieceSquareTableEnding[ex][capture];
+
+
+
+
+
             } else if (locExist(refOtherKnights, 1ull << to)) {
                 unsetBit(refOtherKnights, 1ull << to);
                 key ^= squareZKey(to, 'N');
-
             } else if (locExist(refOtherBishops, 1ull << to)) {
                 unsetBit(refOtherBishops, 1ull << to);
                 key ^= squareZKey(to, 'B');
@@ -1114,7 +1470,7 @@ public:
         refAllPieces = refColorPieces | refOtherPieces;
 
         if (specialEvent == ENPASSANT)
-            enPassantLoc = 3;
+            enPassantLoc = to;
 
         else enPassantLoc = -1;
 
@@ -1135,9 +1491,7 @@ public:
 
 
         //saving all of our history
-        saveHistory();
 
-        moveNumber++;
 
         //three same moves
         zobristTable[key]++;
@@ -1150,12 +1504,14 @@ public:
         allValidCaptures.clear();
         allValidMoves = generateAllMoves();
 
+        saveHistory();
 
     }
 
 //==================================================Saving history, Undo
     // saves history for undo and generating game log
     void saveHistory() {
+        moveNumber++;
         whitePawnHistory[moveNumber] = whitePawns;
         whiteKnightHistory[moveNumber] = whiteKnights;
         whiteBishopHistory[moveNumber] = whiteBishops;
@@ -1187,11 +1543,14 @@ public:
         validMovesHistory[moveNumber] = allValidMoves;
 
         mGamePhaseHistory[moveNumber] = mGamePhase;
+        mPstScoreOpHist[moveNumber] = mPstScoreOp;
+        mPstScoreEdHist[moveNumber] = mPstScoreEd;
+
     }
 
     // reverts the previous move, for search
     void undoo() {
-
+        moveNumber--;
         if (fiftyMoveRule != 0)
             fiftyMoveRule--;
 
@@ -1200,7 +1559,7 @@ public:
             zobristTable[key]--;
         }
 
-        moveNumber--;
+
 
         allValidMoves = validMovesHistory[moveNumber]; //assigning 2 vectors
         allValidCaptures = validCapturesHistory[moveNumber]; //assigning 2 vectors
@@ -1233,6 +1592,9 @@ public:
         blackCastleQ = blackCastleQHistory[moveNumber];
 
         mGamePhase = mGamePhaseHistory[moveNumber];
+
+        mPstScoreOp = mPstScoreOpHist[moveNumber];
+        mPstScoreEd = mPstScoreEdHist[moveNumber];
 
         key = keyHistory[moveNumber];
 
@@ -1324,7 +1686,6 @@ public:
 
     void pass() {
         saveHistory();
-        moveNumber++;
         if (enPassantLoc != -1)
             key ^= passantColumn[getColumn(enPassantLoc)];
         enPassantLoc = -1;
@@ -1409,12 +1770,11 @@ public:
 
     int popLsb(ull &bitBoard) {
         //get LS 1 in the board and toggle itpop
-        int z = (log2(bitBoard & -bitBoard) + EPS);
+        ull z = (log2(bitBoard & -bitBoard) + EPS);
         bitBoard = ((bitBoard & -bitBoard) ^ bitBoard);
 
         return z;
     }
-
 
 //KNIGHT ATTAKS===============================================
     ull knightAttacks(int square, int color) {//0-> white, 1->black
@@ -1937,13 +2297,13 @@ public:
                 else virBlackKing ^= moveXor;
                 if (specialEvent == CASTLEKINGSIDE)
                     if (whiteTurn)
-                        virWhiteRooks ^= 160;
-                    else virWhiteRooks ^= 160ull << (7 * 8);
+                        virWhiteRooks ^= 160ull;
+                    else virBlackRooks ^= 160ull << (7 * 8);
                 else if (specialEvent == CASTLEQUEENSIDE)
                     if (whiteTurn)
-                        virWhiteRooks ^= 9;
+                        virWhiteRooks ^= 9ull;
                     else
-                        virWhiteRooks ^= 9ull << (7 * 8);
+                        virBlackRooks ^= 9ull << (7 * 8);
                 break;
             default:
                 break;
@@ -1960,11 +2320,9 @@ public:
             if (whiteTurn) {
                 if (locExist(virBlackPawns, 1ull << to)) {
                     unsetBit(virBlackPawns, 1ull << to);
-                } else if (~enPassantLoc && type == 0 && to == enPassantLoc + 40 &&
-                           isCellInRow(4, from) &&
-                           (getColumn(from) == enPassantLoc - 1 || getColumn(from) == enPassantLoc + 1)) {
-                    unsetBit(virBlackPawns, 1ull << to);
-                } else if (locExist(virBlackKnights, 1ull << to)) {
+                } else if (~enPassantLoc && type == 0 && getColumn(to) == getColumn(enPassantLoc) && getRow(from) == getRow(enPassantLoc)) {
+                    unsetBit(virBlackPawns, 1ull << (whiteToMove?to-8:to+8));
+                }  else if (locExist(virBlackKnights, 1ull << to)) {
                     unsetBit(virBlackKnights, 1ull << to);
                 } else if (locExist(virBlackBishops, 1ull << to)) {
                     unsetBit(virBlackBishops, 1ull << to);
@@ -1978,10 +2336,8 @@ public:
             } else {
                 if (locExist(virWhitePawns, 1ull << to)) {
                     unsetBit(virWhitePawns, 1ull << to);
-                } else if (~enPassantLoc && type == 0 && to == enPassantLoc + 40 &&
-                           isCellInRow(4, from) &&
-                           (getColumn(from) == enPassantLoc - 1 || getColumn(from) == enPassantLoc + 1)) {
-                    unsetBit(virWhitePawns, 1ull << to);
+                } else if (~enPassantLoc && type == 0 && getColumn(to) == getColumn(enPassantLoc) && getRow(from) == getRow(enPassantLoc)) {
+                    unsetBit(virWhitePawns, 1ull << (whiteToMove?to-8:to+8));
                 } else if (locExist(virWhiteKnights, 1ull << to)) {
                     unsetBit(virWhiteKnights, 1ull << to);
                 } else if (locExist(virWhiteBishops, 1ull << to)) {
@@ -2027,8 +2383,8 @@ public:
                     !(allPieces & (1ull << (newInd - 8)))) {
                     //new valid move from ind to newInd
                     int flag = 0;
-                    if ((getColumn(ind + 1) != 0) && blackPawns & (newInd + 1)) flag = ENPASSANT;
-                    if ((getColumn(ind - 1) != 7) && blackPawns & (newInd - 1)) flag = ENPASSANT;
+                    if (((getColumn(ind + 1) != 0)) && (blackPawns & (1ull << (newInd + 1)))) flag = ENPASSANT;
+                    if (((getColumn(ind - 1) != 7)) && (blackPawns & (1ull << (newInd - 1)))) flag = ENPASSANT;
                     int move = makeMoveMask(flag, 0, pawnTypeNum(), ind, newInd, 0);
                     bool valid = isValid(true, move);
                     if (valid)whitePawnVM.push_back(move);
@@ -2136,8 +2492,8 @@ public:
                     !(allPieces & (1ull << (newInd + 8)))) {
                     //new valid move from ind to newInd
                     int flag = 0;
-                    if ((getColumn(ind + 1) != 0) && whitePawns & (newInd + 1)) flag = ENPASSANT;
-                    if ((getColumn(ind - 1) != 7) && whitePawns & (newInd - 1)) flag = ENPASSANT;
+                    if ((getColumn(ind + 1) != 0) && whitePawns & (1ull<<(newInd + 1))) flag = ENPASSANT;
+                    if ((getColumn(ind - 1) != 7) && whitePawns & (1ull<<(newInd - 1))) flag = ENPASSANT;
                     int move = makeMoveMask(flag, 0, pawnTypeNum(), ind, newInd, 1);
                     if (isValid(false, move))blackPawnVM.push_back(move);
                 }
@@ -2618,12 +2974,12 @@ public:
             bool check = isCheck();
             if (!check) {
                 if (threat[5] != key && threat[6] != key && !(allPieces & 96) && whiteCastleK) {
-                    int move = (makeMoveMask(CASTLEKINGSIDE, 0, kingTypeNum(), 4, 7, 0));
+                    int move = (makeMoveMask(CASTLEKINGSIDE, 0, kingTypeNum(), 4, 6, 0));
                     if (isValid(whiteToMove, move))ret.push_back(move);
 
                 }
-                if (threat[1] != key && threat[2] != key && threat[3] != key && !(allPieces & 14) && whiteCastleQ) {
-                    int move = (makeMoveMask(CASTLEQUEENSIDE, 0, kingTypeNum(), 4, 0, 0));
+                if (threat[2] != key && threat[3] != key && !(allPieces & 14) && whiteCastleQ) {
+                    int move = (makeMoveMask(CASTLEQUEENSIDE, 0, kingTypeNum(), 4, 2, 0));
                     if (isValid(whiteToMove, move))ret.push_back(move);
 
                 }
@@ -2649,14 +3005,15 @@ public:
             if (!check) {
                 if (threat[61] != key && threat[62] != key &&
                     !((allPieces & (1ull << 61)) | (allPieces & (1ull << 62))) && blackCastleK) {
-                    int move = (makeMoveMask(CASTLEKINGSIDE, 0, kingTypeNum(), 60, 63, 1));
-                    if (isValid(whiteToMove, move))ret.push_back(move);
+                    int move = (makeMoveMask(CASTLEKINGSIDE, 0, kingTypeNum(), 60, 62, 1));
+                    if (isValid(whiteToMove, move))
+                        ret.push_back(move);
 
                 }
-                if (threat[57] != key && threat[58] != key && threat[59] != key &&
-                    !(((allPieces & (1ull << 57)) | (allPieces & (1ull << 58)) | (allPieces & (1ull << 59)))) &&
+                if (threat[58] != key && threat[59] != key &&
+                    !(((allPieces & (1ull << 58)) | (allPieces & (1ull << 59)))) &&
                     blackCastleQ) {
-                    int move = (makeMoveMask(CASTLEQUEENSIDE, 0, kingTypeNum(), 60, 56, 1));
+                    int move = (makeMoveMask(CASTLEQUEENSIDE, 0, kingTypeNum(), 60, 58, 1));
                     if (isValid(whiteToMove, move))ret.push_back(move);
 
                 }
@@ -2717,7 +3074,7 @@ public:
         return ret;
     }
 
-    char gui_isValid(string src, string dst, int promotion) {
+    char gui_isValid(string src, string dst, int promotion = 0) {
         if (src.size() != 2 || dst.size() != 2 || (promotion < 0 && promotion > 8)) {
             return 'I';
         }
@@ -2765,11 +3122,12 @@ public:
         if (isDraw())return 'd';
         if (isMate() && whiteToMove)return 'l';
         if (isMate() && !whiteToMove)return 'w';
-        if (isCheck() && (!whiteToMove || true))return 'c';
+        if (isCheck() && (!whiteToMove))return 'c';
         if (isCheck() && whiteToMove)return 'C';
         return '-';
     }
 
+    //This function returns the piece as a char given the position as A1 --> H8
     char gui_getPieceAt(string pos) {
         if (pos.size() != 2) {
             return 'I';
