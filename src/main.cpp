@@ -2,54 +2,28 @@
 #include "Search.h"
 #include "AlphaBeta.h"
 #include "MTDF.h"
-
-//unordered_map<ll, ll> ExternBig::SaveGetScore;
-//unordered_map<ll, vector<ll>> ExternBig::SaveGetPossibleMoves;
-
-
-
-
+#include "PVS.h"
 int main() {
-    int maxDepth = 1;
+
+
+    int maxDepth = 5;
     Board* board1 = new Board();
     board1->fenInterpreter();
     Evaluate* evaluate1 = new Evaluate(board1);
-    cout<<board1->key<<endl;
-    vector<int>vm=board1->allValidMoves;
-    for(int i=0;i<vm.size();i++)
-    {
-        int move=vm[i];
-        board1->doo(move);
-        int score=evaluate1->evaluate();
-        board1->undoo();
-        cout<<move<<" "<<score<<endl;
-    }
-    cout<<board1->key<<endl;
     Search* baseline = new AlphaBeta(maxDepth,board1,evaluate1);
     baseline->GetBestMove();
-    cout<<"###################"<<endl;
-
-
-
+    //cout<<"###################"<<endl;
     Board* board2 = new Board();
     board2->fenInterpreter();
     Evaluate* evaluate2 = new Evaluate(board2);
-
-    for(int i=0;i<board2->allValidMoves.size();i++)
-    {
-        int move=board2->allValidMoves[i];
-        board2->doo(move);
-        int score=evaluate2->evaluate();
-        board2->undoo();
-        cout<<move<<" "<<score<<endl;
-    }
-
-
-
-
-
-    Search *mtdf = new MTDF(maxDepth,board2,evaluate2, false, true);
+    Search *mtdf = new MTDF(maxDepth,board2,evaluate2, false, false);
     mtdf->GetBestMove();
+    //cout<<"###################"<<endl;
+    Board* board3 = new Board();
+    board3->fenInterpreter();
+    Evaluate* evaluate3 = new Evaluate(board3);
+    Search *pvs = new PVS(maxDepth,board3,evaluate3, false);
+    pvs->GetBestMove();
 
 
 
@@ -109,12 +83,7 @@ int main() {
 
 */
     //Evaluate
-    Board b;
-    b.fenInterpreter("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR b KQkq - 0 1", 'w');
-    b.gui_isValid("b8", "a6", 0);
-    b.disp();
-    b.undoo();
-    b.disp();
+
 
 //    cout<<b.gui_getPieceAt("a8")<<endl;
 //    //b.gui_isValid("b7", "b6", 0);

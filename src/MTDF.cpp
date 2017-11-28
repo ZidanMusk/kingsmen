@@ -7,8 +7,6 @@
 
 vector<int> MTDF::_GetSortedPossibleMoves(ll state_id,ll IsMax) {
     vector<int> Pmoves=Search::board->allValidMoves;
-    if(this->useTrans==false)
-        return Pmoves;
     ll BestMoveID=-1;
     if(Search::_TransitionTable.find(state_id)!=Search::_TransitionTable.end())
     {
@@ -110,7 +108,6 @@ ll MTDF::_AlphaBetaWithMemory(ll alpha, ll beta,ll d,bool IsMax,ll MaxDepth,bool
             g = Search::evaluate->evaluate();
         }
         this->_UpdateNode(state_id,g,alpha,beta);
-        if(this->useTrans)
         Search::_InsertlloTransitionTable(state_id,d,g,hashfEXACT,valUNKNOWN);
         return g;
     }
@@ -128,8 +125,7 @@ ll MTDF::_AlphaBetaWithMemory(ll alpha, ll beta,ll d,bool IsMax,ll MaxDepth,bool
             ll R = d > 6 ? MAX_R : MIN_R ;
             ll scorey = this->_AlphaBetaWithMemory(alpha, beta, d-R-1, !IsMax,MaxDepth, true);
             if (scorey >= beta) {
-                if(this->useTrans)
-                    Search::_InsertlloTransitionTable(state_id,d,beta,hashfBETA,valUNKNOWN);
+                Search::_InsertlloTransitionTable(state_id,d,beta,hashfBETA,valUNKNOWN);
                 this->_UpdateNode(state_id,scorey,alpha,beta);
 
                 return beta;
@@ -152,12 +148,11 @@ ll MTDF::_AlphaBetaWithMemory(ll alpha, ll beta,ll d,bool IsMax,ll MaxDepth,bool
             }
             g = max(g,_g);
             a = max(a,g);
-            if(this->useTrans)
-                if (g >= beta) {
-                    Search::_InsertlloTransitionTable(state_id,d,beta,hashfBETA,BestMoveID);
-                    this->_UpdateNode(state_id,g,alpha,beta);
-                    return beta;
-                }
+            if (g >= beta) {
+                Search::_InsertlloTransitionTable(state_id,d,beta,hashfBETA,BestMoveID);
+                this->_UpdateNode(state_id,g,alpha,beta);
+                return beta;
+            }
         }
     } else
     {
@@ -175,16 +170,14 @@ ll MTDF::_AlphaBetaWithMemory(ll alpha, ll beta,ll d,bool IsMax,ll MaxDepth,bool
             }
             g = min(g,_g);
             b = min(b,g);
-            if(this->useTrans)
-                if (g < alpha) {
-                    Search::_InsertlloTransitionTable(state_id,d,g,hashfALPHA,BestMoveID);
-                    this->_UpdateNode(state_id,g,alpha,beta);
-                    return g;
-                }
+            if (g < alpha) {
+                Search::_InsertlloTransitionTable(state_id,d,g,hashfALPHA,BestMoveID);
+                this->_UpdateNode(state_id,g,alpha,beta);
+                return g;
+            }
         }
     }
-    if(this->useTrans)
-            Search::_InsertlloTransitionTable(state_id,d,g,hashfEXACT,BestMoveID);
+    Search::_InsertlloTransitionTable(state_id,d,g,hashfEXACT,BestMoveID);
 
     this->_UpdateNode(state_id,g,alpha,beta);
     return g;

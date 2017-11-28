@@ -65,7 +65,7 @@ void AlphaBeta::_IterativeDeepening(ll MaxDepth) {
     this->allCalls = this->OpenedStates;
 
     cout<<"AlphaBeta : ["<<bestScore<<','<<bestMove<<','<<cntr<<","<<OpenedStates<<"] in "<<(clock() - tStart)/CLOCKS_PER_SEC<<" sec"<<endl;
-    cout<<"AVG TIME  "<<(Search::evaluate->xx)/(Search::evaluate->xxx)<<endl;
+    //cout<<"AVG TIME  "<<(Search::evaluate->xx)/(Search::evaluate->xxx)<<endl;
 
     //MoveTable.clear();
     //return baseline;
