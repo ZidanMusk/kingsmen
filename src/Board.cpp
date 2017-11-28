@@ -1597,7 +1597,7 @@ public:
     bool isDraw() {
 
         // stale
-        if (!(kingMoves().size()) && !isCheck())
+        if (!(allValidMoves.size()) && !isCheck())
             return true;
 
         // 50mr
