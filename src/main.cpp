@@ -59,11 +59,16 @@ int main() {
 */
     //Evaluate
     Board b;
-    b.fenInterpreter("rnbqkbnr/ppppp1pp/5p2/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1", true);
+    b.fenInterpreter("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1", true);
     //cout<<b.gui_isValid("b8", "a6", 0)<<endl;
 
     //b.undoo();
-    cout<<b.toFen()<<endl;
+    b.gui_isValid("b1", "c3", 0);
+    b.gui_isValid("h7", "h6", 0);
+    b.gui_isValid("c3", "d5", 0);
+    b.gui_isValid("h6", "h5", 0);
+    cout<<b.gui_isValid("d5", "c7", 0)<<endl;
+
     b.disp();
 
 //    cout<<b.gui_getPieceAt("a8")<<endl;

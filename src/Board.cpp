@@ -2060,7 +2060,7 @@ public:
     // checks if there's a knight attacking the queen
     bool kingSafeKnights(bool white) {
         bool safe = true;
-        if (!white) {
+        if (white) {
             //6 10 15 17
             int kingInd = (log2(virWhiteKing & -virWhiteKing) + EPS);
             int dangerKnight = kingInd + 6;
