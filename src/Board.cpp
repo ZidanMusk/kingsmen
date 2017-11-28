@@ -5,8 +5,6 @@ typedef unsigned long long ull;
 using namespace std;
 
 
-std::array<std::array<short, 64>, 12> Board::mPieceSquareTableOpening;
-std::array<std::array<short, 64>, 12> Board::mPieceSquareTableEnding;
 
 const std::array<short, 6> pieceValuesOpening = {
         79, 248, 253, 355, 847, 0
@@ -65,6 +63,8 @@ class Board {
 public:
 
     int16_t mPstScoreOp, mPstScoreEd;
+    std::array<std::array<short, 64>, 12> mPieceSquareTableOpening;
+    std::array<std::array<short, 64>, 12> mPieceSquareTableEnding;
 
     inline int16_t getPstScoreOp() const noexcept
     {
@@ -512,7 +512,7 @@ public:
     bool whiteCastleQ = 1;
     bool blackCastleK = 1;
     bool blackCastleQ = 1;
-    ull enPassantLoc;
+    int enPassantLoc = -1;
     bool whiteToMove = true; //True-> myWhiteTurn, False -> blackTurn
 
 
@@ -522,7 +522,7 @@ public:
     vector<int> allValidCaptures;
     vector<int> kingCheckers;
 
-    int moveNumber = 1;
+    int moveNumber = -1;
     int fiftyMoveRule = 0;
 
     int whiteKingMoves = 0;     //move counters
@@ -556,8 +556,6 @@ public:
 **********************************************************************************************************************/
 
     // These two have to be annoyingly static, as we use them in position.cpp to incrementally update the PST eval.
-    static std::array<std::array<short, 64>, 12> mPieceSquareTableOpening;
-    static std::array<std::array<short, 64>, 12> mPieceSquareTableEnding;
 
     inline short getPieceSquareTableOp(Piece p, Square sq) {
         return mPieceSquareTableOpening[p][sq];
@@ -642,7 +640,18 @@ public:
 
 
     // interpretes fen strings.
-    void fenInterpreter(string fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1", char myColor = 'w') {
+    void fenInterpreter(string fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1", bool start = true) {
+        char myColor;
+        for(int j = 0; j < fen.size(); ++j){
+            if(fen[j] == ' '){
+                if(start){
+                    myColor = fen[j + 1];
+                }else{
+                    myColor = fen[j + 1] == 'w'? 'b' : 'w';
+                }
+                break;
+            }
+        }
         me = myColor;
         whiteRooks = 0;
         whiteQueens = 0;
@@ -837,6 +846,7 @@ public:
             else if(p == Piece::Queen)
                 mGamePhase -= (getPieceCount(Color::White, Piece::Queen) + getPieceCount(Color::Black, Piece::Queen))* piecePhase[p];
         }
+        saveHistory();
     }
 
     // loc 0-63 counting from the bottom left corner [A1]
@@ -1159,20 +1169,21 @@ public:
         // queen 4
         // king 5
 
-
+int ex;
 
         switch (type) {
+
             case 0:
                 if (specialEvent == PROMOTEBISHOP || specialEvent == PROMOTEKNIGHT || specialEvent == PROMOTEQUEEN ||
                     specialEvent == PROMOTEROOK) {
-                    refPawns ^= (1ull << from), key ^= squareZKey(from, 'p');
+                    refPawns ^= (1ull << from); key ^= squareZKey(from, 'p');
                     int ex = locExist(whitePieces, (1ull<<from))?type:type+6;
                     mPstScoreOp -= mPieceSquareTableOpening[ex][from];
                     mPstScoreEd -= mPieceSquareTableEnding[ex][from];
 
                 }
                 else {
-                    refPawns ^= moveXor, key ^= ZMove(from, to, 'p');
+                    refPawns ^= moveXor; key ^= ZMove(from, to, 'p');
                     int ex = locExist(whitePieces, (1ull<<from))?type:type+6;
                     mPstScoreOp -= mPieceSquareTableOpening[ex][from];
                     mPstScoreEd -= mPieceSquareTableEnding[ex][from];
@@ -1181,7 +1192,7 @@ public:
 
                 }
                 if (specialEvent == PROMOTEBISHOP) {
-                    refBishops ^= (1ull << to), key ^= squareZKey(to, 'b');
+                    refBishops ^= (1ull << to); key ^= squareZKey(to, 'b');
                     int ex = locExist(whitePieces, (1ull<<from))?type:type+6;
                     mPstScoreOp -= mPieceSquareTableOpening[ex][from];
                     mPstScoreEd -= mPieceSquareTableEnding[ex][from];
@@ -1192,7 +1203,7 @@ public:
                     mGamePhase -= piecePhase[Piece::Bishop];
                 }
                 else if (specialEvent == PROMOTEKNIGHT) {
-                    refKnights ^= (1ull << to), key ^= squareZKey(to, 'n');
+                    refKnights ^= (1ull << to); key ^= squareZKey(to, 'n');
                     int ex = locExist(whitePieces, (1ull<<from))?type:type+6;
                     mPstScoreOp -= mPieceSquareTableOpening[ex][from];
                     mPstScoreEd -= mPieceSquareTableEnding[ex][from];
@@ -1203,7 +1214,7 @@ public:
 
                 }
                 else if (specialEvent == PROMOTEROOK) {
-                    refRooks ^= (1ull << to), key ^= squareZKey(to, 'r');
+                    refRooks ^= (1ull << to); key ^= squareZKey(to, 'r');
                     int ex = locExist(whitePieces, (1ull<<from))?type:type+6;
                     mPstScoreOp -= mPieceSquareTableOpening[ex][from];
                     mPstScoreEd -= mPieceSquareTableEnding[ex][from];
@@ -1214,7 +1225,7 @@ public:
 
                 }
                 else if (specialEvent == PROMOTEQUEEN) {
-                    refQueens ^= (1ull << to), key ^= squareZKey(to, 'q');
+                    refQueens ^= (1ull << to); key ^= squareZKey(to, 'q');
                     int ex = locExist(whitePieces, (1ull<<from))?type:type+6;
                     mPstScoreOp -= mPieceSquareTableOpening[ex][from];
                     mPstScoreEd -= mPieceSquareTableEnding[ex][from];
@@ -1228,7 +1239,7 @@ public:
             case 1:
                 refKnights ^= moveXor;
                 key ^= ZMove(from, to, 'n');
-                int ex = locExist(whitePieces, (1ull<<from))?type:type+6;
+                ex = locExist(whitePieces, (1ull<<from))?type:type+6;
                 mPstScoreOp -= mPieceSquareTableOpening[ex][from];
                 mPstScoreEd -= mPieceSquareTableEnding[ex][from];
                 mPstScoreOp += mPieceSquareTableOpening[ex][to];
@@ -1273,7 +1284,7 @@ public:
                 refKing ^= moveXor;
                 if (specialEvent == CASTLEKINGSIDE) {
                     ull x = whiteToMove?160ull:160ull<<(7*8);
-                    refRooks ^= x, key ^= kingSideCastling;
+                    refRooks ^= x; key ^= kingSideCastling;
 
                     int fromx = from + 3;
                     int tox = to - 1;
@@ -1287,7 +1298,7 @@ public:
                 }
                 else if (specialEvent == CASTLEQUEENSIDE) {
                     ull x = whiteToMove?9ull:9ull<<(7*8);
-                    refRooks ^= x, key ^= queenSideCastling;
+                    refRooks ^= x; key ^= queenSideCastling;
 
                     int fromx = from - 4;
                     int tox = to + 1;
@@ -1424,10 +1435,9 @@ public:
             if (locExist(refOtherPawns, 1ull << to)) {
                 unsetBit(refOtherPawns, 1ull << to);
                 key ^= squareZKey(to, 'P');
-            } else if (~enPassantLoc && type == 0 && to == enPassantLoc + 40 &&
-                       isCellInRow(4, from) &&
-                       (getColumn(from) == enPassantLoc - 1 || getColumn(from) == enPassantLoc + 1)) {
-                unsetBit(refOtherPawns, 1ull << to);
+            } else if (~enPassantLoc && type == 0 && getColumn(to) == getColumn(enPassantLoc) && getRow(from) == getRow(enPassantLoc)) {
+                unsetBit(refOtherPawns, 1ull << (whiteToMove?to-8:to+8));
+
                 key ^= squareZKey(to, 'P');
 
                 int capture = getColumn(to) + getRow(from)*8;
@@ -1460,7 +1470,7 @@ public:
         refAllPieces = refColorPieces | refOtherPieces;
 
         if (specialEvent == ENPASSANT)
-            enPassantLoc = 3;
+            enPassantLoc = to;
 
         else enPassantLoc = -1;
 
@@ -1481,9 +1491,7 @@ public:
 
 
         //saving all of our history
-        saveHistory();
 
-        moveNumber++;
 
         //three same moves
         zobristTable[key]++;
@@ -1496,12 +1504,14 @@ public:
         allValidCaptures.clear();
         allValidMoves = generateAllMoves();
 
+        saveHistory();
 
     }
 
 //==================================================Saving history, Undo
     // saves history for undo and generating game log
     void saveHistory() {
+        moveNumber++;
         whitePawnHistory[moveNumber] = whitePawns;
         whiteKnightHistory[moveNumber] = whiteKnights;
         whiteBishopHistory[moveNumber] = whiteBishops;
@@ -1535,11 +1545,12 @@ public:
         mGamePhaseHistory[moveNumber] = mGamePhase;
         mPstScoreOpHist[moveNumber] = mPstScoreOp;
         mPstScoreEdHist[moveNumber] = mPstScoreEd;
+
     }
 
     // reverts the previous move, for search
     void undoo() {
-
+        moveNumber--;
         if (fiftyMoveRule != 0)
             fiftyMoveRule--;
 
@@ -1548,7 +1559,7 @@ public:
             zobristTable[key]--;
         }
 
-        moveNumber--;
+
 
         allValidMoves = validMovesHistory[moveNumber]; //assigning 2 vectors
         allValidCaptures = validCapturesHistory[moveNumber]; //assigning 2 vectors
@@ -1675,7 +1686,6 @@ public:
 
     void pass() {
         saveHistory();
-        moveNumber++;
         if (enPassantLoc != -1)
             key ^= passantColumn[getColumn(enPassantLoc)];
         enPassantLoc = -1;
@@ -1770,7 +1780,7 @@ public:
     ull knightAttacks(int square, int color) {//0-> white, 1->black
 
         //mask which marks all my attack squares
-        ull ans;
+        ull ans = 0;
 
         //vectors to get the valid moves
         vector<int> tmp;
@@ -1799,7 +1809,7 @@ public:
     ull bishopAttacks(int square, int color, bool version) {
 
         //mask which marks all my attack squares
-        ull ans;
+        ull ans = 0;
 
         //tmp variables
         ull currentBoard = allPieces;
@@ -1858,7 +1868,7 @@ public:
     ull rookAttacks(int square, int color, bool version) {
 
         //mask which marks all my attack squares
-        ull ans;
+        ull ans = 0;
 
         //tmp variables
         ull currentBoard = allPieces;
@@ -1949,7 +1959,7 @@ public:
     ull queenAttacks(int square, int color, bool version) {
 
         //mask which marks all my attack squares
-        ull ans;
+        ull ans = 0;
 
         //tmp variables
         ull currentBoard = allPieces;
@@ -2287,13 +2297,13 @@ public:
                 else virBlackKing ^= moveXor;
                 if (specialEvent == CASTLEKINGSIDE)
                     if (whiteTurn)
-                        virWhiteRooks ^= 160;
-                    else virWhiteRooks ^= 160ull << (7 * 8);
+                        virWhiteRooks ^= 160ull;
+                    else virBlackRooks ^= 160ull << (7 * 8);
                 else if (specialEvent == CASTLEQUEENSIDE)
                     if (whiteTurn)
-                        virWhiteRooks ^= 9;
+                        virWhiteRooks ^= 9ull;
                     else
-                        virWhiteRooks ^= 9ull << (7 * 8);
+                        virBlackRooks ^= 9ull << (7 * 8);
                 break;
             default:
                 break;
@@ -2310,11 +2320,9 @@ public:
             if (whiteTurn) {
                 if (locExist(virBlackPawns, 1ull << to)) {
                     unsetBit(virBlackPawns, 1ull << to);
-                } else if (~enPassantLoc && type == 0 && to == enPassantLoc + 40 &&
-                           isCellInRow(4, from) &&
-                           (getColumn(from) == enPassantLoc - 1 || getColumn(from) == enPassantLoc + 1)) {
-                    unsetBit(virBlackPawns, 1ull << to);
-                } else if (locExist(virBlackKnights, 1ull << to)) {
+                } else if (~enPassantLoc && type == 0 && getColumn(to) == getColumn(enPassantLoc) && getRow(from) == getRow(enPassantLoc)) {
+                    unsetBit(virBlackPawns, 1ull << (whiteToMove?to-8:to+8));
+                }  else if (locExist(virBlackKnights, 1ull << to)) {
                     unsetBit(virBlackKnights, 1ull << to);
                 } else if (locExist(virBlackBishops, 1ull << to)) {
                     unsetBit(virBlackBishops, 1ull << to);
@@ -2328,10 +2336,8 @@ public:
             } else {
                 if (locExist(virWhitePawns, 1ull << to)) {
                     unsetBit(virWhitePawns, 1ull << to);
-                } else if (~enPassantLoc && type == 0 && to == enPassantLoc + 40 &&
-                           isCellInRow(4, from) &&
-                           (getColumn(from) == enPassantLoc - 1 || getColumn(from) == enPassantLoc + 1)) {
-                    unsetBit(virWhitePawns, 1ull << to);
+                } else if (~enPassantLoc && type == 0 && getColumn(to) == getColumn(enPassantLoc) && getRow(from) == getRow(enPassantLoc)) {
+                    unsetBit(virWhitePawns, 1ull << (whiteToMove?to-8:to+8));
                 } else if (locExist(virWhiteKnights, 1ull << to)) {
                     unsetBit(virWhiteKnights, 1ull << to);
                 } else if (locExist(virWhiteBishops, 1ull << to)) {
@@ -2377,8 +2383,8 @@ public:
                     !(allPieces & (1ull << (newInd - 8)))) {
                     //new valid move from ind to newInd
                     int flag = 0;
-                    if ((getColumn(ind + 1) != 0) && blackPawns & (newInd + 1)) flag = ENPASSANT;
-                    if ((getColumn(ind - 1) != 7) && blackPawns & (newInd - 1)) flag = ENPASSANT;
+                    if (((getColumn(ind + 1) != 0)) && (blackPawns & (1ull << (newInd + 1)))) flag = ENPASSANT;
+                    if (((getColumn(ind - 1) != 7)) && (blackPawns & (1ull << (newInd - 1)))) flag = ENPASSANT;
                     int move = makeMoveMask(flag, 0, pawnTypeNum(), ind, newInd, 0);
                     bool valid = isValid(true, move);
                     if (valid)whitePawnVM.push_back(move);
@@ -2486,8 +2492,8 @@ public:
                     !(allPieces & (1ull << (newInd + 8)))) {
                     //new valid move from ind to newInd
                     int flag = 0;
-                    if ((getColumn(ind + 1) != 0) && whitePawns & (newInd + 1)) flag = ENPASSANT;
-                    if ((getColumn(ind - 1) != 7) && whitePawns & (newInd - 1)) flag = ENPASSANT;
+                    if ((getColumn(ind + 1) != 0) && whitePawns & (1ull<<(newInd + 1))) flag = ENPASSANT;
+                    if ((getColumn(ind - 1) != 7) && whitePawns & (1ull<<(newInd - 1))) flag = ENPASSANT;
                     int move = makeMoveMask(flag, 0, pawnTypeNum(), ind, newInd, 1);
                     if (isValid(false, move))blackPawnVM.push_back(move);
                 }
@@ -2968,12 +2974,12 @@ public:
             bool check = isCheck();
             if (!check) {
                 if (threat[5] != key && threat[6] != key && !(allPieces & 96) && whiteCastleK) {
-                    int move = (makeMoveMask(CASTLEKINGSIDE, 0, kingTypeNum(), 4, 7, 0));
+                    int move = (makeMoveMask(CASTLEKINGSIDE, 0, kingTypeNum(), 4, 6, 0));
                     if (isValid(whiteToMove, move))ret.push_back(move);
 
                 }
-                if (threat[1] != key && threat[2] != key && threat[3] != key && !(allPieces & 14) && whiteCastleQ) {
-                    int move = (makeMoveMask(CASTLEQUEENSIDE, 0, kingTypeNum(), 4, 0, 0));
+                if (threat[2] != key && threat[3] != key && !(allPieces & 14) && whiteCastleQ) {
+                    int move = (makeMoveMask(CASTLEQUEENSIDE, 0, kingTypeNum(), 4, 2, 0));
                     if (isValid(whiteToMove, move))ret.push_back(move);
 
                 }
@@ -2999,14 +3005,15 @@ public:
             if (!check) {
                 if (threat[61] != key && threat[62] != key &&
                     !((allPieces & (1ull << 61)) | (allPieces & (1ull << 62))) && blackCastleK) {
-                    int move = (makeMoveMask(CASTLEKINGSIDE, 0, kingTypeNum(), 60, 63, 1));
-                    if (isValid(whiteToMove, move))ret.push_back(move);
+                    int move = (makeMoveMask(CASTLEKINGSIDE, 0, kingTypeNum(), 60, 62, 1));
+                    if (isValid(whiteToMove, move))
+                        ret.push_back(move);
 
                 }
-                if (threat[57] != key && threat[58] != key && threat[59] != key &&
-                    !(((allPieces & (1ull << 57)) | (allPieces & (1ull << 58)) | (allPieces & (1ull << 59)))) &&
+                if (threat[58] != key && threat[59] != key &&
+                    !(((allPieces & (1ull << 58)) | (allPieces & (1ull << 59)))) &&
                     blackCastleQ) {
-                    int move = (makeMoveMask(CASTLEQUEENSIDE, 0, kingTypeNum(), 60, 56, 1));
+                    int move = (makeMoveMask(CASTLEQUEENSIDE, 0, kingTypeNum(), 60, 58, 1));
                     if (isValid(whiteToMove, move))ret.push_back(move);
 
                 }
@@ -3067,7 +3074,7 @@ public:
         return ret;
     }
 
-    char gui_isValid(string src, string dst, int promotion) {
+    char gui_isValid(string src, string dst, int promotion = 0) {
         if (src.size() != 2 || dst.size() != 2 || (promotion < 0 && promotion > 8)) {
             return 'I';
         }
@@ -3115,11 +3122,12 @@ public:
         if (isDraw())return 'd';
         if (isMate() && whiteToMove)return 'l';
         if (isMate() && !whiteToMove)return 'w';
-        if (isCheck() && (!whiteToMove || true))return 'c';
+        if (isCheck() && (!whiteToMove))return 'c';
         if (isCheck() && whiteToMove)return 'C';
         return '-';
     }
 
+    //This function returns the piece as a char given the position as A1 --> H8
     char gui_getPieceAt(string pos) {
         if (pos.size() != 2) {
             return 'I';
