@@ -3292,4 +3292,29 @@ public:
         }
         return str;
     }
+    string moveInterpret(int move, bool gui){
+        int from = getFrom(move);
+        int to = getTo(move);
+        char fromRank = (char)(from/8 + '1'), fromFile = (char)(from%8 + 'a');
+        char toRank = (char)(to/8 + '1'), toFile = (char)(to%8 + 'a');
+        string str ="";
+        str += fromFile + fromRank + toFile + toRank;
+
+        int se = getSpecialEvent(move);
+        if(se == 4){
+            str += gui?'4':(me == 'w'?'N':'n');
+        }else if(se == 5){
+            str += gui?'5':(me == 'w'?'B':'b');
+
+        }else if(se == 6){
+            str += gui?'6':(me == 'w'?'R':'r');
+
+        }else if(se == 7){
+            str += gui?'7':(me == 'w'?'Q':'q');
+
+        }else{
+            str += gui?'0':'-';
+        }
+        return str;
+    }
 };
