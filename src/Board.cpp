@@ -1770,10 +1770,15 @@ public:
 
     int popLsb(ull &bitBoard) {
         //get LS 1 in the board and toggle itpop
-        ull z = (log2(bitBoard & -bitBoard) + EPS);
+        int z = (log2(bitBoard & -bitBoard) + EPS);
         bitBoard = ((bitBoard & -bitBoard) ^ bitBoard);
 
         return z;
+    }
+
+    int getLsb(ull bitBoard) {
+        //get LS 1 in the board and toggle itpop
+        return (int)(log2(bitBoard & -bitBoard) + EPS);
     }
 
 //KNIGHT ATTAKS===============================================

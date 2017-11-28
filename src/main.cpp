@@ -9,13 +9,13 @@
 
 
 int main() {
-    int maxDepth = 5;
-    Board* board = new Board();
-    board->fenInterpreter();
-    Evaluate* evaluate = new Evaluate(board);
-    Search* baseline = new AlphaBeta(maxDepth,board,evaluate);
-    baseline->GetBestMove();
-    int x=baseline->bestMove;
+//    int maxDepth = 5;
+//    Board* board = new Board();
+//    board->fenInterpreter();
+//    Evaluate* evaluate = new Evaluate(board);
+//    Search* baseline = new AlphaBeta(maxDepth,board,evaluate);
+//    baseline->GetBestMove();
+//    int x=baseline->bestMove;
     /*ll mtdfBest1 = 0, mtdfBest2 = 0, mtfdCorrect = 0;
     ll PvsBest1 = 0, PvsBest2 = 0, PvsCorrect = 0;
     bool pvsSa7 = false;
@@ -63,9 +63,13 @@ int main() {
 
 */
     //Evaluate
-//    Board b;
-//    b.fenInterpreter("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR b KQkq - 0 1", 'w');
-//    b.gui_isValid("b8", "a6", 0);
+    Board b;
+    b.fenInterpreter("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR b KQkq - 0 1", 'w');
+    b.gui_isValid("b8", "a6", 0);
+    b.disp();
+    b.undoo();
+    b.disp();
+
 //    cout<<b.gui_getPieceAt("a8")<<endl;
 //    //b.gui_isValid("b7", "b6", 0);
 //    //b.gui_isValid("c2", "c4", 0);

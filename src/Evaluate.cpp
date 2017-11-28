@@ -125,8 +125,7 @@ int Evaluate::mobilityEval(std::array<int, 2> &kingSafetyScore, int phase) {
         // king safety array access with king color and place on board
         //cout<<_board->getBitBoard(!c, 5)<<endl;
         //cout<<_board->getLsb(_board->getBitBoard(!c, 5))<<endl;
-        const auto opponentKingZone = _board->kingSafetyZone[_board->getLsb(
-                _board->getBitBoard(!c, 5))][!c]; // 5 -> king
+        const auto opponentKingZone = _board->kingSafetyZone[_board->getLsb( _board->getBitBoard(!c, 5))][!c]; // 5 -> king
         //cout << _board->getLsb(_board->getBitBoard(!c, 5)) << endl;
         //_board->debug(opponentKingZone);
         //cout << endl;
