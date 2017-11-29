@@ -1,38 +1,41 @@
 #include <bits/stdc++.h>
 #include "Search.h"
+
+using namespace std;
+
 #include "AlphaBeta.h"
 #include "MTDF.h"
 #include "PVS.h"
 
 int main() {
 
-  /*  int maxDepth = 6;
-    Board* board1 = new Board();
-    board1->fenInterpreter();
-    Evaluate* evaluate1 = new Evaluate(board1);
+    /*  int maxDepth = 6;
+      Board* board1 = new Board();
+      board1->fenInterpreter();
+      Evaluate* evaluate1 = new Evaluate(board1);
 
-    Board* board2 = new Board();
-    board2->fenInterpreter();
-    Evaluate* evaluate2 = new Evaluate(board2);
+      Board* board2 = new Board();
+      board2->fenInterpreter();
+      Evaluate* evaluate2 = new Evaluate(board2);
 
-    Search *pvs = new PVS(maxDepth,board1,evaluate1, true);
-    pvs->GetBestMove();
-    //Search* baseline = new AlphaBeta(maxDepth,board1,evaluate1);
-    //baseline->GetBestMove();
+      Search *pvs = new PVS(maxDepth,board1,evaluate1, true);
+      pvs->GetBestMove();
+      //Search* baseline = new AlphaBeta(maxDepth,board1,evaluate1);
+      //baseline->GetBestMove();
 
-    //Search *mtdf = new MTDF(maxDepth,board1,evaluate1, false, true);
-    //mtdf->GetBestMove();
+      //Search *mtdf = new MTDF(maxDepth,board1,evaluate1, false, true);
+      //mtdf->GetBestMove();
 
 
 
-    exit(0);
-    /*for(int i=0;i<10;i++)
-    {
-        mtdf->GetBestMove();
-        board1->doo(mtdf->bestMove);
-        mtdfNull->GetBestMove();
-        board2->doo(mtdfNull->bestMove);
-    }*/
+      exit(0);
+      /*for(int i=0;i<10;i++)
+      {
+          mtdf->GetBestMove();
+          board1->doo(mtdf->bestMove);
+          mtdfNull->GetBestMove();
+          board2->doo(mtdfNull->bestMove);
+      }*/
 
 
     /*cout<<board->key<<endl;
@@ -143,24 +146,59 @@ int main() {
     Board b;
     b.fenInterpreter("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1", true);
 
-    b.gui_isValid("e2", "e4", 0);
-    b.gui_isValid("e7", "e5", 0);
+    b.gui_isValid("a2", "a3", 0);
+    b.gui_isValid("g8", "f6", 0);
+    b.gui_isValid("c2", "c4", 0);
+    b.gui_isValid("d7", "d5", 0);
+    b.gui_isValid("g1", "f3", 0);
+    b.gui_isValid("e7", "e6", 0);
+    b.gui_isValid("d2", "d4", 0);
+    b.gui_isValid("c7", "c5", 0);
+    b.gui_isValid("e2", "e3", 0);
+    b.gui_isValid("b8", "c6", 0);
     b.gui_isValid("b1", "c3", 0);
-    b.gui_isValid("f8", "c5", 0);
-    b.gui_isValid("d2", "d3", 0);
-    b.gui_isValid("d8", "f6", 0);
-    b.gui_isValid("c3", "d5", 0);
-    b.gui_isValid("f6", "f2", 0);
+    b.gui_isValid("f8", "e7", 0);
+    b.gui_isValid("d4", "c5", 0);
+    b.gui_isValid("e7", "c5", 0);
+    b.gui_isValid("h2", "h3", 0);
+    b.gui_isValid("e8", "g8", 0);
+    b.gui_isValid("c1", "d2", 0);
+    b.gui_isValid("c6", "a5", 0);
+    b.gui_isValid("c4", "d5", 0);
+    b.gui_isValid("e6", "d5", 0);
+    b.gui_isValid("b2", "b4", 0);
+    b.gui_isValid("c5", "b4", 0);
+    b.gui_isValid("a3", "b4", 0);
+    b.gui_isValid("a5", "c6", 0);
+    b.gui_isValid("d1", "b1", 0);
+    b.gui_isValid("g7", "g6", 0);
+    b.gui_isValid("f1", "d3", 0);
+    b.gui_isValid("c8", "f5", 0);
+    b.gui_isValid("d3", "f5", 0);
+    b.gui_isValid("g6", "f5", 0);
+    b.gui_isValid("b1", "f5", 0);
+    b.gui_isValid("c6", "b4", 0);
+    b.gui_isValid("e1", "g1", 0);
+    b.gui_isValid("d8", "c8", 0);
+    b.gui_isValid("f5", "g5", 0);
+    b.gui_isValid("g8", "h8", 0);
+    b.gui_isValid("g5", "f6", 0);
+    b.gui_isValid("h8", "g8", 0);
+    b.gui_isValid("f6", "h6", 0);
+    b.gui_isValid("g8", "h8", 0);
+    b.gui_isValid("f3", "g5", 0);
+    b.gui_isValid("c8", "f5", 0);
+    b.gui_isValid("a1", "a7", 0);
+    b.gui_isValid("f8", "g8", 0);
+    b.gui_isValid("e3", "e4", 0);
+    b.gui_isValid("f5", "g5", 0);
+    b.gui_isValid("d2", "g5", 0);
+    b.gui_isValid("g8", "g5", 0);
+    b.gui_isValid("h6", "f6", 0);
+    b.gui_isValid("h8", "g8", 0);
+    b.gui_isValid("a7", "a8", 0);
 
-
-
-
-
-
-
-
-    cout<<b.gui_gameState()<<endl;
-
+    cout << b.gui_gameState() << endl;
 
 //    int x = 5;
 //    int moves[5] = {255872, 817536, 173696, 107088, 197632};
@@ -181,6 +219,5 @@ int main() {
 
 
     b.disp();
-
 }
 
