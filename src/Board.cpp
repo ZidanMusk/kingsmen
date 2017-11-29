@@ -1568,7 +1568,6 @@ public:
             zobristTable[key]--;
         }
 
-
         allValidMoves.assign(validMovesHistory[moveNumber].begin(),
                              validMovesHistory[moveNumber].end()); //assigning 2 vectors
         allValidCaptures.assign(validCapturesHistory[moveNumber].begin(),
