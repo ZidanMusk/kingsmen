@@ -144,7 +144,7 @@ int main() {
 //Evaluate
 
     Board b;
-    b.fenInterpreter("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1", true);
+    b.fenInterpreter("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1", false);
 
     b.gui_isValid("a2", "a3", 0);
     b.gui_isValid("g8", "f6", 0);

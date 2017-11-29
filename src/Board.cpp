@@ -505,10 +505,10 @@ public:
 
 
     //should be considered at implementation
-    bool whiteCastleK = 1;
-    bool whiteCastleQ = 1;
-    bool blackCastleK = 1;
-    bool blackCastleQ = 1;
+    bool whiteCastleK = 0;
+    bool whiteCastleQ = 0;
+    bool blackCastleK = 0;
+    bool blackCastleQ = 0;
     int enPassantLoc = -1;
     bool whiteToMove = true; //True-> myWhiteTurn, False -> blackTurn
 
