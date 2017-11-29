@@ -1169,7 +1169,7 @@ public:
         // queen 4
         // king 5
 
-int ex;
+        int ex;
 
         switch (type) {
 
@@ -1604,7 +1604,7 @@ int ex;
     bool isDraw() {
 
         // stale
-        if (!(kingMoves().size()) && !isCheck())
+        if (!(allValidMoves.size()) && !isCheck())
             return true;
 
         // 50mr
@@ -1625,7 +1625,11 @@ int ex;
     bool isMate() {
 
         //decide if you want to save history here
-        if (!(kingMoves().size()) && isCheck())
+        bool canSave = false;
+        for(int i = 0; i < allValidMoves.size(); ++i){
+            canSave |= isValid(whiteToMove, allValidMoves[i]);
+        }
+        if (!canSave && isCheck())
             return true;
         else
             return false;
@@ -2062,7 +2066,7 @@ int ex;
     // checks if there's a knight attacking the queen
     bool kingSafeKnights(bool white) {
         bool safe = true;
-        if (!white) {
+        if (white) {
             //6 10 15 17
             int kingInd = (log2(virWhiteKing & -virWhiteKing) + EPS);
             int dangerKnight = kingInd + 6;
@@ -2189,7 +2193,7 @@ int ex;
 
         for (int i = 2; i < 4 && !ret; ++i) {
             ull mask = rookZoneAttack[loc][i];
-            ull res = allPieces & mask;
+            ull res = virAllPieces & mask;
             ull firstCollision = getMSB(res);
 
             bool noCollision = firstCollision == 0;
@@ -2328,6 +2332,8 @@ int ex;
                     unsetBit(virBlackBishops, 1ull << to);
                 } else if (locExist(virBlackQueens, 1ull << to)) {
                     unsetBit(virBlackQueens, 1ull << to);
+                }else if (locExist(virBlackRooks, 1ull << to)) {
+                    unsetBit(virBlackRooks, 1ull << to);
                 }
 
                 virBlackPieces = virBlackPawns | virBlackKnights | virBlackBishops | virBlackQueens | virBlackKing |
@@ -2344,6 +2350,8 @@ int ex;
                     unsetBit(virWhiteBishops, 1ull << to);
                 } else if (locExist(virWhiteQueens, 1ull << to)) {
                     unsetBit(virWhiteQueens, 1ull << to);
+                }else if (locExist(virWhiteRooks, 1ull << to)) {
+                    unsetBit(virWhiteRooks, 1ull << to);
                 }
 
                 virWhitePieces = virWhitePawns | virWhiteKnights | virWhiteBishops | virWhiteQueens | virWhiteKing |
@@ -2938,17 +2946,15 @@ int ex;
         vector<int> ret;
 
         ull tmpWhiteKing = whiteKing;
-        ull locRaisedPowW = getLSB(tmpWhiteKing);
 
-        int locW = log2(locRaisedPowW) + EPS;
+        int locW = log2(tmpWhiteKing) + EPS;
 
         ull maskW = kingZoneAttack[locW];
         ull resW = maskW & allPieces;
 
         ull tmpBlackKing = blackKing;
-        ull locRaisedPowB = getLSB(tmpBlackKing);
 
-        int locB = log2(locRaisedPowB) + EPS;
+        int locB = log2(tmpBlackKing) + EPS;
 
         ull maskB = kingZoneAttack[locB];
         ull resB = maskB & allPieces;
@@ -3107,6 +3113,7 @@ int ex;
             if (getFrom(allValidMoves[i]) == srcLoc && getTo(allValidMoves[i]) == dstLoc) {
                 if (getSpecialEvent(allValidMoves[i]) == promotion || getSpecialEvent(allValidMoves[i]) == ENPASSANT) {
                     //ordinary move or promotion
+                    cout<<allValidMoves[i]<<endl;
                     doo(allValidMoves[i]);
                     return 'v';
                 }
