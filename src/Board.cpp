@@ -522,7 +522,7 @@ public:
     vector<int> allValidCaptures;
     vector<int> kingCheckers;
 
-    static int moveNumber = -1;
+    int moveNumber = -1;
     int fiftyMoveRule = 0;
 
     int whiteKingMoves = 0;     //move counters
