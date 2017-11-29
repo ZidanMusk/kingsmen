@@ -3182,5 +3182,115 @@ public:
             }
         }
     }
+    string toFen() {
+        int cur = 0;
+        string v = "";
+        ull all = allPieces;
+
+        ull allWhite = me == 'w' ? whitePieces : blackPieces;
+        ull allBlack = me == 'w' ? blackPieces : whitePieces;
+
+        ull wPawns = me == 'w' ? whitePawns : blackPawns;
+        ull bPawns = me == 'w' ? blackPawns : whitePawns;
+
+        ull wKnights = me == 'w' ? whiteKnights : blackKnights;
+        ull bKnights = me == 'w' ? blackKnights : whiteKnights;
+
+        ull wRooks = me == 'w' ? whiteRooks : blackRooks;
+        ull bRooks = me == 'w' ? blackRooks : whiteRooks;
+
+        ull wBishops = me == 'w' ? whiteBishops : blackBishops;
+        ull bBishops = me == 'w' ? blackBishops : whiteBishops;
+
+        ull wQueens = me == 'w' ? whiteQueens : blackQueens;
+        ull bQueens = me == 'w' ? blackQueens : whiteQueens;
+
+        ull wKing = me == 'w' ? whiteKing : blackKing;
+        ull bKing = me == 'w' ? blackKing : whiteKing;
+
+        int i = 0;
+        int j = 0;
+        string str = "";
+        string strarr[8];
+
+
+        while (all) {
+            int ind = (log2(all & -all) + EPS);
+            all -= (all & -all);
+
+            int row = ind / 8;
+            while (i < row) {
+                i++;
+
+                int temp = i * 8 - j;
+                j = i * 8;
+                if(temp)str += to_string(temp);
+                strarr[i - 1] = str;
+                str = "";
+            }
+            int newind = ind - j;
+            if(newind)str += to_string(newind);
+            j = ind + 1;
+
+
+            if((1ull << ind) & wPawns)str+='P';
+            if((1ull << ind) & bPawns)str+='p';
+
+            if((1ull << ind) & wKnights)str+='N';
+            if((1ull << ind) & bKnights)str+='n';
+
+            if((1ull << ind) & wRooks)str+='R';
+            if((1ull << ind) & bRooks)str+='r';
+
+            if((1ull << ind) & wBishops)str+='B';
+            if((1ull << ind) & bBishops)str+='b';
+
+            if((1ull << ind) & wQueens)str+='Q';
+            if((1ull << ind) & bQueens)str+='q';
+
+            if((1ull << ind) & wKing)str+='K';
+            if((1ull << ind) & bKing)str+='k';
+
+        }
+
+        while (i < 8) {
+            i++;
+            int temp = i * 8 - j;
+            j = i * 8;
+            if(temp)str += to_string(temp);
+            strarr[i - 1] = str;
+            str = "";
+        }
+        while(i-- > 0){
+            str += strarr[i];
+            if(i > 0) str += "/";
+        }
+        return str;
+    }
+    string moveInterpret(int move, bool gui){
+        int from = getFrom(move);
+        int to = getTo(move);
+        char fromRank = (char)(from/8 + '1'), fromFile = (char)(from%8 + 'a');
+        char toRank = (char)(to/8 + '1'), toFile = (char)(to%8 + 'a');
+        string str ="";
+        str += fromFile + fromRank + toFile + toRank;
+
+        int se = getSpecialEvent(move);
+        if(se == 4){
+            str += gui?'4':(me == 'w'?'N':'n');
+        }else if(se == 5){
+            str += gui?'5':(me == 'w'?'B':'b');
+
+        }else if(se == 6){
+            str += gui?'6':(me == 'w'?'R':'r');
+
+        }else if(se == 7){
+            str += gui?'7':(me == 'w'?'Q':'q');
+
+        }else{
+            str += gui?'0':'-';
+        }
+        return str;
+    }
 
 };
