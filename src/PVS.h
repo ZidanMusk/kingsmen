@@ -10,7 +10,7 @@ public:
     PVS(ll maxDepth,Board* board,Evaluate* evaluate,bool nulling):Search(maxDepth, board,evaluate) {this->doNull = nulling;}
     void getPvPath(ll root);
 private:
-    unordered_map <ll,ll> PvTable;
+    unordered_map <ll,int> PvTable;
     unordered_map <ll,ll> VisitedStates;
     ll cntr=0;
     //set<ll>visitedStates;

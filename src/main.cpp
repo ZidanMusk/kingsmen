@@ -6,23 +6,79 @@
 
 int main() {
 
-/*
+
     //TODO last board update changes search results
     //TODO check if states are unique
     int maxDepth = 6;
-    Board* board = new Board();
-    board->fenInterpreter();
-    Evaluate* evaluate = new Evaluate(board);
+    Board* board1 = new Board();
+    board1->fenInterpreter();
+    Evaluate* evaluate1 = new Evaluate(board1);
+
+    Board* board2 = new Board();
+    board2->fenInterpreter();
+    Evaluate* evaluate2 = new Evaluate(board2);
+
+    //Search* baseline = new AlphaBeta(maxDepth,board1,evaluate1);
+    //baseline->GetBestMove();
+
+    Search *mtdf = new MTDF(maxDepth,board1,evaluate1, false, true);
+    mtdf->GetBestMove();
+
+
+    exit(0);
+    /*for(int i=0;i<10;i++)
+    {
+        mtdf->GetBestMove();
+        board1->doo(mtdf->bestMove);
+        mtdfNull->GetBestMove();
+        board2->doo(mtdfNull->bestMove);
+    }*/
+
+
+    /*cout<<board->key<<endl;
+    int arr[] ={205952,891392,230912,824832,843200};
+    for(int j=0;j<5;++j){
+
+        cout<<"State Id : "<<board->key<<", Move : "<<arr[j];
+        for(int i=0;i<board->allValidMoves.size();i++)
+        {
+            if(arr[j] == board->allValidMoves[i])
+                cout<<" and move is correct";
+
+        }
+        cout<<endl;
+        board->doo(arr[j]);
+
+    }*/
+    /*board->doo(205952);
+    cout<<board->key<<endl;
+    board->doo(891392);
+    cout<<board->key<<endl;
+    board->doo(230912);
+    cout<<board->key<<endl;
+    board->doo(824832);
+    cout<<board->key<<endl;
+    board->doo(843200);
+    cout<<board->key<<endl;
+*/
+
+
+
+
+
+
+
+
     //Search* baseline = new AlphaBeta(maxDepth,board,evaluate);
     //baseline->GetBestMove();
 
 
     //cout<<"###################"<<endl;
-    Search *mtdf = new MTDF(maxDepth,board,evaluate, false, false);
-    mtdf->GetBestMove();
+    //Search *mtdf = new MTDF(maxDepth,board,evaluate, false, false);
+    //mtdf->GetBestMove();
 
-    Search *mtdfNull = new MTDF(maxDepth,board,evaluate, true, false);
-    mtdfNull->GetBestMove();
+    /*Search *mtdfNull = new MTDF(maxDepth,board,evaluate, true, false);
+    mtdfNull->GetBestMove();*/
 
 
     //cout<<"###################"<<endl;
@@ -83,6 +139,7 @@ int main() {
 
 
 //Evaluate
+ /*
     Board b;
     b.fenInterpreter("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1", true);
 
@@ -104,6 +161,6 @@ int main() {
     }
 
     b.disp();
-
+*/
 }
 
