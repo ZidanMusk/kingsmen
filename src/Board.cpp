@@ -510,6 +510,7 @@ public:
     bool blackCastleK = 0;
     bool blackCastleQ = 0;
     int enPassantLoc = -1;
+
     bool whiteToMove = true; //True-> myWhiteTurn, False -> blackTurn
 
 
