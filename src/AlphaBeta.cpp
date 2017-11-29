@@ -17,9 +17,10 @@ ll AlphaBeta::alphaBetaSearch(ll alpha, ll beta, ll depth, bool isMax){
     //ToDo rename
     //vector<ll> nextMoves = this->Eval.GetPossibleMoves(stateID);
     vector<int> nextMoves = Search::board->allValidMoves;
-
+    if(nextMoves.size() == 0 ) cout<<"NO MOVES!!!\n";
     ll moves = nextMoves.size();
     ll score = 0;
+
     for (ll i=0; i< moves;++i)  {
         //ToDO make move
         Search::board->doo(nextMoves[i]);

@@ -112,7 +112,7 @@ ll MTDF::_AlphaBetaWithMemory(ll alpha, ll beta,ll d,bool IsMax,ll MaxDepth,bool
     }
 
     vector<int>Pmoves=this->_GetSortedPossibleMoves(state_id,IsMax);
-    if(Pmoves.size() == 0) cout<<"Big A7a\n";
+    if(Pmoves.empty()) cout<<"Big A7a\n";
 
     ll BestMoveID=-1;
     ll BestMoveScore;
@@ -141,10 +141,11 @@ ll MTDF::_AlphaBetaWithMemory(ll alpha, ll beta,ll d,bool IsMax,ll MaxDepth,bool
         a = alpha;
         BestMoveScore=-oo;
         for (ll i = 0; (i < Pmoves.size())&&(g<beta); ++i) {
+            Search::debug.push_back({state_id,Pmoves[i]});
             Search::board->doo(Pmoves[i]);
             _g=_AlphaBetaWithMemory(a, beta, d-1,!IsMax,MaxDepth,true);
             Search::board->undoo();
-
+            Search::debug.pop_back();
             if(_g>BestMoveScore)
             {
                 BestMoveID=Pmoves[i];
@@ -165,8 +166,10 @@ ll MTDF::_AlphaBetaWithMemory(ll alpha, ll beta,ll d,bool IsMax,ll MaxDepth,bool
         b = beta;
         for (ll i = 0; (i < Pmoves.size())&&(g>alpha); ++i) {
             Search::board->doo(Pmoves[i]);
+            Search::debug.push_back({state_id,Pmoves[i]});
             _g=_AlphaBetaWithMemory(alpha, b, d-1,!IsMax,MaxDepth,true);
             Search::board->undoo();
+            Search::debug.pop_back();
             if(_g<BestMoveScore)
             {
                 BestMoveID=Pmoves[i];

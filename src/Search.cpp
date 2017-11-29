@@ -90,12 +90,15 @@ ll Search::_GetFromTransitionTable(ll StateID, ll Depth, ll Alpha, ll Beta) {
 
     if (ENTRY.Depth >= Depth) {
         if (ENTRY.HashFlag == hashfEXACT) {
+            cout<<StateID<<" 1\n";
             return ENTRY.Value;
         }
         if ((ENTRY.HashFlag == hashfALPHA) && (ENTRY.Value <= Alpha)) {
+            cout<<StateID<<" 2\n";
             return Alpha;
         }
         if ((ENTRY.HashFlag == hashfBETA) && (ENTRY.Value >= Beta)) {
+            cout<<StateID<<" 3\n";
             return Beta;
         }
     }
