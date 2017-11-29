@@ -12,6 +12,7 @@
 #include <netinet/in.h>
 #include <string>
 #include <string.h>
+#include <fstream>
 
 using namespace std;
 typedef unsigned char byte;
@@ -224,7 +225,23 @@ public:
 
 int main(int argc, char *argv[]) {
 
-    name temp = name("7772", "7779", "192.168.1.3");
+    ifstream config_file;
+    config_file.open("config.txt");
+
+    string gui_port;
+    string agent_port;
+    string my_ip;
+    config_file >> gui_port >> agent_port >> my_ip;
+    config_file.close();
+
+    cout<<gui_port<<endl;
+    cout<<agent_port<<endl;
+    cout<<my_ip<<endl;
+
+
+//    name temp = name("7772", "7779", "192.168.1.3");
+    name temp = name(gui_port, agent_port, my_ip);
+
     boared _b;
 
     temp.connect();
