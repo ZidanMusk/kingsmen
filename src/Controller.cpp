@@ -1,6 +1,6 @@
 /* A simple server in the internet domain using TCP
    The port number is passed as an argument */
-
+#include <iostream>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -12,10 +12,6 @@
 #include <netinet/in.h>
 #include <string>
 #include <string.h>
-
-#include <bits/stdc++.h>
-#include "Search.h"
-#include "AlphaBeta.h"
 
 using namespace std;
 typedef unsigned char byte;
@@ -95,6 +91,7 @@ public:
         if (newsockfd < 0)
             error("ERROR on accept Python client");
         else printf("GUI PORT = %d", newsockfd);
+        bzero(buffer, 256);
     }
 
     void error(const char *msg) {
@@ -208,6 +205,7 @@ public:
     void Send_GUI(string y) {
         //y="abs";
         //int x=y.size();
+
         n = write(newsockfd, y.c_str(), y.size());
         //printf("sent to gui %s",y.c_str());
         printf("sent to gui %s", y.c_str());
@@ -215,20 +213,46 @@ public:
 
     }
 
+    string wait_for_mode() {
+        n = read(newsockfd2, buffer, 1);
+        string str(buffer);
+        return str;
+
+
+    }
 };
 
 int main(int argc, char *argv[]) {
 
-    name temp = name("7770", "7771", "192.168.1.3");
+    name temp = name("7772", "7779", "192.168.1.3");
+    boared _b;
+
     temp.connect();
     temp.connect2();
-
-    int flag = temp.wait_for_first_player();
-    string fff = temp.Receive_GUI();
+    int flag = -1;
+    flag = temp.wait_for_first_player();
     string F = "" + to_string(flag);
+    string intial_state = temp.wait_for_intial_state();
+    string mode = temp.wait_for_mode();
+    temp.Send_GUI(mode);
+    _b.fenIntrpreter(intial_state, flag);
+    string color = "";
+    if (_b.me == 'w')
+        color = "White";
+    else
+        color = "Black";
+    temp.Send_GUI(color);
+    string fff = temp.Receive_GUI();
     temp.Send_GUI(F);
-    string initial_state = temp.wait_for_intial_state();
-    temp.Send_GUI(initial_state);
+    fff = temp.Receive_GUI();
+    temp.Send_GUI(intial_state);
+    fff = temp.Receive_GUI();
+    if (mode == "0")
+        mode = "human";
+    else
+        mode = "AI";
+    temp.Send_GUI(mode);
+    fff = temp.Receive_GUI();
 
 
     Board *board = new Board();
@@ -240,21 +264,193 @@ int main(int argc, char *argv[]) {
 
     int bestMoveId;
     if (board->whiteToMove) {
-        baseline->GetBestMove();
-        bestMoveId = (int)baseline->bestMove;
-        board->doo(bestMoveId);
     }
 
-    while (1) {
-//////////////////////////////waiting for opponent to play
+    if (mode == "human") {
+        while (1) {
+            if (board->whiteToMove) {
+                baseline->GetBestMove();
+                bestMoveId = (int) baseline->bestMove;
+                string move = board->moveInterpret(bestMoveId);
+                Send_GUI(move);
+                string ACK = Recieve_GUI();
+                string src;
+                string dst;
+                while (1) {
+                    move = Recieve_GUI();
+                    printf("Your move is", move.c_str());
+                    src = move.substr(0, 2);
+                    dst = move.substr(2, 2);
+
+                    if (board->gui_isValid(src, dst, (int) (move[4] - '0')) == 'V') {
+                        string msg = "V" + board->gui_gameState() + board->toFen();
+                        Send_GUI(msg);
+                        Ack = Recieve_GUI();
+                        break;
+                    } else {
+                        string msg = "I" + board->gui_gameState() + board->toFen();
+                        Send_GUI(msg);
+                        Ack = Recieve_GUI();
+                    }
+                }
+                if (move[4] == '0') {
+                    send_move(src, dst);
+                } else // promotion
+                {
+                    string prom = "";
+
+                    if ((move[4]) == '4')prom = 'N';
+                    if ((move[4]) == '5')prom = 'B';
+                    if ((move[4]) == '6')prom = 'R';
+                    if ((move[4]) == '7')prom = 'Q';
+
+                    if (board->me == 'b')prom = to_lower(prom);
+                    send_promotion(src, dst, prom);
+
+                }
+            } else {
+                string move = wait_for_mov();
+                if (move[0] == '2')//single move
+                {
+                    string src = move.substr(1, 2);
+                    string dst = move.substr(3, 2);
+                    if (board->gui_isValid(src, dst, 0) == 'V') {
+                        string msg = src + dst + "0" + board->gui_gameState() + board->toFen();
+                        Send_GUI(msg);
+                        Ack = Receive_GUI();
+                    } else {
+                        string msg = "a1" + "a1" + "0" + 'w' + board->toFen();
+                        Send_GUI(msg);
+                        Ack = Receive_GUI();
+
+                    }
+
+                } else if (move[0] == '6')//promotion
+                {
+
+                    string src = move.substr(1, 2);
+                    string dst = move.substr(3, 2);
+                    int prom = 0;
+                    if (to_upper(move[5]) == 'N')prom = 4;
+                    if (to_upper(move[5]) == 'B')prom = 5;
+                    if (to_upper(move[5]) == 'R')prom = 6;
+                    if (to_upper(move[5]) == 'Q')prom = 7;
+
+                    if (board->gui_isValid(src, dst, prom) == 'V') {
+                        string msg = src + dst + to_string(prom) + board->gui_gameState() + board->toFen();
+                        Send_GUI(msg);
+                        Ack = Receive_GUI();
+                    } else {
+                        string msg = "a1" + "a1" + "0" + 'w' + board->toFen();
+                        Send_GUI(msg);
+                        Ack = Receive_GUI();
+
+                    }
 
 
-////////////////////////////////////////////I am playing(my turn)
-        baseline->GetBestMove();
-        bestMoveId = (int)baseline->bestMove;
-        board->doo(bestMoveId);
+                } else if (move[0] == '3')//w/l timeout
+                {
+                    if (to_upper(move[1]) == 'W') {
+                        string msg = "a1" + "a1" + "0" + 'w' + board->toFen();
+                        Send_GUI(msg);
+                        Ack = Receive_GUI();
+                    } else {
+                        string msg = "a1" + "a1" + "0" + 'l' + board->toFen();
+                        Send_GUI(msg);
+                        Ack = Receive_GUI();
 
-        break;
+                    }
+                }
+            }
+
+
+            break;
+
+        }
+    } else {
+//AAAAAAAAAAAAAAAAAAIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII
+        while (1) {
+            if (board->whiteToMove) {
+                baseline->GetBestMove();
+                bestMoveId = (int) baseline->bestMove;
+                string move = board->moveInterpret(bestMoveId);
+                Send_GUI(move);
+                string ACK = Recieve_GUI();
+                string src = move.substr(0, 2);
+                string dst = move.substr(2, 2);
+
+                if (move[4] == '0') {
+                    send_move(src, dst);
+                } else // promotion
+                {
+                    string prom = "";
+
+                    if ((move[4]) == '4')prom = 'N';
+                    if ((move[4]) == '5')prom = 'B';
+                    if ((move[4]) == '6')prom = 'R';
+                    if ((move[4]) == '7')prom = 'Q';
+
+                    if (board->me == 'b')prom = to_lower(prom);
+                    send_promotion(src, dst, prom);
+
+                }
+            } else {
+                string move = wait_for_mov();
+                if (move[0] == '2')//single move
+                {
+                    string src = move.substr(1, 2);
+                    string dst = move.substr(3, 2);
+                    if (board->gui_isValid(src, dst, 0) == 'V') {
+                        string msg = src + dst + "0" + board->gui_gameState() + board->toFen();
+                        Send_GUI(msg);
+                        Ack = Receive_GUI();
+                    } else {
+                        string msg = "a1" + "a1" + "0" + 'w' + board->toFen();
+                        Send_GUI(msg);
+                        Ack = Receive_GUI();
+
+                    }
+
+                } else if (move[0] == '6')//promotion
+                {
+
+                    string src = move.substr(1, 2);
+                    string dst = move.substr(3, 2);
+                    int prom = 0;
+                    if (to_upper(move[5]) == 'N')prom = 4;
+                    if (to_upper(move[5]) == 'B')prom = 5;
+                    if (to_upper(move[5]) == 'R')prom = 6;
+                    if (to_upper(move[5]) == 'Q')prom = 7;
+
+                    if (board->gui_isValid(src, dst, prom) == 'V') {
+                        string msg = src + dst + to_string(prom) + board->gui_gameState() + board->toFen();
+                        Send_GUI(msg);
+                        Ack = Receive_GUI();
+                    } else {
+                        string msg = "a1" + "a1" + "0" + 'w' + board->toFen();
+                        Send_GUI(msg);
+                        Ack = Receive_GUI();
+
+                    }
+
+
+                } else if (move[0] == '3')//w/l timeout
+                {
+                    if (to_upper(move[1]) == 'W') {
+                        string msg = "a1" + "a1" + "0" + 'w' + board->toFen();
+                        Send_GUI(msg);
+                        Ack = Receive_GUI();
+                    } else {
+                        string msg = "a1" + "a1" + "0" + 'l' + board->toFen();
+                        Send_GUI(msg);
+                        Ack = Receive_GUI();
+
+                    }
+                }
+            }
+
+
+        }
 
     }
     //close(temp.newsockfd2);
