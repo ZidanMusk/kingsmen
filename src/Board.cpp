@@ -1492,9 +1492,6 @@ public:
         if (enPassantLoc != -1)
             key ^= passantColumn[getColumn(enPassantLoc)];
 
-        if (whiteToMove)
-            key ^= whiteMove;
-
 
         //handling fiftyMoveRule
         if (type != 0 && capture == 0)
