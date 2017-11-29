@@ -1641,11 +1641,7 @@ public:
     bool isMate() {
 
         //decide if you want to save history here
-        bool canSave = false;
-        for(int i = 0; i < allValidMoves.size(); ++i){
-            canSave |= isValid(whiteToMove, allValidMoves[i]);
-        }
-        if (!canSave && isCheck())
+        if (!allValidMoves.size() && isCheck())
             return true;
         else
             return false;
@@ -2062,18 +2058,18 @@ public:
 
             int kingInd = (log2(virWhiteKing & -virWhiteKing) + EPS);
             int dangerPawn = kingInd + 7;
-            if ((dangerPawn >= 0 && dangerPawn <= 63) && ((1ull << dangerPawn) & virBlackPawns)) safe = false;
+            if (pawnForwardAttack(kingInd, dangerPawn) && (dangerPawn >= 0 && dangerPawn <= 63) && ((1ull << dangerPawn) & virBlackPawns)) safe = false;
 
             dangerPawn = kingInd + 9;
-            if ((dangerPawn >= 0 && dangerPawn <= 63) && ((1ull << dangerPawn) & virBlackPawns)) safe = false;
+            if (pawnForwardAttack(kingInd, dangerPawn) && (dangerPawn >= 0 && dangerPawn <= 63) && ((1ull << dangerPawn) & virBlackPawns)) safe = false;
 
         } else {
             int kingInd = (log2(virBlackKing & -virBlackKing) + EPS);
             int dangerPawn = kingInd - 7;
-            if ((dangerPawn >= 0 && dangerPawn <= 63) && ((1ull << dangerPawn) & virWhitePawns)) safe = false;
+            if (pawnBackwardAttack(kingInd, dangerPawn) && (dangerPawn >= 0 && dangerPawn <= 63) && ((1ull << dangerPawn) & virWhitePawns)) safe = false;
 
             dangerPawn = kingInd - 9;
-            if ((dangerPawn >= 0 && dangerPawn <= 63) && ((1ull << dangerPawn) & virWhitePawns)) safe = false;
+            if (pawnBackwardAttack(kingInd, dangerPawn) && (dangerPawn >= 0 && dangerPawn <= 63) && ((1ull << dangerPawn) & virWhitePawns)) safe = false;
 
         }
         return safe;
@@ -2084,56 +2080,57 @@ public:
         bool safe = true;
         if (white) {
             //6 10 15 17
+
             int kingInd = (log2(virWhiteKing & -virWhiteKing) + EPS);
             int dangerKnight = kingInd + 6;
-            if ((dangerKnight >= 0 && dangerKnight <= 63) && ((1ull << dangerKnight) & virBlackKnights)) safe = false;
+            if (knightCh(kingInd, dangerKnight) && (dangerKnight >= 0 && dangerKnight <= 63) && ((1ull << dangerKnight) & virBlackKnights)) safe = false;
 
             dangerKnight = kingInd + 10;
-            if ((dangerKnight >= 0 && dangerKnight <= 63) && ((1ull << dangerKnight) & virBlackKnights)) safe = false;
+            if (knightCh(kingInd, dangerKnight) && (dangerKnight >= 0 && dangerKnight <= 63) && ((1ull << dangerKnight) & virBlackKnights)) safe = false;
 
             dangerKnight = kingInd + 15;
-            if ((dangerKnight >= 0 && dangerKnight <= 63) && ((1ull << dangerKnight) & virBlackKnights)) safe = false;
+            if (knightCh(kingInd, dangerKnight) && (dangerKnight >= 0 && dangerKnight <= 63) && ((1ull << dangerKnight) & virBlackKnights)) safe = false;
 
             dangerKnight = kingInd + 17;
-            if ((dangerKnight >= 0 && dangerKnight <= 63) && ((1ull << dangerKnight) & virBlackKnights)) safe = false;
+            if (knightCh(kingInd, dangerKnight) && (dangerKnight >= 0 && dangerKnight <= 63) && ((1ull << dangerKnight) & virBlackKnights)) safe = false;
 
             dangerKnight = kingInd - 6;
-            if ((dangerKnight >= 0 && dangerKnight <= 63) && ((1ull << dangerKnight) & virBlackKnights)) safe = false;
+            if (knightCh(kingInd, dangerKnight) && (dangerKnight >= 0 && dangerKnight <= 63) && ((1ull << dangerKnight) & virBlackKnights)) safe = false;
 
             dangerKnight = kingInd - 10;
-            if ((dangerKnight >= 0 && dangerKnight <= 63) && ((1ull << dangerKnight) & virBlackKnights)) safe = false;
+            if (knightCh(kingInd, dangerKnight) && (dangerKnight >= 0 && dangerKnight <= 63) && ((1ull << dangerKnight) & virBlackKnights)) safe = false;
 
             dangerKnight = kingInd - 15;
-            if ((dangerKnight >= 0 && dangerKnight <= 63) && ((1ull << dangerKnight) & virBlackKnights)) safe = false;
+            if (knightCh(kingInd, dangerKnight) && (dangerKnight >= 0 && dangerKnight <= 63) && ((1ull << dangerKnight) & virBlackKnights)) safe = false;
 
             dangerKnight = kingInd - 17;
-            if ((dangerKnight >= 0 && dangerKnight <= 63) && ((1ull << dangerKnight) & virBlackKnights)) safe = false;
+            if (knightCh(kingInd, dangerKnight) && (dangerKnight >= 0 && dangerKnight <= 63) && ((1ull << dangerKnight) & virBlackKnights)) safe = false;
 
         } else {
             int kingInd = (log2(virBlackKing & -virBlackKing) + EPS);
             int dangerKnight = kingInd + 6;
-            if ((dangerKnight >= 0 && dangerKnight <= 63) && ((1ull << dangerKnight) & virWhiteKnights)) safe = false;
+            if (knightCh(kingInd, dangerKnight) && (dangerKnight >= 0 && dangerKnight <= 63) && ((1ull << dangerKnight) & virWhiteKnights)) safe = false;
 
             dangerKnight = kingInd + 10;
-            if ((dangerKnight >= 0 && dangerKnight <= 63) && ((1ull << dangerKnight) & virWhiteKnights)) safe = false;
+            if (knightCh(kingInd, dangerKnight) && (dangerKnight >= 0 && dangerKnight <= 63) && ((1ull << dangerKnight) & virWhiteKnights)) safe = false;
 
             dangerKnight = kingInd + 15;
-            if ((dangerKnight >= 0 && dangerKnight <= 63) && ((1ull << dangerKnight) & virWhiteKnights)) safe = false;
+            if (knightCh(kingInd, dangerKnight) && (dangerKnight >= 0 && dangerKnight <= 63) && ((1ull << dangerKnight) & virWhiteKnights)) safe = false;
 
             dangerKnight = kingInd + 17;
-            if ((dangerKnight >= 0 && dangerKnight <= 63) && ((1ull << dangerKnight) & virWhiteKnights)) safe = false;
+            if (knightCh(kingInd, dangerKnight) && (dangerKnight >= 0 && dangerKnight <= 63) && ((1ull << dangerKnight) & virWhiteKnights)) safe = false;
 
             dangerKnight = kingInd - 6;
-            if ((dangerKnight >= 0 && dangerKnight <= 63) && ((1ull << dangerKnight) & virWhiteKnights)) safe = false;
+            if (knightCh(kingInd, dangerKnight) && (dangerKnight >= 0 && dangerKnight <= 63) && ((1ull << dangerKnight) & virWhiteKnights)) safe = false;
 
             dangerKnight = kingInd - 10;
-            if ((dangerKnight >= 0 && dangerKnight <= 63) && ((1ull << dangerKnight) & virWhiteKnights)) safe = false;
+            if (knightCh(kingInd, dangerKnight) && (dangerKnight >= 0 && dangerKnight <= 63) && ((1ull << dangerKnight) & virWhiteKnights)) safe = false;
 
             dangerKnight = kingInd - 15;
-            if ((dangerKnight >= 0 && dangerKnight <= 63) && ((1ull << dangerKnight) & virWhiteKnights)) safe = false;
+            if (knightCh(kingInd, dangerKnight) && (dangerKnight >= 0 && dangerKnight <= 63) && ((1ull << dangerKnight) & virWhiteKnights)) safe = false;
 
             dangerKnight = kingInd - 17;
-            if ((dangerKnight >= 0 && dangerKnight <= 63) && ((1ull << dangerKnight) & virWhiteKnights)) safe = false;
+            if (knightCh(kingInd, dangerKnight) && (dangerKnight >= 0 && dangerKnight <= 63) && ((1ull << dangerKnight) & virWhiteKnights)) safe = false;
 
         }
         return safe;

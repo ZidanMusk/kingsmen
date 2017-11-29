@@ -6,6 +6,7 @@
 
 int main() {
 
+
     //TODO last board update changes search results
     //TODO check if states are unique
     int maxDepth = 6;
