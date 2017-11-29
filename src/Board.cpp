@@ -1167,8 +1167,7 @@ public:
 
         int &refKingMoves = whiteToMove ? whiteKingMoves : blackKingMoves;
 
-        if (whiteToMove)
-            key ^= whiteMove;
+        key ^= whiteMove;
 
         int specialEvent = getSpecialEvent(move);
         int capture = getCapture(move);
