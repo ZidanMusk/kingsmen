@@ -3373,5 +3373,8 @@ public:
         }
         return str;
     }
+    bool isOver(){
+        return (isDraw() || isMate());
+    }
 
 };
