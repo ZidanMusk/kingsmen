@@ -102,7 +102,6 @@ ll MTDF::_AlphaBetaWithMemory(ll alpha, ll beta,ll d,bool IsMax,ll MaxDepth,bool
         else
         {
             EvalStates++;
-            //ToDo Qsearch
             g = Search::Qsearch(alpha,beta,IsMax);
             //g = Search::evaluate->evaluate();
         }
@@ -126,7 +125,6 @@ ll MTDF::_AlphaBetaWithMemory(ll alpha, ll beta,ll d,bool IsMax,ll MaxDepth,bool
             ll R = d > 6 ? MAX_R : MIN_R ;
             Search::board->pass();
             ll scorey = this->_AlphaBetaWithMemory(alpha, beta, d-R-1, !IsMax,MaxDepth, true);
-            Search::board->pass();
             Search::board->undoo();
             if (scorey >= beta) {cout<<"Null Cut-off at depth="<<d<<endl;
                 Search::_InsertlloTransitionTable(state_id,d,beta,hashfBETA,valUNKNOWN);

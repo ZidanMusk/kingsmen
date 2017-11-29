@@ -6,9 +6,6 @@
 
 int main() {
 
-
-    //TODO last board update changes search results
-    //TODO check if states are unique
     int maxDepth = 6;
     Board* board1 = new Board();
     board1->fenInterpreter();
@@ -18,11 +15,14 @@ int main() {
     board2->fenInterpreter();
     Evaluate* evaluate2 = new Evaluate(board2);
 
+    Search *pvs = new PVS(maxDepth,board1,evaluate1, true);
+    pvs->GetBestMove();
     //Search* baseline = new AlphaBeta(maxDepth,board1,evaluate1);
     //baseline->GetBestMove();
 
-    Search *mtdf = new MTDF(maxDepth,board1,evaluate1, false, true);
-    mtdf->GetBestMove();
+    //Search *mtdf = new MTDF(maxDepth,board1,evaluate1, false, true);
+    //mtdf->GetBestMove();
+
 
 
     exit(0);

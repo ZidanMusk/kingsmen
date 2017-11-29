@@ -1,48 +1,14 @@
 #include "PVS.h"
 
 ll PVS::pvsSearch(ll alpha, ll beta, ll depth,bool isMax) {
-    ll stateID=Search::board->key;
+    ll stateID= Search::board->key;
     vector<int> nextMoves = Search::board->allValidMoves;
-    if((unsigned ll)stateID==6975813476015783581){
-        sort(nextMoves.begin(),nextMoves.end());
-
-        for(int i=0;i<nextMoves.size();i++)
-        {
-            cout<<nextMoves[i]<<" ";
-        }
-        cout<<endl;
-
-        Board* board2 = new Board();
-        board2->fenInterpreter();
-        int arr[] ={205952,891392,230912,824832,843200};
-        for(int j=0;j<5;++j){
-            board2->doo(arr[j]);
-            if(board2->key==6975813476015783581)
-            {
-                vector<int> nextMoves2 = board2->allValidMoves;
-                sort(nextMoves2.begin(),nextMoves2.end());
-
-                for(int i=0;i<nextMoves2.size();i++)
-                {
-                    cout<<nextMoves2[i]<<" ";
-                }
-                cout<<endl;
-
-            }
-
-        }
-
-        exit(69);
-
-
-    }
     this->OpenedStates++;
     ll bestScore = 0;
     if( depth <= 0 ){
         if (VisitedStates.find(stateID)==VisitedStates.end()) {//not visited b4
             this->cntr++;
             VisitedStates[stateID] = ((isMax) ? 1 : -1) * Search::Qsearch(alpha,beta,isMax);//!isMax
-            //Search::Qsearch(stateID, alpha, beta, isMax);
         }
         return VisitedStates[stateID];
     }
@@ -60,7 +26,6 @@ ll PVS::pvsSearch(ll alpha, ll beta, ll depth,bool isMax) {
         //cout<<endl<<-beta<<" "<<-alpha<<endl;
         Search::board->pass();
         ll scorey = - this->pvsSearch(-beta, -alpha, depth-R-1, !isMax);
-        Search::board->pass();
         Search::board->undoo();
         if (scorey >= beta) { // reduce the depth in case of fail-high
 
@@ -111,7 +76,7 @@ ll PVS::pvsSearch(ll alpha, ll beta, ll depth,bool isMax) {
     this->debug.push_back(make_pair(stateID,this->PvTable[stateID]));
 
     Search::board->doo(this->PvTable[stateID]);
-    bestScore = - this->pvsSearch(-beta, -alpha, depth-1,!isMax);
+    bestScore = - this->pvsSearch(-beta, -alpha, depth-1, !isMax);
     Search::board->undoo();
 
     this->debug.pop_back();

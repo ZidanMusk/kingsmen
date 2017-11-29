@@ -6,28 +6,21 @@
 
 ll AlphaBeta::alphaBetaSearch(ll alpha, ll beta, ll depth, bool isMax){
     ll stateID = Search::board->key;
-    //cout<<stateID<<endl;
     OpenedStates++;
     if( depth == 0 ) {
         this->cntr++;
-        //TODO activate Q-Search
         return ((isMax) ? 1 : -1) * Search::Qsearch(alpha, beta, isMax);
-        //return ((isMax)?1:-1)*Search::evaluate->evaluate();
     }
-    //ToDo rename
-    //vector<ll> nextMoves = this->Eval.GetPossibleMoves(stateID);
+
     vector<int> nextMoves = Search::board->allValidMoves;
     if(nextMoves.size() == 0 ) cout<<"NO MOVES!!!\n";
     ll moves = nextMoves.size();
     ll score = 0;
 
     for (ll i=0; i< moves;++i)  {
-        //ToDO make move
         Search::board->doo(nextMoves[i]);
         score = - this->alphaBetaSearch( -beta, -alpha, depth- 1, !isMax);
-        //ToDO unmake move
         Search::board->undoo();
-
         if( score >= beta ){
             return beta;   //  fail hard beta-cutoff
         }
