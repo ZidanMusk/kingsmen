@@ -35,6 +35,8 @@ struct TransitionEntry {
 };
 class Search {
 public:
+    vector<pair<ll,ll>> debug;
+
     ll uniqueCalls=0;
     ll allCalls=0;
     ll bestMove;
@@ -49,7 +51,7 @@ protected:
     ll _MaxDepth;
     map <ll,TransitionEntry> _TransitionTable;
     virtual void _IterativeDeepening(ll MaxDepth)=0;
-    ll Qsearch(ll alpha,ll beta,bool isMax,ll MaxDepth=5);
+    ll Qsearch(ll alpha,ll beta,bool isMax,ll MaxDepth=0);
     void _InsertlloTransitionTable(ll StateID,ll Depth,ll Value,ll HashFlag,ll BestMoveStateID);
     ll _GetFromTransitionTable(ll StateID,ll Depth, ll Alpha, ll Beta);
 };

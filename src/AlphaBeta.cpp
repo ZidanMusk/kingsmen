@@ -11,8 +11,8 @@ ll AlphaBeta::alphaBetaSearch(ll alpha, ll beta, ll depth, bool isMax){
     if( depth == 0 ) {
         this->cntr++;
         //TODO activate Q-Search
-        //return ((isMax) ? 1 : -1) * Search::Qsearch(stateID, alpha, beta, isMax);
-        return ((isMax)?1:-1)*Search::evaluate->evaluate();
+        return ((isMax) ? 1 : -1) * Search::Qsearch(alpha, beta, isMax);
+        //return ((isMax)?1:-1)*Search::evaluate->evaluate();
     }
     //ToDo rename
     //vector<ll> nextMoves = this->Eval.GetPossibleMoves(stateID);

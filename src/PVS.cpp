@@ -7,14 +7,15 @@ ll PVS::pvsSearch(ll alpha, ll beta, ll depth,bool isMax) {
     if( depth <= 0 ){
         if (VisitedStates.find(stateID)==VisitedStates.end()) {//not visited b4
             this->cntr++;
-            VisitedStates[stateID] = ((isMax) ? 1 : -1) * Search::evaluate->evaluate();//Search::Qsearch(stateID, alpha, beta, isMax);
+            VisitedStates[stateID] = ((isMax) ? 1 : -1) * Search::Qsearch(alpha,beta,isMax);
+            //Search::Qsearch(stateID, alpha, beta, isMax);
         }
         return VisitedStates[stateID];
     }
 
     //Null move
     //TODO DEBUG!!!!
-    if(this->doNull && !Search::Eval.IsCheck() && isMax && (depth >=4)&& (depth <9)){
+    if(this->doNull && isMax && (depth >=4)&& (depth <9)){
         //Search::Eval.makeNullMove(stateID);
 
         //to prevent any consequent nulling
@@ -23,7 +24,10 @@ ll PVS::pvsSearch(ll alpha, ll beta, ll depth,bool isMax) {
         ll R = depth > 6 ? MAX_R : MIN_R ;
         //search with same state but as a minimizer and with a reduced depth!
         //cout<<endl<<-beta<<" "<<-alpha<<endl;
+        Search::board->pass();
         ll scorey = - this->pvsSearch(-beta, -alpha, depth-R-1, !isMax);
+        Search::board->pass();
+        Search::board->undoo();
         if (scorey >= beta) { // reduce the depth in case of fail-high
 
             //depth -= DR;
@@ -44,25 +48,41 @@ ll PVS::pvsSearch(ll alpha, ll beta, ll depth,bool isMax) {
     }
 
     vector<int> nextMoves = Search::board->allValidMoves;
-    //move ordering making thr PV move the left most
-    if (this->PvTable.find(stateID) == this->PvTable.end()) this->PvTable[stateID] = nextMoves[0];
+    if(nextMoves.size()){
+        //move ordering making thr PV move the left most
+        if (this->PvTable.find(stateID) == this->PvTable.end()){
+            this->PvTable[stateID] = nextMoves[0];
+        }
 
-    else if(this->PvTable[stateID] != nextMoves[0])
-    {
-        for (ll i = 1; i < nextMoves.size(); ++i) {
-            if(nextMoves[i] == this->PvTable[stateID]){
-                //cout<<"SWAPED "<<i<<endl;
-                ll tmp = nextMoves[i];
-                nextMoves[i] = nextMoves[0];
-                nextMoves[0] = tmp;
-                break;
+        else if(this->PvTable[stateID] != nextMoves[0]) {
+            for (ll i = 1; i < nextMoves.size(); ++i) {
+                if(nextMoves[i] == this->PvTable[stateID]){
+                    //cout<<"SWAPED "<<i<<endl;
+                    ll tmp = nextMoves[i];
+                    nextMoves[i] = nextMoves[0];
+                    nextMoves[0] = tmp;
+                    break;
+                }
             }
         }
+   }
+    else{
+        cout<<"start from initial state:"<<endl;
+        for(int i=0;i<debug.size();++i) {
+            cout << (unsigned ll)debug[i].first << " -> " << debug[i].second << endl;
+        }
+        cout<<"until reached state with no moves: "<<(unsigned ll)stateID<<endl;
+
     }
+
+    this->debug.push_back(make_pair(stateID,this->PvTable[stateID]));
 
     Search::board->doo(this->PvTable[stateID]);
     bestScore = - this->pvsSearch(-beta, -alpha, depth-1,!isMax);
     Search::board->undoo();
+
+    this->debug.pop_back();
+
     if( bestScore > alpha ) {
         if( bestScore >= beta ){
             return beta;
@@ -76,14 +96,24 @@ ll PVS::pvsSearch(ll alpha, ll beta, ll depth,bool isMax) {
         //make move
         ll nextState = nextMoves[i];
         //perform a zero-window search
+        this->debug.push_back(make_pair(stateID,nextState));
+
         Search::board->doo(nextState);
         score = - this->pvsSearch(-alpha-1, -alpha, depth-1,!isMax); // alphaBeta or zwSearch
         Search::board->undoo();
+
+        this->debug.pop_back();
+
         if( score > alpha && score < beta ) {
             // research with window [alpha;beta]
+            this->debug.push_back(make_pair(stateID,nextState));
+
             Search::board->doo(nextState);
             score = - this->pvsSearch(-beta, -score, depth-1,!isMax);
             Search::board->undoo();
+
+            this->debug.pop_back();
+
 
             // if( score > alpha )
             //    alpha = score;
@@ -151,7 +181,7 @@ void PVS::_IterativeDeepening(ll MaxDepth) {
     cout<<"PVS       : ["<<bestScore<<','<<bestMove<<','<<uniqueCalls<<","<<OpenedStates<<"] in "<<(clock() - tStart)/CLOCKS_PER_SEC<<" sec"<<endl;
     this->cntr=0;
     this->OpenedStates=0;
-    //PvTable.clear();
-    //VisitedStates.clear();
+    PvTable.clear();
+    VisitedStates.clear();
     //return mangi;
 }

@@ -37,7 +37,6 @@ void MTDF::_IterativeDeepening(ll MaxDepth)
 {
     clock_t tStart = clock();
     ll firstguess = 0;
-    //TODO
     ll root_id=Search::board->key;
     for (ll d = 1;d<=MaxDepth; d++) {
         firstguess = this->_MTDF(firstguess, d);
@@ -104,8 +103,8 @@ ll MTDF::_AlphaBetaWithMemory(ll alpha, ll beta,ll d,bool IsMax,ll MaxDepth,bool
         {
             EvalStates++;
             //ToDo Qsearch
-            //g = Search::Qsearch(state_id,alpha,beta,IsMax);
-            g = Search::evaluate->evaluate();
+            g = Search::Qsearch(alpha,beta,IsMax);
+            //g = Search::evaluate->evaluate();
         }
         this->_UpdateNode(state_id,g,alpha,beta);
         Search::_InsertlloTransitionTable(state_id,d,g,hashfEXACT,valUNKNOWN);
@@ -113,18 +112,23 @@ ll MTDF::_AlphaBetaWithMemory(ll alpha, ll beta,ll d,bool IsMax,ll MaxDepth,bool
     }
 
     vector<int>Pmoves=this->_GetSortedPossibleMoves(state_id,IsMax);
+    if(Pmoves.size() == 0) cout<<"Big A7a\n";
+
     ll BestMoveID=-1;
     ll BestMoveScore;
     if(IsMax)
     {
         //Null Move
-        //ToDo Null Move Pass
-        if(this->doNull && !Search::Eval.IsCheck() && IsMax && (d >=4)&& (d <9)){
+        //ToDo inCheck()
+        if(this->doNull && IsMax && (d >=4)&& (d <9)){
 
             this->doNull = false;
             ll R = d > 6 ? MAX_R : MIN_R ;
+            Search::board->pass();
             ll scorey = this->_AlphaBetaWithMemory(alpha, beta, d-R-1, !IsMax,MaxDepth, true);
-            if (scorey >= beta) {
+            Search::board->pass();
+            Search::board->undoo();
+            if (scorey >= beta) {cout<<"Null Cut-off at depth="<<d<<endl;
                 Search::_InsertlloTransitionTable(state_id,d,beta,hashfBETA,valUNKNOWN);
                 this->_UpdateNode(state_id,scorey,alpha,beta);
 
