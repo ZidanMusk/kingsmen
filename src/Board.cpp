@@ -975,7 +975,10 @@ public:
     ull getLSB(ull x) {
         return x & -x;
     }
-
+    int getLsb(ull bitBoard) {
+        //get LS 1 in the board and toggle itpop
+        return (int) (log2(bitBoard & -bitBoard) + EPS);
+    }
     ull getMSB(ull x) {
         if (!x)return 0;
         int z = __builtin_clzll(x);
