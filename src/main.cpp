@@ -6,7 +6,7 @@
 
 int main() {
 
-
+/*
     //TODO last board update changes search results
     //TODO check if states are unique
     int maxDepth = 6;
@@ -83,29 +83,27 @@ int main() {
 
 
 //Evaluate
-//    Board b;
-//    b.fenInterpreter("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1", true);
-//    b.gui_isValid("f2", "f4", 0);
-//
-//    b.gui_isValid("e7", "e5", 0);
-//
-//    b.gui_isValid("a2", "a3", 0);
-//
-//    b.gui_isValid("e5", "f4", 0);
-//
-//    b.gui_isValid("h2", "h4", 0);
-//
-//    b.gui_isValid("a7", "a6", 0);
-//
-//    b.gui_isValid("h1", "h3", 0);
-//
-//    b.gui_isValid("h7", "h6", 0);
-//
-//    b.gui_isValid("h3", "e3", 0);
-//
-//    cout<<b.gui_isValid("f7", "f5", 0)<<endl;
-//    cout<<b.gui_gameState()<<endl;
-//    b.disp();
+    Board b;
+    b.fenInterpreter("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1", true);
+
+    int x = 5;
+    int moves[5] = {255872, 817536, 173696, 107088, 197632};
+    for (int i = 0; i < x; ++i){
+        bool d = false;
+        for(int j = 0; j < b.allValidMoves.size(); ++j){
+            if(b.allValidMoves[j] == moves[i]){
+                cout<<"move: "<<moves[i]<<" done. "<<endl;
+                d = true;
+                b.doo(moves[i]);
+            }
+        }
+        if(!d){
+            cout<<"move: "<<moves[i]<<" doesn't exist. "<<endl;
+            break;
+        }
+    }
+
+    b.disp();
 
 }
 

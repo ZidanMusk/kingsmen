@@ -1550,13 +1550,13 @@ public:
         enPassantLocHistory[moveNumber] = enPassantLoc;
 
         whiteToMoveHistory[moveNumber] = whiteToMove;
-        validCapturesHistory[moveNumber] = allValidCaptures; //assigning 2 vectors
         whiteCastleKHistory[moveNumber] = whiteCastleK;
         whiteCastleQHistory[moveNumber] = whiteCastleQ;
         blackCastleKHistory[moveNumber] = blackCastleK;
         blackCastleQHistory[moveNumber] = blackCastleQ;
         keyHistory[moveNumber] = key;
-        validMovesHistory[moveNumber] = allValidMoves;
+        validMovesHistory[moveNumber].assign(allValidMoves.begin(), allValidMoves.end());
+        validCapturesHistory[moveNumber].assign(allValidCaptures.begin(), allValidCaptures.end()); //assigning 2 vectors
 
         mGamePhaseHistory[moveNumber] = mGamePhase;
         mPstScoreOpHist[moveNumber] = mPstScoreOp;
@@ -1577,8 +1577,8 @@ public:
 
 
 
-        allValidMoves = validMovesHistory[moveNumber]; //assigning 2 vectors
-        allValidCaptures = validCapturesHistory[moveNumber]; //assigning 2 vectors
+        allValidMoves.assign(validMovesHistory[moveNumber].begin(), validMovesHistory[moveNumber].end()); //assigning 2 vectors
+        allValidCaptures.assign(validCapturesHistory[moveNumber].begin(), validCapturesHistory[moveNumber].end()); //assigning 2 vectors
         whiteToMove = whiteToMoveHistory[moveNumber];
 
         whitePawns = whitePawnHistory[moveNumber];
