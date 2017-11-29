@@ -3348,7 +3348,7 @@ public:
         return str;
     }
 
-    string moveInterpret(int move, bool gui) {
+    string moveInterpret(int move, bool gui = true) {
         int from = getFrom(move);
         int to = getTo(move);
         char fromRank = (char) (from / 8 + '1'), fromFile = (char) (from % 8 + 'a');
