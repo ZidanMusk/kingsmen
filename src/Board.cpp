@@ -2423,7 +2423,7 @@ public:
                 } else {
                     int move = makeMoveMask(0, 0, pawnTypeNum(), ind, newInd, 0);
                     bool valid = isValid(true, move);
-                    whitePawnVM.push_back(move);
+                    if(valid)whitePawnVM.push_back(move);
                 }
             }
 

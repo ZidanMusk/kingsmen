@@ -6,7 +6,7 @@
 
 int main() {
 
-    int maxDepth = 6;
+  /*  int maxDepth = 6;
     Board* board1 = new Board();
     board1->fenInterpreter();
     Evaluate* evaluate1 = new Evaluate(board1);
@@ -139,28 +139,48 @@ int main() {
 
 
 //Evaluate
- /*
+
     Board b;
     b.fenInterpreter("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1", true);
 
-    int x = 5;
-    int moves[5] = {255872, 817536, 173696, 107088, 197632};
-    for (int i = 0; i < x; ++i){
-        bool d = false;
-        for(int j = 0; j < b.allValidMoves.size(); ++j){
-            if(b.allValidMoves[j] == moves[i]){
-                cout<<"move: "<<moves[i]<<" done. "<<endl;
-                d = true;
-                b.doo(moves[i]);
-            }
-        }
-        if(!d){
-            cout<<"move: "<<moves[i]<<" doesn't exist. "<<endl;
-            break;
-        }
-    }
+    b.gui_isValid("e2", "e4", 0);
+    b.gui_isValid("e7", "e5", 0);
+    b.gui_isValid("b1", "c3", 0);
+    b.gui_isValid("f8", "c5", 0);
+    b.gui_isValid("d2", "d3", 0);
+    b.gui_isValid("d8", "f6", 0);
+    b.gui_isValid("c3", "d5", 0);
+    b.gui_isValid("f6", "f2", 0);
+
+
+
+
+
+
+
+
+    cout<<b.gui_gameState()<<endl;
+
+
+//    int x = 5;
+//    int moves[5] = {255872, 817536, 173696, 107088, 197632};
+//    for (int i = 0; i < x; ++i){
+//        bool d = false;
+//        for(int j = 0; j < b.allValidMoves.size(); ++j){
+//            if(b.allValidMoves[j] == moves[i]){
+//                cout<<"move: "<<moves[i]<<" done. "<<endl;
+//                d = true;
+//                b.doo(moves[i]);
+//            }
+//        }
+//        if(!d){
+//            cout<<"move: "<<moves[i]<<" doesn't exist. "<<endl;
+//            break;
+//        }
+//    }
+
 
     b.disp();
-*/
+
 }
 
