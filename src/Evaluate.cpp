@@ -44,7 +44,7 @@ int Evaluate::pawnStructure(int phase) {
                                   && _board->getPieceAt(from + 8 - 16 * c) != 'P'
                                   && _board->getPieceAt(from + 8 - 16 * c) != 'p'
                                   && (PawnAttacks[c][from + 8 - 16 * c] & opponentPawns);
-            cout << passed << ' ' << doubled << ' ' << isolated << ' ' << backward << endl;
+            //cout << passed << ' ' << doubled << ' ' << isolated << ' ' << backward << endl;
             if (passed) {
                 scoreOpForColor += passedBonusOpening[pawnRank];
                 scoreEdForColor += passedBonusEnding[pawnRank];
@@ -68,7 +68,7 @@ int Evaluate::pawnStructure(int phase) {
 
         scoreOp += (c ? -scoreOpForColor : scoreOpForColor);
         scoreEd += (c ? -scoreEdForColor : scoreEdForColor);
-        cout << scoreOpForColor << ' ' << scoreEdForColor << endl;
+        //cout << scoreOpForColor << ' ' << scoreEdForColor << endl;
     }
 
     pht.save(_board->ZPawns(), scoreOp, scoreEd);
@@ -78,7 +78,7 @@ int Evaluate::pawnStructure(int phase) {
 
 int Evaluate::kingSafty(int blackKingSafety, int whiteKingSafty, int phase) {
     //cout<<blackKingSafety<<" BLACK"<<endl;
-    //cout<<whiteKingSafty<<" WHITE"<<endl;
+    ////cout<<whiteKingSafty<<" WHITE"<<endl;
     //evaluate white pawn shelter
     int penalty = 0;
     int kingFile = min(1, max(6, _board->getColumn(log2(_board->whiteKing) + _board->EPS)));
@@ -198,11 +198,11 @@ int Evaluate::evaluate() {
     auto phase = clamp(static_cast<int>(_board->getGamePhase()), 0, 64);
 
     auto score = mobilityEval(kingSafetyScore, phase);
-    cout << "mobility " << score << endl;
+    //cout << "mobility " << score << endl;
     score += pawnStructure(phase);
-    cout << "pawn structure " << score << endl;
+    //cout << "pawn structure " << score << endl;
     score += kingSafty(kingSafetyScore[1], kingSafetyScore[0], phase);
-    cout << "king safety " << score << endl;
+    //cout << "king safety " << score << endl;
     score += interpolateScore(_board->getPstScoreOp(), _board->getPstScoreEd(), phase);
 
     // Bishop pair bonus.
@@ -212,9 +212,9 @@ int Evaluate::evaluate() {
             score += (c ? -bishopPairBonus : bishopPairBonus);
         }
     }
-    cout<< "pst " << score<<endl;
+    //cout<< "pst " << score<<endl;
     score += (_board->whiteToMove ? sideToMoveBonus : -sideToMoveBonus);
-//    cout<<score<<endl;
+//    //cout<<score<<endl;
     xx += (clock() - tStart);
     xxx++;
     return score;

@@ -1,19 +1,17 @@
 #include "Search.h"
 
-Search::Search(ll maxDepth,Board* brd, Evaluate* eval) {
+Search::Search(ll maxDepth,Board* brd, Evaluate* eval,int timeL) {
     this->_MaxDepth=maxDepth;
     this->board = brd;
     this->evaluate = eval;
+    this->timeLimit=timeL;
 }
 void Search::GetBestMove() {return this->_IterativeDeepening(this->_MaxDepth);}
-
-
-
 
 ll Search::Qsearch(ll alpha, ll beta,bool isMax,ll MaxDepth) {
     ll state_id = Search::board->key;
     ll score=Search::evaluate->evaluate();
-    if(MaxDepth==0)
+    if(MaxDepth==0 || Search::board->isOver())
         return score;
     if(isMax)
     {
@@ -90,15 +88,13 @@ ll Search::_GetFromTransitionTable(ll StateID, ll Depth, ll Alpha, ll Beta) {
 
     if (ENTRY.Depth >= Depth) {
         if (ENTRY.HashFlag == hashfEXACT) {
-            cout<<StateID<<" 1\n";
+            if(Search::evaluate->evaluate()!=ENTRY.Value&&Depth==0)
             return ENTRY.Value;
         }
         if ((ENTRY.HashFlag == hashfALPHA) && (ENTRY.Value <= Alpha)) {
-            cout<<StateID<<" 2\n";
             return Alpha;
         }
         if ((ENTRY.HashFlag == hashfBETA) && (ENTRY.Value >= Beta)) {
-            cout<<StateID<<" 3\n";
             return Beta;
         }
     }
