@@ -147,7 +147,7 @@ class ThreadedServer(object):
                     #print self.timers[player]
                     #print self.total_time[player]
                     # sock.settimeout(900 - int(c))
-                    sock.settimeout(10.0 - float(c))
+                    sock.settimeout(900.0 - float(c))
                 else: continue
                 data = sock.recv(size)
                 opcode, = unpack('i', data)
