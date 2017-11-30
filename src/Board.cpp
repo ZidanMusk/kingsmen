@@ -1,6 +1,3 @@
-#ifndef KINGSMEN_BOARD_H
-#define KINGSMEN_BOARD_H
-
 #include <bits/stdc++.h>
 #include "enumss.hpp"
 
@@ -566,11 +563,11 @@ public:
     inline short getPieceSquareTableEd(Piece p, Square sq) {
         return mPieceSquareTableEnding[p][sq];
     }
-
-    Board() {
+    bool tr = true;
+    Board(bool tr = true) {
         validMovesHistory.resize(MAX_GAME_LENGTH);
         validCapturesHistory.resize(MAX_GAME_LENGTH);
-
+        this->tr = tr;
 
         //initialize PST
         for (Piece p = Piece::Pawn; p <= Piece::King; ++p) {
@@ -1110,14 +1107,12 @@ public:
             virBlackRooks = whiteRooks;
             virBlackQueens = whiteQueens;
             virBlackKing = whiteKing;
-
             virWhitePawns = blackPawns;
             virWhiteKnights = blackKnights;
             virWhiteBishops = blackBishops;
             virWhiteRooks = blackRooks;
             virWhiteQueens = blackQueens;
             virWhiteKing = blackKing;
-
             virBlackPieces = whitePieces;
             virWhitePieces = blackPieces;
             virAllPieces = allPieces;
@@ -1354,10 +1349,8 @@ public:
         refColorPieces = refPawns | refKnights | refBishops | refRooks | refKing | refQueens;
 /*
  *
-
  *         mPstScoreOp -= mPieceSquareTableOpening[ex][from];
         mPstScoreEd -= mPieceSquareTableEnding[ex][from];
-
  * */
         if (capture) {
 
@@ -3085,84 +3078,162 @@ public:
         int color = !whiteToMove;
         vector<int> ret;
         vector<int> m;
-        m = kingMoves();
-        for (auto mm:m) {
-            ret.push_back(mm);
-            if (getCapture(mm) == 1)allValidCaptures.push_back(mm);
-        }
-        if (!color) {
-            m = queenMoves(0);
+        if(tr) {
+            m = kingMoves();
             for (auto mm:m) {
                 ret.push_back(mm);
                 if (getCapture(mm) == 1)allValidCaptures.push_back(mm);
             }
-        }
-        if (color) {
-            m = queenMoves(1);
+            if (!color) {
+                m = queenMoves(0);
+                for (auto mm:m) {
+                    ret.push_back(mm);
+                    if (getCapture(mm) == 1)allValidCaptures.push_back(mm);
+                }
+            }
+            if (color) {
+                m = queenMoves(1);
+                for (auto mm:m) {
+                    ret.push_back(mm);
+                    if (getCapture(mm) == 1)allValidCaptures.push_back(mm);
+                }
+            }
+            if (!color) {
+                m = rookMoves(whiteRooks, rookTypeNum(), 0);
+                for (auto mm:m) {
+                    ret.push_back(mm);
+                    if (getCapture(mm) == 1)allValidCaptures.push_back(mm);
+                }
+            }
+            if (color) {
+                m = rookMoves(blackRooks, rookTypeNum(), 1);
+                for (auto mm:m) {
+                    ret.push_back(mm);
+                    if (getCapture(mm) == 1)allValidCaptures.push_back(mm);
+                }
+            }
+            if (!color) {
+                m = bishopMoves(whiteBishops, bishopTypeNum(), 0);
+                for (auto mm:m) {
+                    ret.push_back(mm);
+                    if (getCapture(mm) == 1)allValidCaptures.push_back(mm);
+                }
+            }
+            if (color) {
+                m = bishopMoves(blackBishops, bishopTypeNum(), 1);
+                for (auto mm:m) {
+                    ret.push_back(mm);
+                    if (getCapture(mm) == 1)allValidCaptures.push_back(mm);
+                }
+            }
+            if (!color) {
+                m = whiteKnightVMGen();
+                for (auto mm:m) {
+                    ret.push_back(mm);
+                    if (getCapture(mm) == 1)allValidCaptures.push_back(mm);
+                }
+            }
+            if (color) {
+                m = blackKnightVMGen();
+                for (auto mm:m) {
+                    ret.push_back(mm);
+                    if (getCapture(mm) == 1)allValidCaptures.push_back(mm);
+                }
+            }
+            if (!color) {
+                m = whitePawnVMGen();
+                for (auto mm:m) {
+                    ret.push_back(mm);
+                    if (getCapture(mm) == 1)allValidCaptures.push_back(mm);
+                }
+            }
+            if (color) {
+                m = blackPawnVMGen();
+                for (auto mm:m) {
+                    ret.push_back(mm);
+                    if (getCapture(mm) == 1)allValidCaptures.push_back(mm);
+                }
+            }
+        }else{
+            m = kingMoves();
             for (auto mm:m) {
                 ret.push_back(mm);
                 if (getCapture(mm) == 1)allValidCaptures.push_back(mm);
             }
-        }
-        if (!color) {
-            m = rookMoves(whiteRooks, rookTypeNum(), 0);
-            for (auto mm:m) {
-                ret.push_back(mm);
-                if (getCapture(mm) == 1)allValidCaptures.push_back(mm);
+            if (!color) {
+                m = whitePawnVMGen();
+                for (auto mm:m) {
+                    ret.push_back(mm);
+                    if (getCapture(mm) == 1)allValidCaptures.push_back(mm);
+                }
+            }
+            if (color) {
+                m = blackPawnVMGen();
+                for (auto mm:m) {
+                    ret.push_back(mm);
+                    if (getCapture(mm) == 1)allValidCaptures.push_back(mm);
+                }
+            }
+            if (!color) {
+                m = whiteKnightVMGen();
+                for (auto mm:m) {
+                    ret.push_back(mm);
+                    if (getCapture(mm) == 1)allValidCaptures.push_back(mm);
+                }
+            }
+            if (color) {
+                m = blackKnightVMGen();
+                for (auto mm:m) {
+                    ret.push_back(mm);
+                    if (getCapture(mm) == 1)allValidCaptures.push_back(mm);
+                }
+            }
+            if (!color) {
+                m = rookMoves(whiteRooks, rookTypeNum(), 0);
+                for (auto mm:m) {
+                    ret.push_back(mm);
+                    if (getCapture(mm) == 1)allValidCaptures.push_back(mm);
+                }
+            }
+            if (color) {
+                m = rookMoves(blackRooks, rookTypeNum(), 1);
+                for (auto mm:m) {
+                    ret.push_back(mm);
+                    if (getCapture(mm) == 1)allValidCaptures.push_back(mm);
+                }
+            }
+            if (!color) {
+                m = bishopMoves(whiteBishops, bishopTypeNum(), 0);
+                for (auto mm:m) {
+                    ret.push_back(mm);
+                    if (getCapture(mm) == 1)allValidCaptures.push_back(mm);
+                }
+            }
+            if (color) {
+                m = bishopMoves(blackBishops, bishopTypeNum(), 1);
+                for (auto mm:m) {
+                    ret.push_back(mm);
+                    if (getCapture(mm) == 1)allValidCaptures.push_back(mm);
+                }
+            }
+            if (!color) {
+                m = queenMoves(0);
+                for (auto mm:m) {
+                    ret.push_back(mm);
+                    if (getCapture(mm) == 1)allValidCaptures.push_back(mm);
+                }
+            }
+            if (color) {
+                m = queenMoves(1);
+                for (auto mm:m) {
+                    ret.push_back(mm);
+                    if (getCapture(mm) == 1)allValidCaptures.push_back(mm);
+                }
             }
         }
-        if (color) {
-            m = rookMoves(blackRooks, rookTypeNum(), 1);
-            for (auto mm:m) {
-                ret.push_back(mm);
-                if (getCapture(mm) == 1)allValidCaptures.push_back(mm);
-            }
-        }
-        if (!color) {
-            m = bishopMoves(whiteBishops, bishopTypeNum(), 0);
-            for (auto mm:m) {
-                ret.push_back(mm);
-                if (getCapture(mm) == 1)allValidCaptures.push_back(mm);
-            }
-        }
-        if (color) {
-            m = bishopMoves(blackBishops, bishopTypeNum(), 1);
-            for (auto mm:m) {
-                ret.push_back(mm);
-                if (getCapture(mm) == 1)allValidCaptures.push_back(mm);
-            }
-        }
-        if (!color) {
-            m = whiteKnightVMGen();
-            for (auto mm:m) {
-                ret.push_back(mm);
-                if (getCapture(mm) == 1)allValidCaptures.push_back(mm);
-            }
-        }
-        if (color) {
-            m = blackKnightVMGen();
-            for (auto mm:m) {
-                ret.push_back(mm);
-                if (getCapture(mm) == 1)allValidCaptures.push_back(mm);
-            }
-        }
-        if (!color) {
-            m = whitePawnVMGen();
-            for (auto mm:m) {
-                ret.push_back(mm);
-                if (getCapture(mm) == 1)allValidCaptures.push_back(mm);
-            }
-        }
-        if (color) {
-            m = blackPawnVMGen();
-            for (auto mm:m) {
-                ret.push_back(mm);
-                if (getCapture(mm) == 1)allValidCaptures.push_back(mm);
-            }
-        }
-
         return ret;
     }
+
 
     char gui_isValid(string src, string dst, int promotion = 0) {
         if (src.size() != 2 || dst.size() != 2 || (promotion < 0 && promotion > 8)) {
@@ -3399,5 +3470,3 @@ public:
     }
 
 };
-
-#endif //KINGSMEN_BOARD_H

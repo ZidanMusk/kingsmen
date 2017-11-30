@@ -9,10 +9,11 @@ public:
     ll EvalStates=0;
     bool doNull;
     bool useTrans;
-    MTDF(ll maxDepth,Board* board,Evaluate* evaluate, bool nulling,bool trans):Search(maxDepth,board,evaluate) {this->doNull = nulling;this->useTrans=trans;}
+    bool moveOrder;
+    MTDF(ll maxDepth,Board* board,Evaluate* evaluate, bool nulling,bool trans, bool moveO,int time):Search(maxDepth,board,evaluate,time) {this->moveOrder=moveO;this->doNull = nulling;this->useTrans=trans;}
 
 private:
-    unordered_map<ll,Node>_MTDfTable;
+    map<ll,Node>_MTDfTable;
     void _IterativeDeepening(ll MaxDepth);
     ll _MTDF(ll f, ll d);
     ll _AlphaBetaWithMemory(ll alpha, ll beta,ll d,bool IsMax,ll MaxDepth,bool DoNull);

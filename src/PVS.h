@@ -7,17 +7,14 @@ class PVS : public Search{
 public:
     ll OpenedStates=0;
     bool doNull;
-    PVS(ll maxDepth,Board* board,Evaluate* evaluate,bool nulling):Search(maxDepth, board,evaluate) {this->doNull = nulling;}
+    PVS(ll maxDepth,Board* board,Evaluate* evaluate,bool nulling,int time):Search(maxDepth, board,evaluate,time) {this->doNull = nulling;}
     void getPvPath(ll root);
 private:
     unordered_map <ll,int> PvTable;
     unordered_map <ll,ll> VisitedStates;
     ll cntr=0;
-    //set<ll>visitedStates;
-    ll pvsSearch(ll alpha, ll beta, ll depth, bool isMax);
+    ll pvsSearch(ll alpha, ll beta, ll depth, bool isMax, ll maxDepth);
     void _IterativeDeepening(ll MaxDepth);
 
 };
-
-
 #endif //CHESS_SEARCH_PVS_H

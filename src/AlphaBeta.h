@@ -8,7 +8,7 @@
 
 class AlphaBeta : public Search{
 public:
-    AlphaBeta(ll maxDepth,Board* board,Evaluate* evaluate):Search(maxDepth,board,evaluate) {}
+    AlphaBeta(ll maxDepth,Board* board,Evaluate* evaluate):Search(maxDepth,board,evaluate,30) {}
     void getPvPath(ll root);
 
 private:
@@ -17,8 +17,5 @@ private:
     ll OpenedStates=0;
     ll alphaBetaSearch(ll alpha, ll beta, ll depth, bool isMax);
     void _IterativeDeepening(ll MaxDepth);
-
 };
-
-
 #endif //KINGSMEN_ALPHABETA_H

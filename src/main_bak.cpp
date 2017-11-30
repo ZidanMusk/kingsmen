@@ -9,33 +9,81 @@ using namespace std;
 
 int main() {
 
-    /*  int maxDepth = 6;
-      Board* board1 = new Board();
-      board1->fenInterpreter();
-      Evaluate* evaluate1 = new Evaluate(board1);
+    int maxDepth = 10;
+    int timeL=30;
 
-      Board* board2 = new Board();
-      board2->fenInterpreter();
-      Evaluate* evaluate2 = new Evaluate(board2);
+    Board* boardPvs = new Board();
+    boardPvs->fenInterpreter();
+    Evaluate* evaluatePvs = new Evaluate(boardPvs);
 
-      Search *pvs = new PVS(maxDepth,board1,evaluate1, true);
-      pvs->GetBestMove();
-      //Search* baseline = new AlphaBeta(maxDepth,board1,evaluate1);
-      //baseline->GetBestMove();
-
-      //Search *mtdf = new MTDF(maxDepth,board1,evaluate1, false, true);
-      //mtdf->GetBestMove();
+    Board* boardMtdf = new Board(false);
+    boardMtdf->fenInterpreter();
+    Evaluate* evaluateMtdf = new Evaluate(boardMtdf);
 
 
+    //Search* baseline = new AlphaBeta(maxDepth,board,evaluate);
+    //baseline->GetBestMove();
+    Search *pvs = new PVS(maxDepth,boardPvs,evaluatePvs,true,timeL);
+    pvs->GetBestMove();
+    Search *mtdf = new MTDF(maxDepth,boardMtdf,evaluateMtdf, true, true, true,timeL);
+    mtdf->GetBestMove();
 
-      exit(0);
-      /*for(int i=0;i<10;i++)
-      {
-          mtdf->GetBestMove();
-          board1->doo(mtdf->bestMove);
-          mtdfNull->GetBestMove();
-          board2->doo(mtdfNull->bestMove);
-      }*/
+
+    /*for (int i = 0; i < size; ++i) {
+           cout<<"state 0: "<<board->key<<endl;
+           vector<int> vv = board->allValidMoves;
+           for (int j = 0; j < vv.size(); ++j) {
+               if(arr[i] == vv[j]){cout<<"VALID!\n";}
+           }
+           board->doo(arr[i]);
+           cout<<"state 1: "<<board->key<<endl;
+           cout<<board->isOver()<<endl;
+           board->undoo();
+           cout<<endl;
+
+       }*/
+    /*board2->doo(255872);
+    cout<<board2->key<<endl;
+    cout<<"is it Over: "<<board2->isOver()<<endl;
+*/
+//8335008165548075498
+
+
+    ////Search *pvs = new PVS(maxDepth,board1,evaluate1, true);
+    //pvs->GetBestMove();
+    /*  Search* baseline = new AlphaBeta(maxDepth,board1,evaluate1);
+      baseline->GetBestMove();
+  */
+
+    /*map <ll,int> xxx;
+    cout<<"IsOver\n";
+    for (int i = 0; i < mtdf->debugIsOver.size(); ++i) {
+        if(xxx.find(mtdf->debugIsOver[i].first)== xxx.end()){
+            cout<<mtdf->debugIsOver[i].first<<" "<<mtdf->debugIsOver[i].second<<endl;
+            xxx[mtdf->debugIsOver[i].first] =1;
+        }
+    }
+    map <ll,int> xxx2;
+    cout<<"EmptyMoves\n";
+    for (int i = 0; i < mtdf->debugEmptyMoves.size(); ++i) {
+        if(xxx2.find(mtdf->debugEmptyMoves[i].first)== xxx2.end()){
+            cout<<mtdf->debugEmptyMoves[i].first<<" "<<mtdf->debugEmptyMoves[i].second<<endl;
+            xxx2[mtdf->debugEmptyMoves[i].first] =1;
+        }
+    }*/
+    //MTDF      : [22,255872,57877,89461] in 9 sec
+    //MTDF      : [22,255872,57902,92232] in 10 sec
+
+
+
+    //exit(0);
+    /*for(int i=0;i<15;i++)
+    {
+        pvs->GetBestMove();
+        board1->doo(pvs->bestMove);
+        //mtdf->GetBestMove();
+        //board2->doo(mtdf->bestMove);
+    }*/
 
 
     /*cout<<board->key<<endl;
@@ -64,13 +112,6 @@ int main() {
     board->doo(843200);
     cout<<board->key<<endl;
 */
-
-
-
-
-
-
-
 
     //Search* baseline = new AlphaBeta(maxDepth,board,evaluate);
     //baseline->GetBestMove();
@@ -143,89 +184,27 @@ int main() {
 
 //Evaluate
 
-    Board b;
+    /*Board b;
     b.fenInterpreter("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1", true);
 
-    /*
-     *
-     * 3199571540766531599 ->
-8335008165548075498 ->
-11166231980074121213 ->
-9573494289707030095 ->
-1406139172049724326 ->
-18051104819110213384 ->
+    b.gui_isValid("e2", "e4", 0);
+    b.gui_isValid("e7", "e5", 0);
+    b.gui_isValid("b1", "c3", 0);
+    b.gui_isValid("f8", "c5", 0);
+    b.gui_isValid("d2", "d3", 0);
+    b.gui_isValid("d8", "f6", 0);
+    b.gui_isValid("c3", "d5", 0);
+    b.gui_isValid("f6", "f2", 0);
 
 
-     *
-     * */
-    cout<<b.key<<endl;
-    b.doo(255872);
-    cout<<b.key<<endl;
-    b.doo(825856);
-    cout<<b.key<<endl;
-    b.doo(323456);
-    cout<<b.key<<endl;
-    b.doo(843200);
-    cout<<b.key<<endl;
-    b.doo(239232);
-    cout<<b.key<<endl;
-    b.doo(709440);
-    cout<<b.key<<endl;
+
+
+
+
+
+
     cout<<b.gui_gameState()<<endl;
 
-    /*b.gui_isValid("a2", "a3", 0);
-    b.gui_isValid("g8", "f6", 0);
-    b.gui_isValid("c2", "c4", 0);
-    b.gui_isValid("d7", "d5", 0);
-    b.gui_isValid("g1", "f3", 0);
-    b.gui_isValid("e7", "e6", 0);
-    b.gui_isValid("d2", "d4", 0);
-    b.gui_isValid("c7", "c5", 0);
-    b.gui_isValid("e2", "e3", 0);
-    b.gui_isValid("b8", "c6", 0);
-    b.gui_isValid("b1", "c3", 0);
-    b.gui_isValid("f8", "e7", 0);
-    b.gui_isValid("d4", "c5", 0);
-    b.gui_isValid("e7", "c5", 0);
-    b.gui_isValid("h2", "h3", 0);
-    b.gui_isValid("e8", "g8", 0);
-    b.gui_isValid("c1", "d2", 0);
-    b.gui_isValid("c6", "a5", 0);
-    b.gui_isValid("c4", "d5", 0);
-    b.gui_isValid("e6", "d5", 0);
-    b.gui_isValid("b2", "b4", 0);
-    b.gui_isValid("c5", "b4", 0);
-    b.gui_isValid("a3", "b4", 0);
-    b.gui_isValid("a5", "c6", 0);
-    b.gui_isValid("d1", "b1", 0);
-    b.gui_isValid("g7", "g6", 0);
-    b.gui_isValid("f1", "d3", 0);
-    b.gui_isValid("c8", "f5", 0);
-    b.gui_isValid("d3", "f5", 0);
-    b.gui_isValid("g6", "f5", 0);
-    b.gui_isValid("b1", "f5", 0);
-    b.gui_isValid("c6", "b4", 0);
-    b.gui_isValid("e1", "g1", 0);
-    b.gui_isValid("d8", "c8", 0);
-    b.gui_isValid("f5", "g5", 0);
-    b.gui_isValid("g8", "h8", 0);
-    b.gui_isValid("g5", "f6", 0);
-    b.gui_isValid("h8", "g8", 0);
-    b.gui_isValid("f6", "h6", 0);
-    b.gui_isValid("g8", "h8", 0);
-    b.gui_isValid("f3", "g5", 0);
-    b.gui_isValid("c8", "f5", 0);
-    b.gui_isValid("a1", "a7", 0);
-    b.gui_isValid("f8", "g8", 0);
-    b.gui_isValid("e3", "e4", 0);
-    b.gui_isValid("f5", "g5", 0);
-    b.gui_isValid("d2", "g5", 0);
-    b.gui_isValid("g8", "g5", 0);
-    b.gui_isValid("h6", "f6", 0);
-    b.gui_isValid("h8", "g8", 0);
-    b.gui_isValid("a7", "a8", 0);
-
-    cout << b.gui_gameState() << endl;
 
 //    int x = 5;
 //    int moves[5] = {255872, 817536, 173696, 107088, 197632};
@@ -243,8 +222,9 @@ int main() {
 //            break;
 //        }
 //    }
-*/
 
-    b.disp();
+
+    b.disp();*/
+
 }
 
