@@ -29,8 +29,6 @@ int Evaluate::pawnStructure(int phase) {
     for (int c = 0; c <= 1; ++c) {
         const auto ownPawns = c == 1 ? _board->blackPawns : _board->whitePawns;
         const auto opponentPawns = c == 1 ? _board->whitePawns : _board->blackPawns;
-//        bitset<64> b1(ownPawns);
-//        cout << b1 << "   " << opponentPawns << endl;
         auto tempPawns = ownPawns;
         auto scoreOpForColor = 0, scoreEdForColor = 0;
 
