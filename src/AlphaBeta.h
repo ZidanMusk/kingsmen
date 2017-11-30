@@ -8,7 +8,7 @@
 
 class AlphaBeta : public Search{
 public:
-    AlphaBeta(ll maxDepth,Board* board,Evaluate* evaluate):Search(maxDepth,board,evaluate,30) {}
+    AlphaBeta(ll maxDepth,Board* board,Evaluate* evaluate,int timeL):Search(maxDepth,board,evaluate,timeL) {}
     void getPvPath(ll root);
 
 private:
