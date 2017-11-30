@@ -3091,42 +3091,14 @@ public:
             if (getCapture(mm) == 1)allValidCaptures.push_back(mm);
         }
         if (!color) {
-            m = whitePawnVMGen();
+            m = queenMoves(0);
             for (auto mm:m) {
                 ret.push_back(mm);
                 if (getCapture(mm) == 1)allValidCaptures.push_back(mm);
             }
         }
         if (color) {
-            m = blackPawnVMGen();
-            for (auto mm:m) {
-                ret.push_back(mm);
-                if (getCapture(mm) == 1)allValidCaptures.push_back(mm);
-            }
-        }
-        if (!color) {
-            m = whiteKnightVMGen();
-            for (auto mm:m) {
-                ret.push_back(mm);
-                if (getCapture(mm) == 1)allValidCaptures.push_back(mm);
-            }
-        }
-        if (color) {
-            m = blackKnightVMGen();
-            for (auto mm:m) {
-                ret.push_back(mm);
-                if (getCapture(mm) == 1)allValidCaptures.push_back(mm);
-            }
-        }
-        if (!color) {
-            m = bishopMoves(whiteBishops, bishopTypeNum(), 0);
-            for (auto mm:m) {
-                ret.push_back(mm);
-                if (getCapture(mm) == 1)allValidCaptures.push_back(mm);
-            }
-        }
-        if (color) {
-            m = bishopMoves(blackBishops, bishopTypeNum(), 1);
+            m = queenMoves(1);
             for (auto mm:m) {
                 ret.push_back(mm);
                 if (getCapture(mm) == 1)allValidCaptures.push_back(mm);
@@ -3147,20 +3119,47 @@ public:
             }
         }
         if (!color) {
-            m = queenMoves(0);
+            m = bishopMoves(whiteBishops, bishopTypeNum(), 0);
             for (auto mm:m) {
                 ret.push_back(mm);
                 if (getCapture(mm) == 1)allValidCaptures.push_back(mm);
             }
         }
         if (color) {
-            m = queenMoves(1);
+            m = bishopMoves(blackBishops, bishopTypeNum(), 1);
             for (auto mm:m) {
                 ret.push_back(mm);
                 if (getCapture(mm) == 1)allValidCaptures.push_back(mm);
             }
         }
-
+        if (!color) {
+            m = whiteKnightVMGen();
+            for (auto mm:m) {
+                ret.push_back(mm);
+                if (getCapture(mm) == 1)allValidCaptures.push_back(mm);
+            }
+        }
+        if (color) {
+            m = blackKnightVMGen();
+            for (auto mm:m) {
+                ret.push_back(mm);
+                if (getCapture(mm) == 1)allValidCaptures.push_back(mm);
+            }
+        }
+        if (!color) {
+            m = whitePawnVMGen();
+            for (auto mm:m) {
+                ret.push_back(mm);
+                if (getCapture(mm) == 1)allValidCaptures.push_back(mm);
+            }
+        }
+        if (color) {
+            m = blackPawnVMGen();
+            for (auto mm:m) {
+                ret.push_back(mm);
+                if (getCapture(mm) == 1)allValidCaptures.push_back(mm);
+            }
+        }
 
         return ret;
     }
