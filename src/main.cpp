@@ -8,7 +8,7 @@ using namespace std;
 #include "PVS.h"
 
 int main() {
-
+/*
     int maxDepth = 10;
     int timeL=30;
 
@@ -28,7 +28,7 @@ int main() {
     Search *mtdf = new MTDF(maxDepth,boardMtdf,evaluateMtdf, true, true, true,timeL);
     mtdf->GetBestMove();
 
-
+*/
     /*for (int i = 0; i < size; ++i) {
            cout<<"state 0: "<<board->key<<endl;
            vector<int> vv = board->allValidMoves;
@@ -184,24 +184,12 @@ int main() {
 
 //Evaluate
 
-    /*Board b;
-    b.fenInterpreter("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1", true);
-
-    b.gui_isValid("e2", "e4", 0);
-    b.gui_isValid("e7", "e5", 0);
-    b.gui_isValid("b1", "c3", 0);
-    b.gui_isValid("f8", "c5", 0);
-    b.gui_isValid("d2", "d3", 0);
-    b.gui_isValid("d8", "f6", 0);
-    b.gui_isValid("c3", "d5", 0);
-    b.gui_isValid("f6", "f2", 0);
+    Board b;
+    b.fenInterpreter("B2q1r2/4b1p1/k2pbp2/1p5p/pP1PpB1P/7N/P1P1QPP1/R3R1K1 b - - 0 1", true);
 
 
 
-
-
-
-
+    cout<<b.gui_isValid("a6", "h7", 0)<<endl;
 
     cout<<b.gui_gameState()<<endl;
 
@@ -224,7 +212,7 @@ int main() {
 //    }
 
 
-    b.disp();*/
+    b.disp();
 
 }
 

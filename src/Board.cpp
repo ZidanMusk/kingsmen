@@ -2986,6 +2986,15 @@ public:
         return ret;
     }
 
+    bool isToKing(int ind, int newInd){
+        int Row = ind/8;
+        int newRow = newInd/8;
+        int col = ind%8;
+        int newCol = newInd%8;
+
+        return (abs(Row - newRow) <= 1 && abs(col - newCol) <= 1);
+
+    }
 // king moves generation
     vector<int> kingMoves() {
         vector<int> ret;
@@ -3010,8 +3019,8 @@ public:
 
         if (whiteToMove) {
             for (int i = 0; i < 8; ++i) {
-                if (cellInBoard(locW + di[i]) && locExist(intersection, 1ull << (locW + di[i])))continue;
-                if (cellInBoard(locW + di[i]) && threat[locW + di[i]] != key)
+                if (isToKing(locW, locW + di[i]) && cellInBoard(locW + di[i]) && locExist(intersection, 1ull << (locW + di[i])))continue;
+                if (isToKing(locW, locW + di[i]) && cellInBoard(locW + di[i]) && threat[locW + di[i]] != key)
                     if (!((resW >> (locW + di[i])) & 1ull)) {
                         int move = (makeMoveMask(0, 0, kingTypeNum(), locW, locW + di[i], 0));
                         if (isValid(whiteToMove, move))ret.push_back(move);
@@ -3038,8 +3047,8 @@ public:
 
         } else {
             for (int i = 0; i < 8; ++i) {
-                if (cellInBoard(locB + di[i]) && locExist(intersection, 1ull << (locB + di[i])))continue;
-                if (cellInBoard(locB + di[i]) && threat[locB + di[i]] != key)
+                if (isToKing(locW, locW + di[i]) && cellInBoard(locB + di[i]) && locExist(intersection, 1ull << (locB + di[i])))continue;
+                if (isToKing(locW, locW + di[i]) && cellInBoard(locB + di[i]) && threat[locB + di[i]] != key)
                     if (!((resB >> (locB + di[i])) & 1ull)) {
                         int move = (makeMoveMask(0, 0, kingTypeNum(), locB, locB + di[i], 1));
                         if (isValid(whiteToMove, move))ret.push_back(move);
@@ -3268,7 +3277,7 @@ public:
             if (getFrom(allValidMoves[i]) == srcLoc && getTo(allValidMoves[i]) == dstLoc) {
                 if (getSpecialEvent(allValidMoves[i]) == promotion || getSpecialEvent(allValidMoves[i]) == ENPASSANT) {
                     //ordinary move or promotion
-                    cout << allValidMoves[i] << endl;
+                    //cout << allValidMoves[i] << endl;
                     doo(allValidMoves[i]);
                     return 'V';
                 }
