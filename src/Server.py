@@ -24,9 +24,9 @@ class ThreadedServer(object):
         self.hsockets = [None, None]
 
         # start timestamp for each player waiting for it's move
-        self.timers = [0, 0]
+        self.timers = [0.0, 0.0]
         # total time used for each player
-        self.total_time = [0, 0]
+        self.total_time = [0.0, 0.0]
 
         self.game = False
         self.first_play = True
@@ -134,16 +134,21 @@ class ThreadedServer(object):
             while 1:
                 if not self.players[0] or not self.players[1]:
                     continue
+
                 if self.turn == player:
-                    if self.timers[player] == 0:
+
+                    if self.timers[player] == 0.0:
                         self.timers[player] = time.time()
                     current = time.time() - self.timers[player]
-                    c = current + self.total_time[player]
-                    #print player
+                    c = current + self.total_time[player] + 0.0
+
+                #print player
                     #print c
                     #print self.timers[player]
                     #print self.total_time[player]
-                    sock.settimeout(900 - int(c))
+                    # sock.settimeout(900 - int(c))
+                    sock.settimeout(10.0 - float(c))
+                else: continue
                 data = sock.recv(size)
                 opcode, = unpack('i', data)
                 # Debug Msg
@@ -256,6 +261,10 @@ class ThreadedServer(object):
         except Exception, e:
             print e
             if hasattr(e, 'message') and e.message=="timed out":
+                current = time.time()
+                c = current - self.timers[player]
+                self.total_time[player] += (c)
+                log("my time "+str(self.total_time[player]))
                 log('Player ' + str((player + 1) % 2 +1) + ' won!')
                 sock.sendall(pack('is', 3, 'L'))
                 try:
@@ -295,7 +304,7 @@ class ThreadedServer(object):
     def stop_timer(self, player):
         current = time.time()
         c = current - self.timers[player]
-        self.total_time[player] += int(c)
+        self.total_time[player] += (c)
 
         print '[Player%d_Timing] Move took : %d sec , total time elasped : %d sec' % (
             player + 1, c, self.total_time[player])
