@@ -1,5 +1,5 @@
 #include "Evaluate.h"
-
+#include <bitset>
 template<class T>
 T clamp(T value, T lowerBound, T upperBound) {
     return std::max(lowerBound, std::min(value, upperBound));
@@ -29,6 +29,8 @@ int Evaluate::pawnStructure(int phase) {
     for (int c = 0; c <= 1; ++c) {
         const auto ownPawns = c == 1 ? _board->blackPawns : _board->whitePawns;
         const auto opponentPawns = c == 1 ? _board->whitePawns : _board->blackPawns;
+//        bitset<64> b1(ownPawns);
+//        cout << b1 << "   " << opponentPawns << endl;
         auto tempPawns = ownPawns;
         auto scoreOpForColor = 0, scoreEdForColor = 0;
 
@@ -44,7 +46,7 @@ int Evaluate::pawnStructure(int phase) {
                                   && _board->getPieceAt(from + 8 - 16 * c) != 'P'
                                   && _board->getPieceAt(from + 8 - 16 * c) != 'p'
                                   && (PawnAttacks[c][from + 8 - 16 * c] & opponentPawns);
-
+            cout << passed << ' ' << doubled << ' ' << isolated << ' ' << backward << endl;
             if (passed) {
                 scoreOpForColor += passedBonusOpening[pawnRank];
                 scoreEdForColor += passedBonusEnding[pawnRank];
@@ -68,6 +70,7 @@ int Evaluate::pawnStructure(int phase) {
 
         scoreOp += (c ? -scoreOpForColor : scoreOpForColor);
         scoreEd += (c ? -scoreEdForColor : scoreEdForColor);
+        cout << scoreOpForColor << ' ' << scoreEdForColor << endl;
     }
 
     pht.save(_board->ZPawns(), scoreOp, scoreEd);
@@ -197,11 +200,11 @@ int Evaluate::evaluate() {
     auto phase = clamp(static_cast<int>(_board->getGamePhase()), 0, 64);
 
     auto score = mobilityEval(kingSafetyScore, phase);
-    //cout<<score<<endl;
+    cout << "mobility " << score << endl;
     score += pawnStructure(phase);
-    //cout<<score<<endl;
+    cout << "pawn structure " << score << endl;
     score += kingSafty(kingSafetyScore[1], kingSafetyScore[0], phase);
-    //cout<<score<<endl;
+    cout << "king safety " << score << endl;
     score += interpolateScore(_board->getPstScoreOp(), _board->getPstScoreEd(), phase);
 
     // Bishop pair bonus.
@@ -211,9 +214,9 @@ int Evaluate::evaluate() {
             score += (c ? -bishopPairBonus : bishopPairBonus);
         }
     }
-    //cout<<score<<endl;
+    cout<< "pst " << score<<endl;
     score += (_board->whiteToMove ? sideToMoveBonus : -sideToMoveBonus);
-    //cout<<score<<endl;
+//    cout<<score<<endl;
     xx += (clock() - tStart);
     xxx++;
     return score;

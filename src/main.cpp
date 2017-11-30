@@ -146,11 +146,12 @@ int main() {
     Board b;
     b.fenInterpreter("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1", true);
     Evaluate e(&b);
+    cout << e.evaluate() << endl;
 
     /*
      *
      * 3199571540766531599 ->
-8335008165548075498 ->
+        8335008165548075498 ->
 11166231980074121213 ->
 9573494289707030095 ->
 1406139172049724326 ->
@@ -159,20 +160,20 @@ int main() {
 
      *
      * */
-    cout<<b.isOver()<<endl;
-    b.doo(255872);
-    cout<<b.isOver()<<endl;
-    b.doo(825856);
-    cout<<b.isOver()<<endl;
-    b.doo(323456);
-    cout<<b.isOver()<<endl;
-    b.doo(843200);
-    cout<<b.isOver()<<endl;
-    b.doo(239232);
-    cout<<b.isOver()<<endl;
-    b.doo(709440);
-    cout<<b.isOver()<<endl;
-    cout<<b.gui_gameState()<<endl;
+//    cout<<b.isOver()<<endl;
+//    b.doo(255872);
+//    cout<<b.isOver()<<endl;
+//    b.doo(825856);
+//    cout<<b.isOver()<<endl;
+//    b.doo(323456);
+//    cout<<b.isOver()<<endl;
+//    b.doo(843200);
+//    cout<<b.isOver()<<endl;
+//    b.doo(239232);
+//    cout<<b.isOver()<<endl;
+//    b.doo(709440);
+//    cout<<b.isOver()<<endl;
+//    cout<<b.gui_gameState()<<endl;
 
     /*b.gui_isValid("a2", "a3", 0);
     b.gui_isValid("g8", "f6", 0);
