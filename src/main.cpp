@@ -1,251 +1,490 @@
+/* A simple server in the internet domain using TCP
+   The port number is passed as an argument */
+#include <iostream>
+#include <stdio.h>
+#include <stdlib.h>
+
+#include <arpa/inet.h>
+
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <string>
+#include <string.h>
+#include <fstream>
 #include <bits/stdc++.h>
 #include "Search.h"
+#include "Evaluate.h"
+#include "AlphaBeta.h"
+
 
 using namespace std;
-
-#include "AlphaBeta.h"
-#include "MTDF.h"
-#include "PVS.h"
-
-int main() {
-
-    /*  int maxDepth = 6;
-      Board* board1 = new Board();
-      board1->fenInterpreter();
-      Evaluate* evaluate1 = new Evaluate(board1);
-
-      Board* board2 = new Board();
-      board2->fenInterpreter();
-      Evaluate* evaluate2 = new Evaluate(board2);
-
-      Search *pvs = new PVS(maxDepth,board1,evaluate1, true);
-      pvs->GetBestMove();
-      //Search* baseline = new AlphaBeta(maxDepth,board1,evaluate1);
-      //baseline->GetBestMove();
-
-      //Search *mtdf = new MTDF(maxDepth,board1,evaluate1, false, true);
-      //mtdf->GetBestMove();
+typedef unsigned char byte;
 
 
+class name {
+public:
+    int sockfd, sockfd2, newsockfd, newsockfd2, portno, portno2;
+    socklen_t clilen, clilen2;
+    char buffer[256];
+    struct sockaddr_in serv_addr, serv_addr2, cli_addr, cli_addr2;
+    int n;
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    string port, port2;
+    string ip;
 
-      exit(0);
-      /*for(int i=0;i<10;i++)
-      {
-          mtdf->GetBestMove();
-          board1->doo(mtdf->bestMove);
-          mtdfNull->GetBestMove();
-          board2->doo(mtdfNull->bestMove);
-      }*/
-
-
-    /*cout<<board->key<<endl;
-    int arr[] ={205952,891392,230912,824832,843200};
-    for(int j=0;j<5;++j){
-
-        cout<<"State Id : "<<board->key<<", Move : "<<arr[j];
-        for(int i=0;i<board->allValidMoves.size();i++)
-        {
-            if(arr[j] == board->allValidMoves[i])
-                cout<<" and move is correct";
-
-        }
-        cout<<endl;
-        board->doo(arr[j]);
-
-    }*/
-    /*board->doo(205952);
-    cout<<board->key<<endl;
-    board->doo(891392);
-    cout<<board->key<<endl;
-    board->doo(230912);
-    cout<<board->key<<endl;
-    board->doo(824832);
-    cout<<board->key<<endl;
-    board->doo(843200);
-    cout<<board->key<<endl;
-*/
+    name(string port_1, string port_2, string ip_1) : port(port_1), port2(port_2), ip(ip_1) {
+    };
 
 
+    void connect2() {
+
+        sockfd2 = socket(AF_INET, SOCK_STREAM, 0);
+        if (sockfd2 < 0)
+            error("ERROR opening socket");
+        bzero((char *) &serv_addr2, sizeof(serv_addr2));
+        portno2 = atoi(port2.c_str());
+        const char *cp = ip.c_str();
+        serv_addr2.sin_family = AF_INET;
+        serv_addr2.sin_addr.s_addr = inet_addr(cp);
+        serv_addr2.sin_port = htons(portno2);
+        if (bind(sockfd2, (struct sockaddr *) &serv_addr2,
+                 sizeof(serv_addr2)) < 0)
+            error("ERROR on binding");
+        //printf("2bl l listen");
+        ////////////////////////////listen for GUI//////////////////////////
+
+        listen(sockfd2, 5);
+        printf("Listening to PYTHON. \n");
+        clilen = sizeof(cli_addr2);
+        //printf("heeeeeeeeeeeh");
+        newsockfd2 = accept(sockfd2,
+                            (struct sockaddr *) &cli_addr2,
+                            &clilen2);
+
+        if (newsockfd2 < 0)
+            error("ERROR on accept GUI = ");
+        else printf("PYTHON PORT  %d \n", newsockfd2);
+
+        /////////////////////////////////listen for python////////////////////////////////////
 
 
-
-
-
-
-    //Search* baseline = new AlphaBeta(maxDepth,board,evaluate);
-    //baseline->GetBestMove();
-
-
-    //cout<<"###################"<<endl;
-    //Search *mtdf = new MTDF(maxDepth,board,evaluate, false, false);
-    //mtdf->GetBestMove();
-
-    /*Search *mtdfNull = new MTDF(maxDepth,board,evaluate, true, false);
-    mtdfNull->GetBestMove();*/
-
-
-    //cout<<"###################"<<endl;
-    //Search *pvs = new PVS(maxDepth,board,evaluate, false);
-    //pvs->GetBestMove();
-
-    //Search *pvsnull = new PVS(maxDepth,board,evaluate, true);
-    //pvsnull->GetBestMove();
-
-
-
-    /*ll mtdfBest1 = 0, mtdfBest2 = 0, mtfdCorrect = 0;
-    ll PvsBest1 = 0, PvsBest2 = 0, PvsCorrect = 0;
-    bool pvsSa7 = false;
-    bool mtdfSa7 = false;
-    ll trials = 1;
-    ll MaxDepth = 7;
-    for (ll i = 0; i < trials; i++) {
-
-        pvsSa7 = false;
-        mtdfSa7 = false;
-        cout << "Start Generating Tree of Depth = " << MaxDepth << endl;
-        ExternBig::GenerateRandTree(1, 0, MaxDepth);
-        cout << "END Generating The Tree" << endl;
-        Search *Baseline = new AlphaBeta(MaxDepth);
-        Baseline->GetBestMove(1);
-        Search *Bibo = new PVS(MaxDepth, true);
-        Bibo->GetBestMove(1);
-        Search *Manga = new MTDF(MaxDepth, true, true);
-        Manga->GetBestMove(1);
-        if (Baseline->bestScore == Bibo->bestScore) {
-            PvsCorrect += 1;
-            pvsSa7 = true;
-        }
-        if (Baseline->bestScore == Manga->bestScore) {
-            mtfdCorrect += 1;
-            mtdfSa7 = true;
-        }
-        if (pvsSa7 && mtdfSa7) {
-            if (Bibo->uniqueCalls > Manga->uniqueCalls) mtdfBest1 += 1;
-            if (Bibo->uniqueCalls < Manga->uniqueCalls) PvsBest1 += 1;
-            if (Bibo->allCalls > Manga->allCalls) mtdfBest2 += 1;
-            if (Bibo->allCalls < Manga->allCalls) PvsBest2 += 1;
-        }
+        bzero(buffer, 256);
     }
-    cout << endl << "=============" << endl;
-    cout << "PVS  correctness: " << PvsCorrect << "/" << trials << endl;
-    cout << "MTDF correctness: " << mtfdCorrect << "/" << trials << endl;
-    cout << endl << "=============" << endl;
-    cout << "PVS  1st no. best: " << PvsBest1 << "/" << trials << endl;
-    cout << "MTDF 1st no. best: " << mtdfBest1 << "/" << trials << endl;
-    cout << endl << "=============" << endl;
-    cout << "PVS  2nd no. best: " << PvsBest2 << "/" << trials << endl;
-    cout << "MTDF 2nd no. best: " << mtdfBest2 << "/" << trials << endl;
+
+    void connect() {
+        sockfd = socket(AF_INET, SOCK_STREAM, 0);
+        if (sockfd < 0)
+            error("ERROR opening socket");
+        bzero((char *) &serv_addr, sizeof(serv_addr));
+        portno = atoi(port.c_str());
+        const char *cp = ip.c_str();
+        serv_addr.sin_family = AF_INET;
+        serv_addr.sin_addr.s_addr = inet_addr(cp);
+        serv_addr.sin_port = htons(portno);
+        if (bind(sockfd, (struct sockaddr *) &serv_addr,
+                 sizeof(serv_addr)) < 0)
+            error("ERROR on binding");
+        listen(sockfd, 5);
+        printf("Listening to GUI. \n");
+        clilen = sizeof(cli_addr);
+
+        newsockfd = accept(sockfd,
+                           (struct sockaddr *) &cli_addr,
+                           &clilen);
+
+        if (newsockfd < 0)
+            error("ERROR on accept Python client");
+        else printf("GUI PORT = %d\n", newsockfd);
+        bzero(buffer, 256);
+    }
+
+    void error(const char *msg) {
+        perror(msg);
+        exit(1);
+    }
 
 
-*/
+    int byte_to_Integer(char buffer[4]) {
+        int Int32 = 0;
+
+        Int32 = (Int32 << 8) + buffer[3];
+        Int32 = (Int32 << 8) + buffer[2];
+        Int32 = (Int32 << 8) + buffer[1];
+        Int32 = (Int32 << 8) + buffer[0];
+        return Int32;
+    }
+
+    string wait_for_intial_state() {
+        n = read(newsockfd2, buffer, 4);
+        //printf("n is %d",n);
+        int size = byte_to_Integer(buffer);
+        //printf("size %d",size);
+        n = read(newsockfd2, buffer, size);
+        //printf("buffer is %s",buffer);
+
+        string s(buffer);
+        clear();
+        return s;
+
+    }
+
+    int wait_for_first_player() {
+
+        n = read(newsockfd2, buffer, 4);
+        int opcode = byte_to_Integer(buffer);
+        n = read(newsockfd2, buffer, 4);
+        int x = byte_to_Integer(buffer);
+        printf("X is %d \n", x);
+        bzero(buffer, 256);
+        return x;
+    }
 
 
-//Evaluate
+    string wait_for_mov() {
 
-    Board b;
-    b.fenInterpreter("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1", true);
-    Evaluate e(&b);
+        n = read(newsockfd2, buffer, 4);
+        int opcode = byte_to_Integer(buffer);
+        string s = "";
+        //printf("op code  %d\n",opcode);
 
-    /*
-     *
-     * 3199571540766531599 ->
-8335008165548075498 ->
-11166231980074121213 ->
-9573494289707030095 ->
-1406139172049724326 ->
-18051104819110213384 ->
+        if (opcode == 2)///single move
+        {
+            n = read(newsockfd2, buffer, 4);
+            printf("buffer is %s \n", buffer);
+            string str(buffer);
+            s = '2' + str;
+
+        } else if (opcode == 6)///promotion
+        {
+            n = read(newsockfd2, buffer, 5);
+            string str(buffer);
+            s = '6' + str;
 
 
-     *
-     * */
-    cout<<b.isOver()<<endl;
-    b.doo(255872);
-    cout<<b.isOver()<<endl;
-    b.doo(825856);
-    cout<<b.isOver()<<endl;
-    b.doo(323456);
-    cout<<b.isOver()<<endl;
-    b.doo(843200);
-    cout<<b.isOver()<<endl;
-    b.doo(239232);
-    cout<<b.isOver()<<endl;
-    b.doo(709440);
-    cout<<b.isOver()<<endl;
-    cout<<b.gui_gameState()<<endl;
+        } else if (opcode == 3)///win or lose message
+        {
+            n = read(newsockfd2, buffer, 1);
+            string str(buffer);
+            s = '3' + str;
 
-    /*b.gui_isValid("a2", "a3", 0);
-    b.gui_isValid("g8", "f6", 0);
-    b.gui_isValid("c2", "c4", 0);
-    b.gui_isValid("d7", "d5", 0);
-    b.gui_isValid("g1", "f3", 0);
-    b.gui_isValid("e7", "e6", 0);
-    b.gui_isValid("d2", "d4", 0);
-    b.gui_isValid("c7", "c5", 0);
-    b.gui_isValid("e2", "e3", 0);
-    b.gui_isValid("b8", "c6", 0);
-    b.gui_isValid("b1", "c3", 0);
-    b.gui_isValid("f8", "e7", 0);
-    b.gui_isValid("d4", "c5", 0);
-    b.gui_isValid("e7", "c5", 0);
-    b.gui_isValid("h2", "h3", 0);
-    b.gui_isValid("e8", "g8", 0);
-    b.gui_isValid("c1", "d2", 0);
-    b.gui_isValid("c6", "a5", 0);
-    b.gui_isValid("c4", "d5", 0);
-    b.gui_isValid("e6", "d5", 0);
-    b.gui_isValid("b2", "b4", 0);
-    b.gui_isValid("c5", "b4", 0);
-    b.gui_isValid("a3", "b4", 0);
-    b.gui_isValid("a5", "c6", 0);
-    b.gui_isValid("d1", "b1", 0);
-    b.gui_isValid("g7", "g6", 0);
-    b.gui_isValid("f1", "d3", 0);
-    b.gui_isValid("c8", "f5", 0);
-    b.gui_isValid("d3", "f5", 0);
-    b.gui_isValid("g6", "f5", 0);
-    b.gui_isValid("b1", "f5", 0);
-    b.gui_isValid("c6", "b4", 0);
-    b.gui_isValid("e1", "g1", 0);
-    b.gui_isValid("d8", "c8", 0);
-    b.gui_isValid("f5", "g5", 0);
-    b.gui_isValid("g8", "h8", 0);
-    b.gui_isValid("g5", "f6", 0);
-    b.gui_isValid("h8", "g8", 0);
-    b.gui_isValid("f6", "h6", 0);
-    b.gui_isValid("g8", "h8", 0);
-    b.gui_isValid("f3", "g5", 0);
-    b.gui_isValid("c8", "f5", 0);
-    b.gui_isValid("a1", "a7", 0);
-    b.gui_isValid("f8", "g8", 0);
-    b.gui_isValid("e3", "e4", 0);
-    b.gui_isValid("f5", "g5", 0);
-    b.gui_isValid("d2", "g5", 0);
-    b.gui_isValid("g8", "g5", 0);
-    b.gui_isValid("h6", "f6", 0);
-    b.gui_isValid("h8", "g8", 0);
-    b.gui_isValid("a7", "a8", 0);
 
-    cout << b.gui_gameState() << endl;
+        }
+        bzero(buffer, 256);
+        printf("returned s at  wait for move %s\n", s.c_str());
+        return s;
+    }
 
-//    int x = 5;
-//    int moves[5] = {255872, 817536, 173696, 107088, 197632};
-//    for (int i = 0; i < x; ++i){
-//        bool d = false;
-//        for(int j = 0; j < b.allValidMoves.size(); ++j){
-//            if(b.allValidMoves[j] == moves[i]){
-//                cout<<"move: "<<moves[i]<<" done. "<<endl;
-//                d = true;
-//                b.doo(moves[i]);
-//            }
-//        }
-//        if(!d){
-//            cout<<"move: "<<moves[i]<<" doesn't exist. "<<endl;
-//            break;
-//        }
-//    }
-*/
+    void send_move(string src, string dst) {
+        string y = '2' + src + dst;
+        printf("Sending");
+        n = write(newsockfd2, y.c_str(), 5);
+        if (n < 0) error("ERROR writing to socket");
+    }
 
-    b.disp();
+    void send_promotion(string src, string dst, string promotion) {
+        string y = '6' + src + dst + promotion;
+
+        n = write(newsockfd2, y.c_str(), 6);
+        if (n < 0) error("ERROR writing to socket");
+    }
+
+    void send_win() {
+
+        n = write(newsockfd2, "3", 1);
+        if (n < 0) error("ERROR writing to socket");
+    }
+
+    void clear() {
+        bzero(buffer, 256);
+
+    }
+
+    string Receive_GUI() {
+        n = read(newsockfd, buffer, 5);
+        printf("buffer is %s \n", buffer);
+        string str(buffer);
+        clear();
+        return str;
+    }
+
+    void Send_GUI(string y) {
+        //y="abs";
+        //int x=y.size();
+
+        n = write(newsockfd, y.c_str(), y.size());
+        //printf("sent to gui %s",y.c_str());
+        printf("sent to gui %s\n", y.c_str());
+        if (n < 0) error("ERROR writing to socket");
+
+    }
+
+    string wait_for_mode() {
+        n = read(newsockfd2, buffer, 4);
+        int g = byte_to_Integer(buffer);
+        string sh = "" + to_string(g);
+        clear();
+        return sh;
+
+
+    }
+};
+
+int main(int argc, char *argv[]) {
+
+    ifstream config_file;
+    config_file.open("config.txt");
+
+    string gui_port;
+    string agent_port;
+    string my_ip;
+    config_file >> gui_port >> agent_port >> my_ip;
+    config_file.close();
+
+    cout << gui_port << endl;
+    cout << agent_port << endl;
+    cout << my_ip << endl;
+
+
+//    name comm = name("7772", "7779", "192.168.1.3");
+    name comm = name(gui_port, agent_port, my_ip);
+
+    Board *board = new Board();
+
+    comm.connect();
+    comm.connect2();
+    int flag = -1;
+    flag = comm.wait_for_first_player();
+    string F = "" + to_string(flag);
+    string initial_state = comm.wait_for_intial_state();
+    string mode = comm.wait_for_mode();
+    //comm.Send_GUI(mode);
+    board->fenInterpreter(initial_state, flag);
+    string color = "";
+    if (board->me == 'w')
+        color = "White";
+    else
+        color = "Black";
+    comm.Send_GUI(color);
+    string fff = comm.Receive_GUI();
+    comm.Send_GUI(F);
+    fff = comm.Receive_GUI();
+    comm.Send_GUI(initial_state);
+    fff = comm.Receive_GUI();
+    cout<<mode;
+    if (mode == "1")
+        mode = "human";
+    else
+        mode = "AI";
+    comm.Send_GUI(mode);
+    fff = comm.Receive_GUI();
+
+
+    board->fenInterpreter(initial_state, flag);
+
+    int maxDepth = 5;
+    Evaluate *evaluate = new Evaluate(board);
+    Search *baseline = new AlphaBeta(maxDepth, board, evaluate);
+
+    int bestMoveId;
+
+    string Ack;
+
+    if (mode == "human") {
+        while (1) {
+            if (board->whiteToMove) {
+                baseline->GetBestMove();
+                bestMoveId = (int) baseline->bestMove;
+                string move = board->moveInterpret(bestMoveId);
+                comm.Send_GUI(move);
+                Ack = comm.Receive_GUI();
+                string src;
+                string dst;
+                while (1) {
+                    move = comm.Receive_GUI();
+                    printf("Your move is %s\n", move.c_str());
+                    src = move.substr(0, 2);
+                    dst = move.substr(2, 2);
+
+                    if (board->gui_isValid(src, dst, (int) (move[4] - '0')) == 'V') {
+                        string msg = "V";
+                        msg += board->gui_gameState();
+                        msg += board->toFen();
+                        comm.Send_GUI(msg);
+                        Ack = comm.Receive_GUI();
+                        break;
+                    } else {
+                        string msg = "I";
+                        msg += board->gui_gameState();
+                        msg += board->toFen();
+                        comm.Send_GUI(msg);
+                        Ack = comm.Receive_GUI();
+                    }
+                }
+                if (move[4] == '0') {
+                    comm.send_move(src, dst);
+                } else // promotion
+                {
+                    string prom = "";
+
+                    if ((move[4]) == '4')prom = 'N';
+                    if ((move[4]) == '5')prom = 'B';
+                    if ((move[4]) == '6')prom = 'R';
+                    if ((move[4]) == '7')prom = 'Q';
+
+                    if (board->me == 'b')prom[0] = tolower(prom[0]);
+                    comm.send_promotion(src, dst, prom);
+
+                }
+            } else {
+                string move = comm.wait_for_mov();
+                if (move[0] == '2')//single move
+                {
+                    string src = move.substr(1, 2);
+                    string dst = move.substr(3, 2);
+                    if (board->gui_isValid(src, dst, 0) == 'V') {
+                        string msg = src + dst + "0";
+                        msg += board->gui_gameState();
+                        msg += board->toFen();
+                        comm.Send_GUI(msg);
+                        Ack = comm.Receive_GUI();
+                    } else {
+                        string msg = "a1a10w" + board->toFen();
+                        comm.Send_GUI(msg);
+                        Ack = comm.Receive_GUI();
+
+                    }
+
+                } else if (move[0] == '6')//promotion
+                {
+
+                    string src = move.substr(1, 2);
+                    string dst = move.substr(3, 2);
+                    int prom = 0;
+                    if (toupper(move[5]) == 'N')prom = 4;
+                    if (toupper(move[5]) == 'B')prom = 5;
+                    if (toupper(move[5]) == 'R')prom = 6;
+                    if (toupper(move[5]) == 'Q')prom = 7;
+
+                    if (board->gui_isValid(src, dst, prom) == 'V') {
+                        string msg = src + dst + to_string(prom) + board->gui_gameState() + board->toFen();
+                        comm.Send_GUI(msg);
+                        Ack = comm.Receive_GUI();
+                    } else {
+                        string msg = "a1a10w" + board->toFen();
+                        comm.Send_GUI(msg);
+                        Ack = comm.Receive_GUI();
+
+                    }
+
+
+                } else if (move[0] == '3')//w/l timeout
+                {
+                    if (toupper(move[1]) == 'W') {
+                        string msg = "a1a10w" + board->toFen();
+                        comm.Send_GUI(msg);
+                        Ack = comm.Receive_GUI();
+                    } else {
+                        string msg = "a1a10l" + board->toFen();
+                        comm.Send_GUI(msg);
+                        Ack = comm.Receive_GUI();
+
+                    }
+                }
+            }
+
+
+            break;
+
+        }
+    } else {
+
+        while (1) {
+            if (board->whiteToMove) {
+                baseline->GetBestMove();
+                bestMoveId = (int) baseline->bestMove;
+                string move = board->moveInterpret(bestMoveId);
+                cout << "OUR FUCKIN MOVE " << move << endl;
+                string src = move.substr(0, 2);
+                string dst = move.substr(2, 2);
+                board->gui_isValid(src, dst, (int) (move[4] - '0'));
+                comm.Send_GUI(move + board->gui_gameState() + board->toFen());
+                string ACK = comm.Receive_GUI();
+
+                if (move[4] == '0') {
+                    comm.send_move(src, dst);
+                } else // promotion
+                {
+                    string prom = "";
+
+                    if ((move[4]) == '4')prom = 'N';
+                    if ((move[4]) == '5')prom = 'B';
+                    if ((move[4]) == '6')prom = 'R';
+                    if ((move[4]) == '7')prom = 'Q';
+
+                    if (board->me == 'b')prom[0] = tolower(prom[0]);
+                    comm.send_promotion(src, dst, prom);
+
+                }
+            } else {
+                string move = comm.wait_for_mov();
+                if (move[0] == '2')//single move
+                {
+                    string src = move.substr(1, 2);
+                    string dst = move.substr(3, 2);
+                    if (board->gui_isValid(src, dst, 0) == 'V') {
+                        string msg = src + dst + "0" + board->gui_gameState() + board->toFen();
+                        comm.Send_GUI(msg);
+                        Ack = comm.Receive_GUI();
+                    } else {
+                        string msg = "a1a10w" + board->toFen();
+                        comm.Send_GUI(msg);
+                        Ack = comm.Receive_GUI();
+                    }
+
+                } else if (move[0] == '6')//promotion
+                {
+
+                    string src = move.substr(1, 2);
+                    string dst = move.substr(3, 2);
+                    int prom = 0;
+                    if (toupper(move[5]) == 'N')prom = 4;
+                    if (toupper(move[5]) == 'B')prom = 5;
+                    if (toupper(move[5]) == 'R')prom = 6;
+                    if (toupper(move[5]) == 'Q')prom = 7;
+
+                    if (board->gui_isValid(src, dst, prom) == 'V') {
+                        string msg = src + dst + to_string(prom) + board->gui_gameState() + board->toFen();
+                        comm.Send_GUI(msg);
+                        Ack = comm.Receive_GUI();
+                    } else {
+                        string msg = "a1a10w" + board->toFen();
+                        comm.Send_GUI(msg);
+                        Ack = comm.Receive_GUI();
+                    }
+
+
+                } else if (move[0] == '3')//w/l timeout
+                {
+                    if (toupper(move[1]) == 'W') {
+                        string msg = "a1a10w" + board->toFen();
+                        comm.Send_GUI(msg);
+                        Ack = comm.Receive_GUI();
+                    } else {
+                        string msg = "a1a10l" + board->toFen();
+                        comm.Send_GUI(msg);
+                        Ack = comm.Receive_GUI();
+                    }
+                }
+            }
+
+
+        }
+
+    }
+    //close(comm.newsockfd2);
+    //close(comm.sockfd);
+    return 0;
 }
 

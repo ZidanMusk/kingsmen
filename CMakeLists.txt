@@ -10,7 +10,8 @@ set(SOURCE_FILES
         src/main.cpp
         src/Search.cpp src/Search.h
         src/AlphaBeta.h src/AlphaBeta.cpp
-        src/enumss.hpp src/MTDF.h src/MTDF.cpp
+        src/enumss.hpp
+        src/MTDF.h src/MTDF.cpp
         src/PVS.h  src/PVS.cpp)
 
 add_executable(kingsmen ${SOURCE_FILES})
