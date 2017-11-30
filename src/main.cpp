@@ -144,21 +144,8 @@ int main() {
 //Evaluate
 
     Board b;
-    b.fenInterpreter("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1", true);
-    Evaluate e(&b);
+    b.fenInterpreter("c2b20dr2r4/4bp1p/1p1k3P/pP1q4/P7/8/1K6/6q1 w KQkq - 0 1", true);
 
-    /*
-     *
-     * 3199571540766531599 ->
-8335008165548075498 ->
-11166231980074121213 ->
-9573494289707030095 ->
-1406139172049724326 ->
-18051104819110213384 ->
-
-
-     *
-     * */
     cout<<b.isOver()<<endl;
     b.doo(255872);
     cout<<b.isOver()<<endl;

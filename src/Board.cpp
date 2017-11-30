@@ -640,6 +640,7 @@ public:
     // interpretes fen strings.
     void fenInterpreter(string fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1", bool start = true) {
         char myColor;
+        drawState = false;
         for (int j = 0; j < fen.size(); ++j) {
             if (fen[j] == ' ') {
                 if (start) {
@@ -1106,14 +1107,12 @@ public:
             virBlackRooks = whiteRooks;
             virBlackQueens = whiteQueens;
             virBlackKing = whiteKing;
-
             virWhitePawns = blackPawns;
             virWhiteKnights = blackKnights;
             virWhiteBishops = blackBishops;
             virWhiteRooks = blackRooks;
             virWhiteQueens = blackQueens;
             virWhiteKing = blackKing;
-
             virBlackPieces = whitePieces;
             virWhitePieces = blackPieces;
             virAllPieces = allPieces;
@@ -1350,10 +1349,8 @@ public:
         refColorPieces = refPawns | refKnights | refBishops | refRooks | refKing | refQueens;
 /*
  *
-
  *         mPstScoreOp -= mPieceSquareTableOpening[ex][from];
         mPstScoreEd -= mPieceSquareTableEnding[ex][from];
-
  * */
         if (capture) {
 
@@ -1565,8 +1562,8 @@ public:
 
         if (zobristTable[key] == 3) {
             drawState = false;
-            zobristTable[key]--;
         }
+        zobristTable[key]--;
 
         allValidMoves.assign(validMovesHistory[moveNumber].begin(),
                              validMovesHistory[moveNumber].end()); //assigning 2 vectors
@@ -3087,42 +3084,14 @@ public:
             if (getCapture(mm) == 1)allValidCaptures.push_back(mm);
         }
         if (!color) {
-            m = whitePawnVMGen();
+            m = queenMoves(0);
             for (auto mm:m) {
                 ret.push_back(mm);
                 if (getCapture(mm) == 1)allValidCaptures.push_back(mm);
             }
         }
         if (color) {
-            m = blackPawnVMGen();
-            for (auto mm:m) {
-                ret.push_back(mm);
-                if (getCapture(mm) == 1)allValidCaptures.push_back(mm);
-            }
-        }
-        if (!color) {
-            m = whiteKnightVMGen();
-            for (auto mm:m) {
-                ret.push_back(mm);
-                if (getCapture(mm) == 1)allValidCaptures.push_back(mm);
-            }
-        }
-        if (color) {
-            m = blackKnightVMGen();
-            for (auto mm:m) {
-                ret.push_back(mm);
-                if (getCapture(mm) == 1)allValidCaptures.push_back(mm);
-            }
-        }
-        if (!color) {
-            m = bishopMoves(whiteBishops, bishopTypeNum(), 0);
-            for (auto mm:m) {
-                ret.push_back(mm);
-                if (getCapture(mm) == 1)allValidCaptures.push_back(mm);
-            }
-        }
-        if (color) {
-            m = bishopMoves(blackBishops, bishopTypeNum(), 1);
+            m = queenMoves(1);
             for (auto mm:m) {
                 ret.push_back(mm);
                 if (getCapture(mm) == 1)allValidCaptures.push_back(mm);
@@ -3143,23 +3112,51 @@ public:
             }
         }
         if (!color) {
-            m = queenMoves(0);
+            m = bishopMoves(whiteBishops, bishopTypeNum(), 0);
             for (auto mm:m) {
                 ret.push_back(mm);
                 if (getCapture(mm) == 1)allValidCaptures.push_back(mm);
             }
         }
         if (color) {
-            m = queenMoves(1);
+            m = bishopMoves(blackBishops, bishopTypeNum(), 1);
+            for (auto mm:m) {
+                ret.push_back(mm);
+                if (getCapture(mm) == 1)allValidCaptures.push_back(mm);
+            }
+        }
+        if (!color) {
+            m = whiteKnightVMGen();
+            for (auto mm:m) {
+                ret.push_back(mm);
+                if (getCapture(mm) == 1)allValidCaptures.push_back(mm);
+            }
+        }
+        if (color) {
+            m = blackKnightVMGen();
+            for (auto mm:m) {
+                ret.push_back(mm);
+                if (getCapture(mm) == 1)allValidCaptures.push_back(mm);
+            }
+        }
+        if (!color) {
+            m = whitePawnVMGen();
+            for (auto mm:m) {
+                ret.push_back(mm);
+                if (getCapture(mm) == 1)allValidCaptures.push_back(mm);
+            }
+        }
+        if (color) {
+            m = blackPawnVMGen();
             for (auto mm:m) {
                 ret.push_back(mm);
                 if (getCapture(mm) == 1)allValidCaptures.push_back(mm);
             }
         }
 
-
         return ret;
     }
+
 
     char gui_isValid(string src, string dst, int promotion = 0) {
         if (src.size() != 2 || dst.size() != 2 || (promotion < 0 && promotion > 8)) {
@@ -3185,18 +3182,18 @@ public:
             //casteling
             if (getSpecialEvent(allValidMoves[i]) == CASTLEKINGSIDE && srcLoc == curKingLoc && dstLoc == srcLoc + 2) {
                 doo(allValidMoves[i]);
-                return 'k';
+                return 'V';
             }
             if (getSpecialEvent(allValidMoves[i]) == CASTLEQUEENSIDE && srcLoc == curKingLoc && dstLoc == srcLoc - 2) {
                 doo(allValidMoves[i]);
-                return 'q';
+                return 'V';
             }
             if (getFrom(allValidMoves[i]) == srcLoc && getTo(allValidMoves[i]) == dstLoc) {
                 if (getSpecialEvent(allValidMoves[i]) == promotion || getSpecialEvent(allValidMoves[i]) == ENPASSANT) {
                     //ordinary move or promotion
                     cout << allValidMoves[i] << endl;
                     doo(allValidMoves[i]);
-                    return 'v';
+                    return 'V';
                 }
 
             }
@@ -3341,20 +3338,37 @@ public:
             strarr[i - 1] = str;
             str = "";
         }
-        while (i-- > 0) {
-            str += strarr[i];
-            if (i > 0) str += "/";
-        }
+        if (me == 'b') {
+            for (int i = 0; i < 8; ++i) {
+                str += strarr[i];
+                if (i < 7) str += "/";
+
+            }
+        } else
+            while (i-- > 0) {
+                str += strarr[i];
+                if (i > 0) str += "/";
+            }
         return str;
     }
+
 
     string moveInterpret(int move, bool gui = true) {
         int from = getFrom(move);
         int to = getTo(move);
-        char fromRank = (char) (from / 8 + '1'), fromFile = (char) (from % 8 + 'a');
-        char toRank = (char) (to / 8 + '1'), toFile = (char) (to % 8 + 'a');
+
+        char fromRank = from / 8 + '1', toRank = to / 8 + '1';
+        if (me == 'b')fromRank = 7 - from / 8 + '1', toRank = 7 - to / 8 + '1';
+        char fromFile = (char) (from % 8 + 'a');
+        char toFile = (char) (to % 8 + 'a');
+
+        cout << "FROM RANK: " << (int) fromRank << endl;
+        cout << "TO RANK: " << (int) toRank << endl;
         string str = "";
-        str += fromFile + fromRank + toFile + toRank;
+        str += fromFile;
+        str += fromRank;
+        str += toFile;
+        str += toRank;
 
         int se = getSpecialEvent(move);
         if (se == 4) {
@@ -3373,7 +3387,8 @@ public:
         }
         return str;
     }
-    bool isOver(){
+
+    bool isOver() {
         return (isDraw() || isMate());
     }
 
