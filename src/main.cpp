@@ -17,6 +17,8 @@
 #include "Search.h"
 #include "Evaluate.h"
 #include "AlphaBeta.h"
+#include "PVS.h"
+#include "MTDF.h"
 
 
 using namespace std;
@@ -251,6 +253,7 @@ int main(int argc, char *argv[]) {
     name comm = name(gui_port, agent_port, my_ip);
 
     Board *board = new Board();
+//    Board *boardMTDF = new Board(false);
 
     comm.connect();
     comm.connect2();
@@ -283,9 +286,12 @@ int main(int argc, char *argv[]) {
 
     board->fenInterpreter(initial_state, flag);
 
-    int maxDepth = 5;
+    int maxDepth = 10;
+    int timeL=5;
     Evaluate *evaluate = new Evaluate(board);
-    Search *baseline = new AlphaBeta(maxDepth, board, evaluate);
+//    Search *baseline = new AlphaBeta(maxDepth, board, evaluate);
+    Search *baseline = new PVS(maxDepth,board,evaluate,true,timeL);
+//    Search *mtdf = new MTDF(maxDepth,boardMTDF,evaluate, true, true, true,timeL);
 
     int bestMoveId;
 
