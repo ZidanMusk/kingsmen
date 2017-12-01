@@ -308,11 +308,27 @@ class ThreadedServer(object):
 
         print '[Player%d_Timing] Move took : %d sec , total time elasped : %d sec' % (
             player + 1, c, self.total_time[player])
-        log('[Player' + str(player+1) + '] Move took : ' + str(c) + ' sec , total time elapsed : ' + str(self.total_time[player]) + ' sec')
-        max = 900  # 15 minutes
+        log('[Player' + str(player + 1) + '] Move took : ' + str(c) + ' sec , total time elapsed : ' + str(
+            self.total_time[player]) + ' sec')
+        max = 900.0  # 15 minutes
         if int(self.total_time[player]) >= max:
-            print '[Timing] Player %d lose => timeout !!' % (player+1)
-            log('[Timing] Player ' + str(player+1) +' lose => timeout !!')
+            print '[Timing] Player %d lose => timeout !!' % (player + 1)
+            log('[Timing] Player ' + str(player + 1) + ' lose => timeout !!')
+            log("my time " + str(self.total_time[player]))
+
+            log('Player ' + str((player + 1) % 2 + 1) + ' won!')
+            sock = self.hsockets[player]
+            sock.sendall(pack('is', 3, 'L'))
+            try:
+                Othersock = self.hsockets[(player + 1) % 2]
+                Othersock.sendall(pack('is', 3, 'W'))
+            except Exception, e:
+                # any exception for the other palyer thread should not hang the current thread
+                print '[-] failed to send timeout to player %d' % (
+                    (player + 1) % 2 + 1)
+                log('[-] failed to send timeout to player ' + str((player + 1) % 2 + 1))
+
+
 
 
 if __name__ == "__main__":

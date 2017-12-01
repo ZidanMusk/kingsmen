@@ -66,6 +66,10 @@ void MTDF::_IterativeDeepening(ll MaxDepth) {
     //TODO get it from table
     ll firstguess = 0;
     ll root_id=Search::board->key;
+
+    if(Search::_TransitionTable.find(root_id) != Search::_TransitionTable.end()){
+        firstguess = Search::_TransitionTable[root_id].Value;
+    }
     bool x = this->doNull;
     for (ll d = 1;d<=MaxDepth&&Search::hasTime(); d++) {
         this->Interpt=false;
