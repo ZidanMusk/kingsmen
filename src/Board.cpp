@@ -3016,13 +3016,11 @@ public:
         ull maskB = kingZoneAttack[locB];
         ull resB = maskB & allPieces;
 
-        ull intersection = maskW & maskB;
 
         int di[] = {-9, -8, -7, -1, 1, 7, 8, 9};
 
         if (whiteToMove) {
             for (int i = 0; i < 8; ++i) {
-                if (isToKing(locW, locW + di[i]) && cellInBoard(locW + di[i]) && locExist(intersection, 1ull << (locW + di[i])))continue;
                 if (isToKing(locW, locW + di[i]) && cellInBoard(locW + di[i]) && threat[locW + di[i]] != key)
                     if (!((resW >> (locW + di[i])) & 1ull)) {
                         int move = (makeMoveMask(0, 0, kingTypeNum(), locW, locW + di[i], 0));
@@ -3050,8 +3048,7 @@ public:
 
         } else {
             for (int i = 0; i < 8; ++i) {
-                if (isToKing(locW, locW + di[i]) && cellInBoard(locB + di[i]) && locExist(intersection, 1ull << (locB + di[i])))continue;
-                if (isToKing(locW, locW + di[i]) && cellInBoard(locB + di[i]) && threat[locB + di[i]] != key)
+                if (isToKing(locB, locB + di[i]) && cellInBoard(locB + di[i]) && threat[locB + di[i]] != key)
                     if (!((resB >> (locB + di[i])) & 1ull)) {
                         int move = (makeMoveMask(0, 0, kingTypeNum(), locB, locB + di[i], 1));
                         if (isValid(whiteToMove, move))ret.push_back(move);
