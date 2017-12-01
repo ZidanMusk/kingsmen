@@ -1621,7 +1621,7 @@ public:
             return true;
 
         // insufficient material -- so far only Kk, but need to add:
-        if ((whitePieces & ~whiteKing) == 0 && (blackPieces & ~blackKing) == 0)
+        if (popCnt(whitePieces) == 1 && popCnt(blackPieces) == 1)
             return true;
 
         return false;
@@ -3003,9 +3003,10 @@ public:
 
 
         int di[] = {-9, -8, -7, -1, 1, 7, 8, 9};
-
+        ull intersection = maskW & maskB;
         if (whiteToMove) {
             for (int i = 0; i < 8; ++i) {
+                if (isToKing(locW, locW + di[i]) && cellInBoard(locW + di[i]) && locExist(intersection, 1ull << (locW + di[i])))continue;
                 if (isToKing(locW, locW + di[i]) && cellInBoard(locW + di[i]))
                     if (!((resW >> (locW + di[i])) & 1ull)) {
                         int move = (makeMoveMask(0, 0, kingTypeNum(), locW, locW + di[i], 0));
@@ -3039,6 +3040,7 @@ public:
 
         } else {
             for (int i = 0; i < 8; ++i) {
+                if (isToKing(locB, locB + di[i]) && cellInBoard(locB + di[i]) && locExist(intersection, 1ull << (locB + di[i])))continue;
                 if (isToKing(locB, locB + di[i]) && cellInBoard(locB + di[i]))
                     if (!((resB >> (locB + di[i])) & 1ull)) {
                         int move = (makeMoveMask(0, 0, kingTypeNum(), locB, locB + di[i], 1));

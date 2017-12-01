@@ -8,11 +8,11 @@ using namespace std;
 #include "PVS.h"
 
 int main() {
-/*
+
     int maxDepth = 10;
     int timeL=30;
 
-    Board* boardPvs = new Board();
+    /*Board* boardPvs = new Board();
     boardPvs->fenInterpreter();
     Evaluate* evaluatePvs = new Evaluate(boardPvs);
 
@@ -28,189 +28,87 @@ int main() {
     Search *mtdf = new MTDF(maxDepth,boardMtdf,evaluateMtdf, true, true, true,timeL);
     mtdf->GetBestMove();
 
+     new MTDF(maxDepth,b1,e1, true, true, true,timeL);
 */
-    /*for (int i = 0; i < size; ++i) {
-           cout<<"state 0: "<<board->key<<endl;
-           vector<int> vv = board->allValidMoves;
-           for (int j = 0; j < vv.size(); ++j) {
-               if(arr[i] == vv[j]){cout<<"VALID!\n";}
-           }
-           board->doo(arr[i]);
-           cout<<"state 1: "<<board->key<<endl;
-           cout<<board->isOver()<<endl;
-           board->undoo();
-           cout<<endl;
-
-       }*/
-    /*board2->doo(255872);
-    cout<<board2->key<<endl;
-    cout<<"is it Over: "<<board2->isOver()<<endl;
-*/
-//8335008165548075498
-
-
-    ////Search *pvs = new PVS(maxDepth,board1,evaluate1, true);
-    //pvs->GetBestMove();
-    /*  Search* baseline = new AlphaBeta(maxDepth,board1,evaluate1);
-      baseline->GetBestMove();
-  */
-
-    /*map <ll,int> xxx;
-    cout<<"IsOver\n";
-    for (int i = 0; i < mtdf->debugIsOver.size(); ++i) {
-        if(xxx.find(mtdf->debugIsOver[i].first)== xxx.end()){
-            cout<<mtdf->debugIsOver[i].first<<" "<<mtdf->debugIsOver[i].second<<endl;
-            xxx[mtdf->debugIsOver[i].first] =1;
-        }
-    }
-    map <ll,int> xxx2;
-    cout<<"EmptyMoves\n";
-    for (int i = 0; i < mtdf->debugEmptyMoves.size(); ++i) {
-        if(xxx2.find(mtdf->debugEmptyMoves[i].first)== xxx2.end()){
-            cout<<mtdf->debugEmptyMoves[i].first<<" "<<mtdf->debugEmptyMoves[i].second<<endl;
-            xxx2[mtdf->debugEmptyMoves[i].first] =1;
-        }
-    }*/
-    //MTDF      : [22,255872,57877,89461] in 9 sec
-    //MTDF      : [22,255872,57902,92232] in 10 sec
-
-
-
-    //exit(0);
-    /*for(int i=0;i<15;i++)
-    {
-        pvs->GetBestMove();
-        board1->doo(pvs->bestMove);
-        //mtdf->GetBestMove();
-        //board2->doo(mtdf->bestMove);
-    }*/
-
-
-    /*cout<<board->key<<endl;
-    int arr[] ={205952,891392,230912,824832,843200};
-    for(int j=0;j<5;++j){
-
-        cout<<"State Id : "<<board->key<<", Move : "<<arr[j];
-        for(int i=0;i<board->allValidMoves.size();i++)
-        {
-            if(arr[j] == board->allValidMoves[i])
-                cout<<" and move is correct";
-
-        }
-        cout<<endl;
-        board->doo(arr[j]);
-
-    }*/
-    /*board->doo(205952);
-    cout<<board->key<<endl;
-    board->doo(891392);
-    cout<<board->key<<endl;
-    board->doo(230912);
-    cout<<board->key<<endl;
-    board->doo(824832);
-    cout<<board->key<<endl;
-    board->doo(843200);
-    cout<<board->key<<endl;
-*/
-
-    //Search* baseline = new AlphaBeta(maxDepth,board,evaluate);
-    //baseline->GetBestMove();
-
-
-    //cout<<"###################"<<endl;
-    //Search *mtdf = new MTDF(maxDepth,board,evaluate, false, false);
-    //mtdf->GetBestMove();
-
-    /*Search *mtdfNull = new MTDF(maxDepth,board,evaluate, true, false);
-    mtdfNull->GetBestMove();*/
-
-
-    //cout<<"###################"<<endl;
-    //Search *pvs = new PVS(maxDepth,board,evaluate, false);
-    //pvs->GetBestMove();
-
-    //Search *pvsnull = new PVS(maxDepth,board,evaluate, true);
-    //pvsnull->GetBestMove();
-
-
-
-    /*ll mtdfBest1 = 0, mtdfBest2 = 0, mtfdCorrect = 0;
-    ll PvsBest1 = 0, PvsBest2 = 0, PvsCorrect = 0;
-    bool pvsSa7 = false;
-    bool mtdfSa7 = false;
-    ll trials = 1;
-    ll MaxDepth = 7;
-    for (ll i = 0; i < trials; i++) {
-
-        pvsSa7 = false;
-        mtdfSa7 = false;
-        cout << "Start Generating Tree of Depth = " << MaxDepth << endl;
-        ExternBig::GenerateRandTree(1, 0, MaxDepth);
-        cout << "END Generating The Tree" << endl;
-        Search *Baseline = new AlphaBeta(MaxDepth);
-        Baseline->GetBestMove(1);
-        Search *Bibo = new PVS(MaxDepth, true);
-        Bibo->GetBestMove(1);
-        Search *Manga = new MTDF(MaxDepth, true, true);
-        Manga->GetBestMove(1);
-        if (Baseline->bestScore == Bibo->bestScore) {
-            PvsCorrect += 1;
-            pvsSa7 = true;
-        }
-        if (Baseline->bestScore == Manga->bestScore) {
-            mtfdCorrect += 1;
-            mtdfSa7 = true;
-        }
-        if (pvsSa7 && mtdfSa7) {
-            if (Bibo->uniqueCalls > Manga->uniqueCalls) mtdfBest1 += 1;
-            if (Bibo->uniqueCalls < Manga->uniqueCalls) PvsBest1 += 1;
-            if (Bibo->allCalls > Manga->allCalls) mtdfBest2 += 1;
-            if (Bibo->allCalls < Manga->allCalls) PvsBest2 += 1;
-        }
-    }
-    cout << endl << "=============" << endl;
-    cout << "PVS  correctness: " << PvsCorrect << "/" << trials << endl;
-    cout << "MTDF correctness: " << mtfdCorrect << "/" << trials << endl;
-    cout << endl << "=============" << endl;
-    cout << "PVS  1st no. best: " << PvsBest1 << "/" << trials << endl;
-    cout << "MTDF 1st no. best: " << mtdfBest1 << "/" << trials << endl;
-    cout << endl << "=============" << endl;
-    cout << "PVS  2nd no. best: " << PvsBest2 << "/" << trials << endl;
-    cout << "MTDF 2nd no. best: " << mtdfBest2 << "/" << trials << endl;
-
-
-*/
-
-
 //Evaluate
 
-    Board b;
-    b.fenInterpreter("rnbqk1nr/pppppP1p/8/6pP/8/8/PPPPP3/RNBQK2R w KQkq g6 0 1", true);
+    Board* b1 = new Board(false);
+    b1->fenInterpreter("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1", false);
+    Evaluate* e1 = new Evaluate(b1);
+    Search *mtdf1 = new PVS(3,b1,e1,true,timeL);
 
-    //cout<<b.gui_isValid("e1", "g1", 0)<<endl;
-    cout<<b.gui_isValid("h5", "g6", 0)<<endl;
+    Board* b2 = new Board(false);
+    b2->fenInterpreter("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1", true);
+    Evaluate* e2 = new Evaluate(b2);
+    Search *mtdf2 = new PVS(10,b2,e2,true,timeL);
 
+    vector<string> p1, p2;
 
+    int counter = 0;
 
-//    int x = 5;
-//    int moves[5] = {255872, 817536, 173696, 107088, 197632};
-//    for (int i = 0; i < x; ++i){
-//        bool d = false;
-//        for(int j = 0; j < b.allValidMoves.size(); ++j){
-//            if(b.allValidMoves[j] == moves[i]){
-//                cout<<"move: "<<moves[i]<<" done. "<<endl;
-//                d = true;
-//                b.doo(moves[i]);
-//            }
-//        }
-//        if(!d){
-//            cout<<"move: "<<moves[i]<<" doesn't exist. "<<endl;
-//            break;
-//        }
-//    }
+    while(!b1->isOver() && !b2->isOver()){
+        p1.clear(); p2.clear();
+        for (int i = 0; i < b1->allValidMoves.size(); i++){
+            p1.push_back(b1->moveInterpret(b1->allValidMoves[i]));
+        }
+        for (int i = 0; i < b2->allValidMoves.size(); i++){
+            p2.push_back(b2->moveInterpret(b2->allValidMoves[i]));
+        }
+        cout<<"=================================================="<<endl;
+        cout<<"not matching moves in white palyer["<<b1->me<<"]: "<<endl;
 
+        for (int i = 0; i < p1.size(); i++){
+            bool x = true;
+            for (int j = 0; j < p2.size(); j++){
+                if(p1[i] == p2[j])x = false;
+            }
+            if(x){
+                cout<<p1[i]<<endl;
+            }
+        }
 
-    b.disp();
+        cout<<"not matching moves in black palyer["<<b2->me<<"]: "<<endl;
+
+        for (int i = 0; i < p2.size(); i++){
+            bool x = true;
+            for (int j = 0; j < p1.size(); j++){
+                if(p2[i] == p1[j])x = false;
+            }
+            if(x){
+                cout<<p2[i]<<endl;
+            }
+        }
+        if(b1->whiteToMove && !b2->whiteToMove){
+            mtdf1->GetBestMove();
+            int move = mtdf1->bestMove;
+            string str = b1->moveInterpret(move);
+            if(b1->gui_isValid(str.substr(0, 2), str.substr(2, 2), str[4] - '0')!='V')cout<<"a7a"<<endl;
+            if(b2->gui_isValid(str.substr(0, 2), str.substr(2, 2), str[4] - '0')!='V')cout<<"a7a"<<endl;
+            cout<<"done move: "<<str<<endl;
+        }else if(!b1->whiteToMove && b2->whiteToMove){
+            mtdf2->GetBestMove();
+            int move = mtdf2->bestMove;
+            string str = b2->moveInterpret(move);
+            if(b1->gui_isValid(str.substr(0, 2), str.substr(2, 2), str[4] - '0')!='V')cout<<"a7a"<<endl;
+            if(b2->gui_isValid(str.substr(0, 2), str.substr(2, 2), str[4] - '0')!='V')cout<<"a7a"<<endl;
+            cout<<"done move: "<<str<<endl;
+
+        }else{
+            cout<<"mismatching turns\n";
+            break;
+        }
+
+        if(b1->toFen() != b2->toFen()){
+            cout<<"mismatching state\n";
+            break;
+        }
+        if(++counter == 500)break;
+        cout<<counter<<" moves done.\n";
+        cout<<"new state: "<<b1->toFen()<<endl;
+    }
+    cout<<"white palyer["<<b1->me<<"]: "<<b1->gui_gameState()<<endl;
+    cout<<"black palyer["<<b2->me<<"]: "<<b2->gui_gameState()<<endl;
+
 
 }
 
