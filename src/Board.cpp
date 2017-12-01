@@ -3298,6 +3298,27 @@ public:
         return '-';
     }
 
+
+    string getWinningKing(){
+        int kingPos;
+        if(!whiteToMove){
+            kingPos = log2(whiteKing) + EPS;
+
+        }else{
+            kingPos = log2(blackKing) + EPS;
+        }
+        char fromRank = kingPos / 8 + '1';
+        if (me == 'b')fromRank = 7 - kingPos / 8 + '1';
+        char fromFile = (char) (kingPos % 8 + 'a');
+
+        string str = "";
+        str += fromFile;
+        str += fromRank;
+
+
+        return str + str + "0w";
+    }
+
     //This function returns the piece as a char given the position as A1 --> H8
     char gui_getPieceAt(string pos) {
         if (pos.size() != 2) {
@@ -3448,8 +3469,6 @@ public:
         char fromFile = (char) (from % 8 + 'a');
         char toFile = (char) (to % 8 + 'a');
 
-        cout << "FROM RANK: " << (int) fromRank << endl;
-        cout << "TO RANK: " << (int) toRank << endl;
         string str = "";
         str += fromFile;
         str += fromRank;
