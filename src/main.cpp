@@ -185,13 +185,12 @@ int main() {
 //Evaluate
 
     Board b;
-    b.fenInterpreter("B2q1r2/4b1p1/k2pbp2/1p5p/pP1PpB1P/7N/P1P1QPP1/R3R1K1 b - - 0 1", true);
+    b.fenInterpreter("r1bqkb1r/pppppppp/5n2/8/8/3P1N2/PPn1PPPP/RNBQKB1R b KQkq - 0 1", true);
 
 
-
-    cout<<b.gui_isValid("a6", "h7", 0)<<endl;
-
-    cout<<b.gui_gameState()<<endl;
+    cout<<b.gui_isValid("a7", "a6", 0)<<endl;
+    cout<<b.gui_isValid("e1", "d2", 0)<<endl;
+    cout<<b.gui_getPieceAt("e1")<<endl;
 
 
 //    int x = 5;
