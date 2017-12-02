@@ -62,8 +62,8 @@ class Board {
 public:
 
     int16_t mPstScoreOp, mPstScoreEd;
-    std::array<std::array<short, 64>, 12> mPieceSquareTableOpening;
-    std::array<std::array<short, 64>, 12> mPieceSquareTableEnding;
+    std::array<std::array<long, 64>, 12> mPieceSquareTableOpening;
+    std::array<std::array<long, 64>, 12> mPieceSquareTableEnding;
 
     inline int16_t getPstScoreOp() const noexcept {
         return mPstScoreOp;
@@ -571,11 +571,15 @@ public:
         //initialize PST
         for (Piece p = Piece::Pawn; p <= Piece::King; ++p) {
             for (Square sq = Square::A1; sq <= Square::H8; ++sq) {
-                mPieceSquareTableOpening[p][sq] = openingPST[p][sq] + pieceValuesOpening[p];
-                mPieceSquareTableEnding[p][sq] = endingPST[p][sq] + pieceValuesEnding[p];
+//                mPieceSquareTableOpening[p][sq] = openingPST[p][sq] + pieceValuesOpening[p];
+                mPieceSquareTableOpening[p][sq] = pieceValuesOpening[p];
+//                mPieceSquareTableEnding[p][sq] = endingPST[p][sq] + pieceValuesEnding[p];
+                mPieceSquareTableEnding[p][sq] = pieceValuesEnding[p];
 
-                mPieceSquareTableOpening[p + Color::Black * 6][sq ^ 56] = -(openingPST[p][sq] + pieceValuesOpening[p]);
-                mPieceSquareTableEnding[p + Color::Black * 6][sq ^ 56] = -(endingPST[p][sq] + pieceValuesEnding[p]);
+//                mPieceSquareTableOpening[p + Color::Black * 6][sq ^ 56] = -(openingPST[p][sq] + pieceValuesOpening[p]);
+                mPieceSquareTableOpening[p + Color::Black * 6][sq ^ 56] = -(pieceValuesOpening[p]);
+//                mPieceSquareTableEnding[p + Color::Black * 6][sq ^ 56] = -(endingPST[p][sq] + pieceValuesEnding[p]);
+                mPieceSquareTableEnding[p + Color::Black * 6][sq ^ 56] = -(pieceValuesEnding[p]);
             }
         }
     }
@@ -1197,8 +1201,8 @@ public:
                     refPawns ^= (1ull << from);
                     key ^= squareZKey(from, mp);
                     int ex = locExist(whitePieces, (1ull << from)) ? type : type + 6;
-                    mPstScoreOp -= mPieceSquareTableOpening[ex][from];
-                    mPstScoreEd -= mPieceSquareTableEnding[ex][from];
+//                    mPstScoreOp -= mPieceSquareTableOpening[ex][from];
+//                    mPstScoreEd -= mPieceSquareTableEnding[ex][from];
 
                 } else {
                     refPawns ^= moveXor;
