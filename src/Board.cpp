@@ -3337,7 +3337,7 @@ public:
         str += fromRank;
 
 
-        return str + str + "0w";
+        return str + str + "0";
     }
 
     //This function returns the piece as a char given the position as A1 --> H8
