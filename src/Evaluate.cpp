@@ -1,5 +1,5 @@
 #include "Evaluate.h"
-
+#include <bitset>
 template<class T>
 T clamp(T value, T lowerBound, T upperBound) {
     return std::max(lowerBound, std::min(value, upperBound));
@@ -44,7 +44,7 @@ int Evaluate::pawnStructure(int phase) {
                                   && _board->getPieceAt(from + 8 - 16 * c) != 'P'
                                   && _board->getPieceAt(from + 8 - 16 * c) != 'p'
                                   && (PawnAttacks[c][from + 8 - 16 * c] & opponentPawns);
-
+            //cout << passed << ' ' << doubled << ' ' << isolated << ' ' << backward << endl;
             if (passed) {
                 scoreOpForColor += passedBonusOpening[pawnRank];
                 scoreEdForColor += passedBonusEnding[pawnRank];
@@ -68,6 +68,7 @@ int Evaluate::pawnStructure(int phase) {
 
         scoreOp += (c ? -scoreOpForColor : scoreOpForColor);
         scoreEd += (c ? -scoreEdForColor : scoreEdForColor);
+        //cout << scoreOpForColor << ' ' << scoreEdForColor << endl;
     }
 
     pht.save(_board->ZPawns(), scoreOp, scoreEd);
@@ -77,7 +78,7 @@ int Evaluate::pawnStructure(int phase) {
 
 int Evaluate::kingSafty(int blackKingSafety, int whiteKingSafty, int phase) {
     //cout<<blackKingSafety<<" BLACK"<<endl;
-    //cout<<whiteKingSafty<<" WHITE"<<endl;
+    ////cout<<whiteKingSafty<<" WHITE"<<endl;
     //evaluate white pawn shelter
     int penalty = 0;
     int kingFile = min(1, max(6, _board->getColumn(log2(_board->whiteKing) + _board->EPS)));
