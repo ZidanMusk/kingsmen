@@ -56,7 +56,7 @@ protected:
     ll _MaxDepth;
     map <ll,TransitionEntry> _TransitionTable;
     virtual void _IterativeDeepening(ll MaxDepth)=0;
-    ll Qsearch(ll alpha,ll beta,bool isMax,ll MaxDepth=0);
+    ll Qsearch(ll alpha,ll beta,bool isMax,ll MaxDepth=2);
     void _InsertlloTransitionTable(ll StateID,ll Depth,ll Value,ll HashFlag,ll BestMoveStateID);
     ll _GetFromTransitionTable(ll StateID,ll Depth, ll Alpha, ll Beta);
     bool hasTime()
