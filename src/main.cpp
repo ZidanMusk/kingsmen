@@ -286,11 +286,11 @@ int main(int argc, char *argv[]) {
 
     board->fenInterpreter(initial_state, flag);
 
-    int maxDepth = 4;
+    int maxDepth = 3;
     int timeL=200;
     Evaluate *evaluate = new Evaluate(board);
-//    Search *baseline = new AlphaBeta(maxDepth, board, evaluate);
-    Search *baseline = new PVS(maxDepth,board,evaluate,true,timeL);
+    Search *baseline = new AlphaBeta(maxDepth, board, evaluate);
+//    Search *baseline = new PVS(maxDepth,board,evaluate,true,timeL);
 //    Search *mtdf = new MTDF(maxDepth,boardMTDF,evaluate, true, true, true,timeL);
 
     int bestMoveId;
