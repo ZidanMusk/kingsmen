@@ -188,9 +188,9 @@ int Evaluate::mobilityEval(std::array<int, 2> &kingSafetyScore, int phase) {
 int Evaluate::evaluate() {
 
     // IF DRAW RETURN 0
-//    if () {
-//        return 0;
-//    }
+    if (_board->isDraw()) {
+        return 0;
+    }
     clock_t tStart = clock();
 
     std::array<int, 2> kingSafetyScore;
