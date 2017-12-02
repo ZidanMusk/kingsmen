@@ -197,12 +197,13 @@ int Evaluate::evaluate() {
     auto phase = clamp(static_cast<int>(_board->getGamePhase()), 0, 64);
 
     auto score = mobilityEval(kingSafetyScore, phase);
-    //cout<<score<<endl;
+    cout<<"MOBILITY "<<score<<endl;
     score += pawnStructure(phase);
-    //cout<<score<<endl;
+    cout<<"pawnStructure "<<score<<endl;
     score += kingSafty(kingSafetyScore[1], kingSafetyScore[0], phase);
-    //cout<<score<<endl;
+    cout<<"kingSafty "<<score<<endl;
     score += interpolateScore(_board->getPstScoreOp(), _board->getPstScoreEd(), phase);
+    cout<<"PST "<<score<<endl;
 
     // Bishop pair bonus.
     for (Color c = Color::White; c <= Color::Black; ++c) {
@@ -211,9 +212,9 @@ int Evaluate::evaluate() {
             score += (c ? -bishopPairBonus : bishopPairBonus);
         }
     }
-    //cout<<score<<endl;
+    cout<<"bishopPairBonus "<<score<<endl;
     score += (_board->whiteToMove ? sideToMoveBonus : -sideToMoveBonus);
-    //cout<<score<<endl;
+    cout<<"sideToMoveBonus "<<score<<endl;
     xx += (clock() - tStart);
     xxx++;
     return score;
