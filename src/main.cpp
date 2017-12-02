@@ -286,8 +286,8 @@ int main(int argc, char *argv[]) {
 
     board->fenInterpreter(initial_state, flag);
 
-    int maxDepth = 10;
-    int timeL=5;
+    int maxDepth = 4;
+    int timeL=200;
     Evaluate *evaluate = new Evaluate(board);
 //    Search *baseline = new AlphaBeta(maxDepth, board, evaluate);
     Search *baseline = new PVS(maxDepth,board,evaluate,true,timeL);
