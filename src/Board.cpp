@@ -3317,7 +3317,7 @@ public:
         str += fromRank;
 
 
-        return str + str + "0w";
+        return str + str + "0";
     }
 
     string getWinningKing(){

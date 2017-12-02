@@ -319,6 +319,7 @@ int main(int argc, char *argv[]) {
                         msg += board->toFen();
                         comm.Send_GUI(msg);
                         Ack = comm.Receive_GUI();
+                        cout<<evaluate->evaluate()<<endl;
                         break;
                     } else {
                         string msg = "I";
@@ -355,8 +356,10 @@ int main(int argc, char *argv[]) {
                         msg += board->toFen();
                         comm.Send_GUI(msg);
                         Ack = comm.Receive_GUI();
+                        cout<<evaluate->evaluate()<<endl;
+
                     } else {
-                        string msg = "a1a10w" + board->toFen();
+                        string msg = board->getLosingKing() + "w" + board->toFen();
                         comm.Send_GUI(msg);
                         Ack = comm.Receive_GUI();
 
@@ -377,8 +380,10 @@ int main(int argc, char *argv[]) {
                         string msg = src + dst + to_string(prom) + board->gui_gameState() + board->toFen();
                         comm.Send_GUI(msg);
                         Ack = comm.Receive_GUI();
+                        cout<<evaluate->evaluate()<<endl;
+
                     } else {
-                        string msg = "a1a10w" + board->toFen();
+                        string msg = board->getLosingKing() + "w" + board->toFen();
                         comm.Send_GUI(msg);
                         Ack = comm.Receive_GUI();
 
@@ -388,11 +393,11 @@ int main(int argc, char *argv[]) {
                 } else if (move[0] == '3')//w/l timeout
                 {
                     if (toupper(move[1]) == 'W') {
-                        string msg = "a1a10w" + board->toFen();
+                        string msg = board->getLosingKing() + "w" + board->toFen();
                         comm.Send_GUI(msg);
                         Ack = comm.Receive_GUI();
                     } else {
-                        string msg = "a1a10l" + board->toFen();
+                        string msg = board->getLosingKing() + "l" + board->toFen();
                         comm.Send_GUI(msg);
                         Ack = comm.Receive_GUI();
 
@@ -414,6 +419,7 @@ int main(int argc, char *argv[]) {
                 board->gui_isValid(src, dst, (int) (move[4] - '0'));
                 comm.Send_GUI(move + board->gui_gameState() + board->toFen());
                 string ACK = comm.Receive_GUI();
+                cout<<evaluate->evaluate()<<endl;
 
                 if (move[4] == '0') {
                     comm.send_move(src, dst);
@@ -440,8 +446,10 @@ int main(int argc, char *argv[]) {
                         string msg = src + dst + "0" + board->gui_gameState() + board->toFen();
                         comm.Send_GUI(msg);
                         Ack = comm.Receive_GUI();
+                        cout<<evaluate->evaluate()<<endl;
+
                     } else {
-                        string msg = "a1a10w" + board->toFen();
+                        string msg = board->getLosingKing() + "w" + board->toFen();
                         comm.Send_GUI(msg);
                         Ack = comm.Receive_GUI();
                     }
@@ -461,8 +469,10 @@ int main(int argc, char *argv[]) {
                         string msg = src + dst + to_string(prom) + board->gui_gameState() + board->toFen();
                         comm.Send_GUI(msg);
                         Ack = comm.Receive_GUI();
+                        cout<<evaluate->evaluate()<<endl;
+
                     } else {
-                        string msg = "a1a10w" + board->toFen();
+                        string msg = board->getLosingKing() + "w" + board->toFen();
                         comm.Send_GUI(msg);
                         Ack = comm.Receive_GUI();
                     }
@@ -471,11 +481,11 @@ int main(int argc, char *argv[]) {
                 } else if (move[0] == '3')//w/l timeout
                 {
                     if (toupper(move[1]) == 'W') {
-                        string msg = "a1a10w" + board->toFen();
+                        string msg = board->getLosingKing() + "w" + board->toFen();
                         comm.Send_GUI(msg);
                         Ack = comm.Receive_GUI();
                     } else {
-                        string msg = "a1a10l" + board->toFen();
+                        string msg = board->getLosingKing() + "l" + board->toFen();
                         comm.Send_GUI(msg);
                         Ack = comm.Receive_GUI();
                     }
