@@ -420,7 +420,6 @@ public:
                             0x1c99ded33cb890a1L, 0xcf3145de0add4289L, 0xd0e4427a5514fb72L,
                             0x77c621cc9fb3a483L, 0x67a34dac4356550bL};
     // contains the zobrist key of the position where each cell was threatened
-    ull threat[64];
     // zobrist key for whose turn is it
     ull whiteMove = 0xf8d626aaaf278509L;
 
@@ -738,7 +737,7 @@ public:
         }
         if (fen[cas] == '-')cas += 2;
         else {
-            enPassantLoc = (fen[cas + 1] - '1') * 8 + (fen[cas] - 'a') + (whiteToMove ? 8 : -8);
+            enPassantLoc = (fen[cas + 1] - '1') * 8 + (fen[cas] - 'a') + (whiteToMove ? -8 : 8);
             cas += 3;
         }
         string str = "";
@@ -1622,7 +1621,7 @@ public:
             return true;
 
         // insufficient material -- so far only Kk, but need to add:
-        if ((whitePieces & ~whiteKing) == 0 && (blackPieces & ~blackKing) == 0)
+        if (popCnt(whitePieces) == 1 && popCnt(blackPieces) == 1)
             return true;
 
         return false;
@@ -2471,7 +2470,6 @@ public:
 
                 if (isValid(true, move)) {
                     whitePawnCap.push_back(move);
-                    threat[newInd] = key;
                 }
             }
             if (pawnForwardAttack(ind, newInd) && (newInd >= 0 && newInd <= 63) && (blackPieces & (1ull << newInd))) {
@@ -2483,13 +2481,12 @@ public:
                         whitePawnCap.push_back(makeMoveMask(PROMOTEROOK, 1, pawnTypeNum(), ind, newInd, 0));
                         whitePawnCap.push_back(makeMoveMask(PROMOTEKNIGHT, 1, pawnTypeNum(), ind, newInd, 0));
                         whitePawnCap.push_back(makeMoveMask(PROMOTEQUEEN, 1, pawnTypeNum(), ind, newInd, 0));
-                        threat[newInd] = key;
                     }
                 } else {
                     int move = makeMoveMask(0, 1, pawnTypeNum(), ind, newInd, 0);
                     if (isValid(true, move)) {
                         whitePawnCap.push_back(move);
-                        threat[newInd] = key;
+                        //threat[newInd] = key;
                     }
                 }
             }
@@ -2499,7 +2496,7 @@ public:
                 int move = makeMoveMask(0, 1, pawnTypeNum(), ind, newInd, 0);
                 if (isValid(true, move)) {
                     whitePawnCap.push_back(move);
-                    threat[newInd] = key;
+                    //threat[newInd] = key;
                 }
             }
             if (pawnForwardAttack(ind, newInd) && (newInd >= 0 && newInd <= 63) && (blackPieces & (1ull << newInd))) {
@@ -2511,13 +2508,13 @@ public:
                         whitePawnCap.push_back(makeMoveMask(PROMOTEROOK, 1, pawnTypeNum(), ind, newInd, 0));
                         whitePawnCap.push_back(makeMoveMask(PROMOTEKNIGHT, 1, pawnTypeNum(), ind, newInd, 0));
                         whitePawnCap.push_back(makeMoveMask(PROMOTEQUEEN, 1, pawnTypeNum(), ind, newInd, 0));
-                        threat[newInd] = key;
+                        //threat[newInd] = key;
                     }
                 } else {
                     int move = makeMoveMask(0, 1, pawnTypeNum(), ind, newInd, 0);
                     if (isValid(true, move)) {
                         whitePawnCap.push_back(move);
-                        threat[newInd] = key;
+                        //threat[newInd] = key;
                     }
                 }
 
@@ -2576,7 +2573,7 @@ public:
                 int move = makeMoveMask(0, 1, pawnTypeNum(), ind, newInd, 1);
                 if (isValid(false, move)) {
                     blackPawnCap.push_back(move);
-                    threat[newInd] = key;
+                    //threat[newInd] = key;
                 }
             }
             if (pawnBackwardAttack(ind, newInd) && (newInd >= 0 && newInd <= 63) && (whitePieces & (1ull << newInd))) {
@@ -2588,13 +2585,11 @@ public:
                         blackPawnCap.push_back(makeMoveMask(PROMOTEKNIGHT, 1, pawnTypeNum(), ind, newInd, 1));
                         blackPawnCap.push_back(makeMoveMask(PROMOTEBISHOP, 1, pawnTypeNum(), ind, newInd, 1));
                         blackPawnCap.push_back(makeMoveMask(PROMOTEROOK, 1, pawnTypeNum(), ind, newInd, 1));
-                        threat[newInd] = key;
                     }
                 } else {
                     int move = makeMoveMask(0, 1, pawnTypeNum(), ind, newInd, 1);
                     if (isValid(false, move)) {
                         blackPawnCap.push_back(move);
-                        threat[newInd] = key;
                     }
                 }
             }
@@ -2604,7 +2599,6 @@ public:
                 int move = makeMoveMask(0, 1, pawnTypeNum(), ind, newInd, 1);
                 if (isValid(false, move)) {
                     blackPawnCap.push_back(move);
-                    threat[newInd] = key;
                 }
             }
             if (pawnBackwardAttack(ind, newInd) && (newInd >= 0 && newInd <= 63) && (whitePieces & (1ull << newInd))) {
@@ -2616,13 +2610,11 @@ public:
                         blackPawnCap.push_back(makeMoveMask(PROMOTEKNIGHT, 1, pawnTypeNum(), ind, newInd, 1));
                         blackPawnCap.push_back(makeMoveMask(PROMOTEBISHOP, 1, pawnTypeNum(), ind, newInd, 1));
                         blackPawnCap.push_back(makeMoveMask(PROMOTEROOK, 1, pawnTypeNum(), ind, newInd, 1));
-                        threat[newInd] = key;
                     }
                 } else {
                     int move = makeMoveMask(0, 1, pawnTypeNum(), ind, newInd, 1);
                     if (isValid(false, move)) {
                         blackPawnCap.push_back(move);
-                        threat[newInd] = key;
                     }
                 }
 
@@ -2651,7 +2643,6 @@ public:
                 int move = makeMoveMask(0, 1, knightTypeNum(), ind, newInd, 0);
                 if (isValid(true, move)) {
                     whiteKnightCap.push_back(move);
-                    threat[newInd] = key;
                 }
             }
             newInd = ind + 10;
@@ -2662,7 +2653,6 @@ public:
                 int move = makeMoveMask(0, 1, knightTypeNum(), ind, newInd, 0);
                 if (isValid(true, move)) {
                     whiteKnightCap.push_back(move);
-                    threat[newInd] = key;
                 }
             }
             newInd = ind + 15;
@@ -2673,7 +2663,7 @@ public:
                 int move = makeMoveMask(0, 1, knightTypeNum(), ind, newInd, 0);
                 if (isValid(true, move)) {
                     whiteKnightCap.push_back(move);
-                    threat[newInd] = key;
+                    //threat[newInd] = key;
                 }
             }
             newInd = ind + 17;
@@ -2684,7 +2674,7 @@ public:
                 int move = makeMoveMask(0, 1, knightTypeNum(), ind, newInd, 0);
                 if (isValid(true, move)) {
                     whiteKnightCap.push_back(move);
-                    threat[newInd] = key;
+                    //threat[newInd] = key;
                 }
             }
 
@@ -2697,7 +2687,7 @@ public:
                 int move = makeMoveMask(0, 1, knightTypeNum(), ind, newInd, 0);
                 if (isValid(true, move)) {
                     whiteKnightCap.push_back(move);
-                    threat[newInd] = key;
+                    //threat[newInd] = key;
                 }
             }
             newInd = ind - 10;
@@ -2708,7 +2698,7 @@ public:
                 int move = makeMoveMask(0, 1, knightTypeNum(), ind, newInd, 0);
                 if (isValid(true, move)) {
                     whiteKnightCap.push_back(move);
-                    threat[newInd] = key;
+                    //threat[newInd] = key;
                 }
             }
             newInd = ind - 15;
@@ -2719,7 +2709,7 @@ public:
                 int move = makeMoveMask(0, 1, knightTypeNum(), ind, newInd, 0);
                 if (isValid(true, move)) {
                     whiteKnightCap.push_back(move);
-                    threat[newInd] = key;
+                    //threat[newInd] = key;
                 }
             }
             newInd = ind - 17;
@@ -2730,7 +2720,7 @@ public:
                 int move = makeMoveMask(0, 1, knightTypeNum(), ind, newInd, 0);
                 if (isValid(true, move)) {
                     whiteKnightCap.push_back(move);
-                    threat[newInd] = key;
+                    //threat[newInd] = key;
                 }
             }
 
@@ -2758,7 +2748,7 @@ public:
                 int move = makeMoveMask(0, 1, knightTypeNum(), ind, newInd, 1);
                 if (isValid(false, move)) {
                     blackKnightCap.push_back(move);
-                    threat[newInd] = key;
+                    //threat[newInd] = key;
                 }
             }
             newInd = ind + 10;
@@ -2769,7 +2759,7 @@ public:
                 int move = makeMoveMask(0, 1, knightTypeNum(), ind, newInd, 1);
                 if (isValid(false, move)) {
                     blackKnightCap.push_back(move);
-                    threat[newInd] = key;
+                    //threat[newInd] = key;
                 }
             }
             newInd = ind + 15;
@@ -2780,7 +2770,7 @@ public:
                 int move = makeMoveMask(0, 1, knightTypeNum(), ind, newInd, 1);
                 if (isValid(false, move)) {
                     blackKnightCap.push_back(move);
-                    threat[newInd] = key;
+                    //threat[newInd] = key;
                 }
             }
             newInd = ind + 17;
@@ -2791,7 +2781,7 @@ public:
                 int move = makeMoveMask(0, 1, knightTypeNum(), ind, newInd, 1);
                 if (isValid(false, move)) {
                     blackKnightCap.push_back(move);
-                    threat[newInd] = key;
+                    //threat[newInd] = key;
                 }
             }
 
@@ -2804,7 +2794,6 @@ public:
                 int move = makeMoveMask(0, 1, knightTypeNum(), ind, newInd, 1);
                 if (isValid(false, move)) {
                     blackKnightCap.push_back(move);
-                    threat[newInd] = key;
                 }
             }
             newInd = ind - 10;
@@ -2815,7 +2804,6 @@ public:
                 int move = makeMoveMask(0, 1, knightTypeNum(), ind, newInd, 1);
                 if (isValid(false, move)) {
                     blackKnightCap.push_back(move);
-                    threat[newInd] = key;
                 }
             }
             newInd = ind - 15;
@@ -2826,7 +2814,7 @@ public:
                 int move = makeMoveMask(0, 1, knightTypeNum(), ind, newInd, 1);
                 if (isValid(false, move)) {
                     blackKnightCap.push_back(move);
-                    threat[newInd] = key;
+                    //threat[newInd] = key;
                 }
             }
             newInd = ind - 17;
@@ -2837,7 +2825,7 @@ public:
                 int move = makeMoveMask(0, 1, knightTypeNum(), ind, newInd, 1);
                 if (isValid(false, move)) {
                     blackKnightCap.push_back(move);
-                    threat[newInd] = key;
+                    //threat[newInd] = key;
                 }
             }
 
@@ -2873,10 +2861,10 @@ public:
                 for (int j = loc + dx[i]; j < lim[i] && (j < firstCollisionCell || noCollision); j += dx[i]) {
                     int moveMask = makeMoveMask(0, 0, type, loc, j, color);
                     if (isValid(!color, moveMask))
-                        ret.push_back(moveMask), threat[j] = key;
+                        ret.push_back(moveMask);// threat[j] = key;
                 }
                 if (!noCollision) {
-                    threat[firstCollisionCell] = key;
+                    //threat[firstCollisionCell] = key;
                     if (locExist(target, firstCollision)) {
                         int moveMask = makeMoveMask(0, 1, type, loc, firstCollisionCell, color);
                         if (isValid(!color, moveMask))
@@ -2896,10 +2884,10 @@ public:
                 for (int j = loc + dx[i]; j > lim[i] && (j > firstCollisionCell || noCollision); j += dx[i]) {
                     int moveMask = makeMoveMask(0, 0, type, loc, j, color);
                     if (isValid(!color, moveMask))
-                        ret.push_back(makeMoveMask(0, 0, type, loc, j, color)), threat[j] = key;
+                        ret.push_back(makeMoveMask(0, 0, type, loc, j, color));// //threat[j] = key;
                 }
                 if (!noCollision) {
-                    threat[firstCollisionCell] = key;
+                    ////threat[firstCollisionCell] = key;
                     int moveMask = makeMoveMask(0, 1, type, loc, firstCollisionCell, color);
                     if (locExist(target, firstCollision) && isValid(!color, moveMask))
                         ret.push_back(makeMoveMask(0, 1, type, loc, firstCollisionCell, color));
@@ -2940,10 +2928,10 @@ public:
                                                                              y2); j += di[i], x2 += dx[i], y2 += dy[i]) {
                     int moveMask = makeMoveMask(0, 0, type, loc, j, color);
                     if (isValid(!color, moveMask))
-                        ret.push_back(makeMoveMask(0, 0, type, loc, j, color)), threat[j] = key;
+                        ret.push_back(makeMoveMask(0, 0, type, loc, j, color));// threat[j] = key;
                 }
                 if (!noCollision) {
-                    threat[firstCollisionCell] = key;
+                    //threat[firstCollisionCell] = key;
                     int moveMask = makeMoveMask(0, 1, type, loc, firstCollisionCell, color);
                     if (locExist(target, firstCollision) && isValid(!color, moveMask))
                         ret.push_back(makeMoveMask(0, 1, type, loc, firstCollisionCell, color));
@@ -2963,10 +2951,10 @@ public:
                                                                              y2); j += di[i], x2 += dx[i], y2 += dy[i]) {
                     int moveMask = makeMoveMask(0, 0, type, loc, j, color);
                     if (isValid(!color, moveMask))
-                        ret.push_back(makeMoveMask(0, 0, type, loc, j, color)), threat[j] = key;
+                        ret.push_back(makeMoveMask(0, 0, type, loc, j, color));// threat[j] = key;
                 }
                 if (!noCollision) {
-                    threat[firstCollisionCell] = key;
+                    //threat[firstCollisionCell] = key;
                     int moveMask = makeMoveMask(0, 1, type, loc, firstCollisionCell, color);
                     if (locExist(target, firstCollision) && isValid(!color, moveMask))
                         ret.push_back(makeMoveMask(0, 1, type, loc, firstCollisionCell, color));
@@ -2986,8 +2974,6 @@ public:
         return ret;
     }
 
-
-
     bool isToKing(int ind, int newInd){
         int Row = ind/8;
         int newRow = newInd/8;
@@ -2997,7 +2983,6 @@ public:
         return (abs(Row - newRow) <= 1 && abs(col - newCol) <= 1);
 
     }
-
 // king moves generation
     vector<int> kingMoves() {
         vector<int> ret;
@@ -3018,10 +3003,11 @@ public:
 
 
         int di[] = {-9, -8, -7, -1, 1, 7, 8, 9};
-
+        ull intersection = maskW & maskB;
         if (whiteToMove) {
             for (int i = 0; i < 8; ++i) {
-                if (isToKing(locW, locW + di[i]) && cellInBoard(locW + di[i]) && threat[locW + di[i]] != key)
+                if (isToKing(locW, locW + di[i]) && cellInBoard(locW + di[i]) && locExist(intersection, 1ull << (locW + di[i])))continue;
+                if (isToKing(locW, locW + di[i]) && cellInBoard(locW + di[i]))
                     if (!((resW >> (locW + di[i])) & 1ull)) {
                         int move = (makeMoveMask(0, 0, kingTypeNum(), locW, locW + di[i], 0));
                         if (isValid(whiteToMove, move))ret.push_back(move);
@@ -3034,24 +3020,33 @@ public:
             }
             bool check = isCheck();
             if (!check) {
-                if (threat[5] != key && threat[6] != key && !(allPieces & 96) && whiteCastleK) {
+                if (!((allPieces & (1ull << 5)) | (allPieces & (1ull << 6)))  && whiteCastleK) {
                     int move = (makeMoveMask(CASTLEKINGSIDE, 0, kingTypeNum(), 4, 6, 0));
-                    if (isValid(whiteToMove, move))ret.push_back(move);
+                    if (isValid(whiteToMove, move)){
+                        ret.push_back(move);
+                        whiteCastleK = 0;
+                    }
 
                 }
-                if (threat[2] != key && threat[3] != key && !(allPieces & 14) && whiteCastleQ) {
+                if (!(((allPieces & (1ull << 1)) | (allPieces & (1ull << 2)) | (allPieces & (1ull << 3)))) && whiteCastleQ) {
                     int move = (makeMoveMask(CASTLEQUEENSIDE, 0, kingTypeNum(), 4, 2, 0));
-                    if (isValid(whiteToMove, move))ret.push_back(move);
+                    if (isValid(whiteToMove, move)){
+                        ret.push_back(move);
+                        whiteCastleQ = 0;
+                    }
 
                 }
             }
 
         } else {
             for (int i = 0; i < 8; ++i) {
-                if (isToKing(locB, locB + di[i]) && cellInBoard(locB + di[i]) && threat[locB + di[i]] != key)
+                if (isToKing(locB, locB + di[i]) && cellInBoard(locB + di[i]) && locExist(intersection, 1ull << (locB + di[i])))continue;
+                if (isToKing(locB, locB + di[i]) && cellInBoard(locB + di[i]))
                     if (!((resB >> (locB + di[i])) & 1ull)) {
                         int move = (makeMoveMask(0, 0, kingTypeNum(), locB, locB + di[i], 1));
-                        if (isValid(whiteToMove, move))ret.push_back(move);
+                        if (isValid(whiteToMove, move)) {
+                            ret.push_back(move);
+                        }
 
                     } else {
                         if (locExist(whitePieces, 1ull << (locB + di[i]))) {
@@ -3063,19 +3058,21 @@ public:
             }
             bool check = isCheck();
             if (!check) {
-                if (threat[61] != key && threat[62] != key &&
-                    !((allPieces & (1ull << 61)) | (allPieces & (1ull << 62))) && blackCastleK) {
+                if (!((allPieces & (1ull << 61)) | (allPieces & (1ull << 62))) && blackCastleK) {
                     int move = (makeMoveMask(CASTLEKINGSIDE, 0, kingTypeNum(), 60, 62, 1));
-                    if (isValid(whiteToMove, move))
+                    if (isValid(whiteToMove, move)) {
                         ret.push_back(move);
+                        blackCastleK = 0;
+                    }
 
                 }
-                if (threat[58] != key && threat[59] != key &&
-                    !(((allPieces & (1ull << 58)) | (allPieces & (1ull << 59)))) &&
+                if (!(((allPieces & (1ull << 57)) | (allPieces & (1ull << 58)) | (allPieces & (1ull << 59)))) &&
                     blackCastleQ) {
                     int move = (makeMoveMask(CASTLEQUEENSIDE, 0, kingTypeNum(), 60, 58, 1));
-                    if (isValid(whiteToMove, move))ret.push_back(move);
-
+                    if (isValid(whiteToMove, move)) {
+                        ret.push_back(move);
+                        blackCastleQ = 0;
+                    }
                 }
             }
         }
@@ -3277,7 +3274,7 @@ public:
             if (getFrom(allValidMoves[i]) == srcLoc && getTo(allValidMoves[i]) == dstLoc) {
                 if (getSpecialEvent(allValidMoves[i]) == promotion || getSpecialEvent(allValidMoves[i]) == ENPASSANT) {
                     //ordinary move or promotion
-                    cout << allValidMoves[i] << endl;
+                    //cout << allValidMoves[i] << endl;
                     doo(allValidMoves[i]);
                     return 'V';
                 }
@@ -3296,6 +3293,47 @@ public:
         if (isCheck() && (!whiteToMove))return 'c';
         if (isCheck() && whiteToMove)return 'C';
         return '-';
+    }
+
+
+    string getLosingKing(){
+        int kingPos;
+        if(whiteToMove){
+            kingPos = log2(whiteKing) + EPS;
+
+        }else{
+            kingPos = log2(blackKing) + EPS;
+        }
+        char fromRank = kingPos / 8 + '1';
+        if (me == 'b')fromRank = 7 - kingPos / 8 + '1';
+        char fromFile = (char) (kingPos % 8 + 'a');
+
+        string str = "";
+        str += fromFile;
+        str += fromRank;
+
+
+        return str + str + "0w";
+    }
+
+    string getWinningKing(){
+        int kingPos;
+        if(!whiteToMove){
+            kingPos = log2(whiteKing) + EPS;
+
+        }else{
+            kingPos = log2(blackKing) + EPS;
+        }
+        char fromRank = kingPos / 8 + '1';
+        if (me == 'b')fromRank = 7 - kingPos / 8 + '1';
+        char fromFile = (char) (kingPos % 8 + 'a');
+
+        string str = "";
+        str += fromFile;
+        str += fromRank;
+
+
+        return str + str + "0w";
     }
 
     //This function returns the piece as a char given the position as A1 --> H8
@@ -3448,8 +3486,6 @@ public:
         char fromFile = (char) (from % 8 + 'a');
         char toFile = (char) (to % 8 + 'a');
 
-        cout << "FROM RANK: " << (int) fromRank << endl;
-        cout << "TO RANK: " << (int) toRank << endl;
         string str = "";
         str += fromFile;
         str += fromRank;
