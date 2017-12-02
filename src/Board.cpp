@@ -571,15 +571,15 @@ public:
         //initialize PST
         for (Piece p = Piece::Pawn; p <= Piece::King; ++p) {
             for (Square sq = Square::A1; sq <= Square::H8; ++sq) {
-//                mPieceSquareTableOpening[p][sq] = openingPST[p][sq] + pieceValuesOpening[p];
-                mPieceSquareTableOpening[p][sq] = pieceValuesOpening[p];
-//                mPieceSquareTableEnding[p][sq] = endingPST[p][sq] + pieceValuesEnding[p];
-                mPieceSquareTableEnding[p][sq] = pieceValuesEnding[p];
+                mPieceSquareTableOpening[p][sq] = openingPST[p][sq] + pieceValuesOpening[p];
+//                mPieceSquareTableOpening[p][sq] = pieceValuesOpening[p];
+                mPieceSquareTableEnding[p][sq] = endingPST[p][sq] + pieceValuesEnding[p];
+//                mPieceSquareTableEnding[p][sq] = pieceValuesEnding[p];
 
-//                mPieceSquareTableOpening[p + Color::Black * 6][sq ^ 56] = -(openingPST[p][sq] + pieceValuesOpening[p]);
-                mPieceSquareTableOpening[p + Color::Black * 6][sq ^ 56] = -(pieceValuesOpening[p]);
-//                mPieceSquareTableEnding[p + Color::Black * 6][sq ^ 56] = -(endingPST[p][sq] + pieceValuesEnding[p]);
-                mPieceSquareTableEnding[p + Color::Black * 6][sq ^ 56] = -(pieceValuesEnding[p]);
+                mPieceSquareTableOpening[p + Color::Black * 6][sq ^ 56] = -(openingPST[p][sq] + pieceValuesOpening[p]);
+//                mPieceSquareTableOpening[p + Color::Black * 6][sq ^ 56] = -(pieceValuesOpening[p]);
+                mPieceSquareTableEnding[p + Color::Black * 6][sq ^ 56] = -(endingPST[p][sq] + pieceValuesEnding[p]);
+//                mPieceSquareTableEnding[p + Color::Black * 6][sq ^ 56] = -(pieceValuesEnding[p]);
             }
         }
     }
