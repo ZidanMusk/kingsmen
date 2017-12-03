@@ -284,6 +284,7 @@ int main(int argc, char *argv[]) {
 //    comm.Send_GUI(mode);
 //    fff = comm.Receive_GUI();
 //
+//   string str = "r2qkbr1/pbp3pp/1pn2p2/4p3/3Pp1nP/2N5/PPP2PP1/R1BQKBR1 b KQkq - 0 1";
    string str = "r1bqkbr1/pNp3pp/1pn2p2/4p3/3Pp1nP/2N5/PPP2PP1/R1BQKBR1 b KQkq - 0 1";
 //    string str = "r1bqkbr1/ppp2pp1/2n5/3pP1Np/4P3/1PN2P2/PnP3PP/R1BQKBR1 w KQkq - 0 1";
 //    string str = "rnbqkbnr/pppppppp/8/8/8/3P4/PPP1PPPP/RNBQKBNR w KQkq g6 0 1";
