@@ -59,7 +59,7 @@ ll PVS::pvsSearch(ll alpha, ll beta, ll depth,bool isMax, ll maxDepth) {
             cout << (unsigned ll)debug[i].first << " -> " << debug[i].second << endl;
         }
         cout<<"until reached state with no moves: "<<(unsigned ll)stateID<<endl;*/
-        cout<<"VERY BIG A7A!\n";
+        cout<<"VERY BIG ERROR!\n";
     }
 
     //this->debug.push_back(make_pair(stateID,this->PvTable[stateID]));

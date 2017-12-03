@@ -106,8 +106,8 @@ int main(){
             mtdf1->GetBestMove();
             int move = mtdf1->bestMove;
             string str = b1->moveInterpret(move);
-            if(b1->gui_isValid(str.substr(0, 2), str.substr(2, 2), str[4] - '0')!='V')cout<<"a7a"<<endl;
-            if(b2->gui_isValid(str.substr(0, 2), str.substr(2, 2), str[4] - '0')!='V')cout<<"a7a"<<endl;
+            if(b1->gui_isValid(str.substr(0, 2), str.substr(2, 2), str[4] - '0')!='V')cout<<"ERROR"<<endl;
+            if(b2->gui_isValid(str.substr(0, 2), str.substr(2, 2), str[4] - '0')!='V')cout<<"ERROR"<<endl;
             cout<<"evaluation of p1: "<<e1->evaluate(true)<<endl;
             cout<<"evaluation of p2: "<<e2->evaluate(true)<<endl;
             cout<<"done move: "<<str<<endl;
@@ -115,8 +115,8 @@ int main(){
             string str;
             cin>>str;
 
-            if(b1->gui_isValid(str.substr(0, 2), str.substr(2, 2), str[4] - '0')!='V')cout<<"a7a"<<endl;
-            if(b2->gui_isValid(str.substr(0, 2), str.substr(2, 2), str[4] - '0')!='V')cout<<"a7a"<<endl;
+            if(b1->gui_isValid(str.substr(0, 2), str.substr(2, 2), str[4] - '0')!='V')cout<<"ERROR"<<endl;
+            if(b2->gui_isValid(str.substr(0, 2), str.substr(2, 2), str[4] - '0')!='V')cout<<"ERROR"<<endl;
             cout<<"evaluation of p1: "<<e1->evaluate(true)<<endl;
             cout<<"evaluation of p2: "<<e2->evaluate(true)<<endl;
             cout<<"done move: "<<str<<endl;
@@ -183,8 +183,8 @@ int main(){
 //            mtdf1->GetBestMove();
 //            int move = mtdf1->bestMove;
 //            string str = b1->moveInterpret(move);
-//            if(b1->gui_isValid(str.substr(0, 2), str.substr(2, 2), str[4] - '0')!='V')cout<<"a7a"<<endl;
-//            if(b2->gui_isValid(str.substr(0, 2), str.substr(2, 2), str[4] - '0')!='V')cout<<"a7a"<<endl;
+//            if(b1->gui_isValid(str.substr(0, 2), str.substr(2, 2), str[4] - '0')!='V')cout<<"ERROR"<<endl;
+//            if(b2->gui_isValid(str.substr(0, 2), str.substr(2, 2), str[4] - '0')!='V')cout<<"ERROR"<<endl;
 //            cout<<"evaluation of p1: "<<e1->evaluate()<<endl;
 //            cout<<"evaluation of p2: "<<e2->evaluate()<<endl;
 //            cout<<"done move: "<<str<<endl;
@@ -192,8 +192,8 @@ int main(){
 //            mtdf2->GetBestMove();
 //            int move = mtdf2->bestMove;
 //            string str = b2->moveInterpret(move);
-//            if(b1->gui_isValid(str.substr(0, 2), str.substr(2, 2), str[4] - '0')!='V')cout<<"a7a"<<endl;
-//            if(b2->gui_isValid(str.substr(0, 2), str.substr(2, 2), str[4] - '0')!='V')cout<<"a7a"<<endl;
+//            if(b1->gui_isValid(str.substr(0, 2), str.substr(2, 2), str[4] - '0')!='V')cout<<"ERROR"<<endl;
+//            if(b2->gui_isValid(str.substr(0, 2), str.substr(2, 2), str[4] - '0')!='V')cout<<"ERROR"<<endl;
 //            cout<<"evaluation of p1: "<<e1->evaluate()<<endl;
 //            cout<<"evaluation of p2: "<<e2->evaluate()<<endl;
 //            cout<<"done move: "<<str<<endl;
