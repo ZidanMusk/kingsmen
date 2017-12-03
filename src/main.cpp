@@ -253,6 +253,7 @@ int main(int argc, char *argv[]) {
 //    name comm = name(gui_port, agent_port, my_ip);
 
     Board *board = new Board();
+
 //    Board *boardMTDF = new Board(false);
 //
 //    comm.connect();
@@ -283,11 +284,19 @@ int main(int argc, char *argv[]) {
 //    comm.Send_GUI(mode);
 //    fff = comm.Receive_GUI();
 //
-    string str = "r1bqkbr1/pNp3pp/1pn2p2/4p3/3Pp1nP/2N5/PPP2PP1/R1BQKBR1 b KQkq - 0 1";
-    board->fenInterpreter(str, 1);
+    string str = "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 1";
+    board->fenInterpreter(str, 0);
     Evaluate *evaluate = new Evaluate(board);
+    cout << evaluate->evaluate() << endl;
 
-    cout << evaluate->evaluate();
+    board->doo(board->allValidMoves[0]);
+
+
+    cout << evaluate->evaluate() << endl;
+//    cout << board->mPstScoreOp << endl;
+    board->undoo();
+//    cout << 1 << endl;
+    cout << evaluate->evaluate() << endl;
 //
 //    int maxDepth = 3;
 //    int timeL = 200;

@@ -191,8 +191,8 @@ int Evaluate::evaluate() {
     if (_board->isDraw()) {
         return 0;
     }
-    if (_board->isMate() && _board->whiteToMove)return (int)-1e5;
-    if (_board->isMate() && !_board->whiteToMove)return (int)1e5;
+    if (_board->isMate() && _board->whiteToMove)return (int) -1e5;
+    if (_board->isMate() && !_board->whiteToMove)return (int) 1e5;
 
     clock_t tStart = clock();
 
@@ -205,7 +205,8 @@ int Evaluate::evaluate() {
     //cout<<score<<endl;
 //    score += kingSafty(kingSafetyScore[1], kingSafetyScore[0], phase);
     //cout<<score<<endl;
-    score += interpolateScore(_board->getPstScoreOp(), _board->getPstScoreEd(), phase);
+    int sign = (_board->me == 'b') ? -1 : 1;
+    score += interpolateScore(_board->getPstScoreOp() * sign, _board->getPstScoreEd() * sign, phase);
 
 //     Bishop pair bonus.
 //    for (Color c = Color::White; c <= Color::Black; ++c) {
