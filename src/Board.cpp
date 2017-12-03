@@ -3084,6 +3084,7 @@ public:
     vector<int> generateAllMoves() { // generates white moves in case of white turn, black in black's turn
         int color = !whiteToMove;
         vector<int> ret;
+
         vector<int> m;
         if (tr) {
             m = kingMoves();

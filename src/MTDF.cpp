@@ -66,10 +66,6 @@ void MTDF::_IterativeDeepening(ll MaxDepth) {
     //TODO get it from table
     ll firstguess = 0;
     ll root_id=Search::board->key;
-
-    if(Search::_TransitionTable.find(root_id) != Search::_TransitionTable.end()){
-        firstguess = Search::_TransitionTable[root_id].Value;
-    }
     bool x = this->doNull;
     for (ll d = 1;d<=MaxDepth&&Search::hasTime(); d++) {
         this->Interpt=false;
@@ -132,9 +128,9 @@ ll MTDF::_AlphaBetaWithMemory(ll alpha, ll beta,ll d,bool IsMax,ll MaxDepth,bool
     }
 
     if(this->useTrans)
-    if(g=Search::_GetFromTransitionTable(state_id,d,alpha,beta)!=valUNKNOWN)
-        return g;
-    
+        if(g=Search::_GetFromTransitionTable(state_id,d,alpha,beta)!=valUNKNOWN)
+            return g;
+
     OpenedStates++;
     if (d <= 0 || Search::board->isOver()||Search::hasTime()==false) {
         /* leaf node */

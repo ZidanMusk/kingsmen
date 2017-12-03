@@ -45,7 +45,7 @@ ll Search::Qsearch(ll alpha, ll beta,bool isMax,ll MaxDepth) {
 }
 
 void Search::_InsertlloTransitionTable(ll StateID, ll Depth, ll Value, ll HashFlag, ll BestMoveStateID) {
-    //if(_TransitionTable.size() > 500000) _TransitionTable.clear();
+    if(_TransitionTable.size() > 500000) _TransitionTable.clear();
     if(_TransitionTable.find(StateID)==_TransitionTable.end())
     {
         TransitionEntry  ENTRY;
@@ -89,7 +89,7 @@ ll Search::_GetFromTransitionTable(ll StateID, ll Depth, ll Alpha, ll Beta) {
     if (ENTRY.Depth >= Depth) {
         if (ENTRY.HashFlag == hashfEXACT) {
             if(Search::evaluate->evaluate()!=ENTRY.Value&&Depth==0)
-            return ENTRY.Value;
+                return ENTRY.Value;
         }
         if ((ENTRY.HashFlag == hashfALPHA) && (ENTRY.Value <= Alpha)) {
             return Alpha;
