@@ -45,9 +45,12 @@ int main(){
 
 
     Board* b1 = new Board();
-    b1->fenInterpreter("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1", true);
+    b1->fenInterpreter("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1", false);
     Evaluate* e1 = new Evaluate(b1);
-    Search *mtdf1 = new PVS(10,b1,e1,true,timeL);
+    Search *mtdf1 = new PVS(6,b1,e1,true,timeL);
+    Board* b2 = new Board();
+    b2->fenInterpreter("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1", true);
+    Evaluate* e2 = new Evaluate(b2);
 //    cout<<b1->gui_isValid("d2", "d4", 0)<<endl;
 //    cout<<b1->gui_isValid("e7", "e6", 0)<<endl;
 //    cout<<b1->gui_isValid("g1", "f3", 0)<<endl;
@@ -104,17 +107,22 @@ int main(){
             int move = mtdf1->bestMove;
             string str = b1->moveInterpret(move);
             if(b1->gui_isValid(str.substr(0, 2), str.substr(2, 2), str[4] - '0')!='V')cout<<"a7a"<<endl;
-            cout<<"evaluation of p1: "<<e1->evaluate()<<endl;
+            if(b2->gui_isValid(str.substr(0, 2), str.substr(2, 2), str[4] - '0')!='V')cout<<"a7a"<<endl;
+            cout<<"evaluation of p1: "<<e1->evaluate(true)<<endl;
+            cout<<"evaluation of p2: "<<e2->evaluate(true)<<endl;
             cout<<"done move: "<<str<<endl;
         }else {
             string str;
             cin>>str;
 
             if(b1->gui_isValid(str.substr(0, 2), str.substr(2, 2), str[4] - '0')!='V')cout<<"a7a"<<endl;
-            cout<<"evaluation of p1: "<<e1->evaluate()<<endl;
+            if(b2->gui_isValid(str.substr(0, 2), str.substr(2, 2), str[4] - '0')!='V')cout<<"a7a"<<endl;
+            cout<<"evaluation of p1: "<<e1->evaluate(true)<<endl;
+            cout<<"evaluation of p2: "<<e2->evaluate(true)<<endl;
             cout<<"done move: "<<str<<endl;
 
         }
+        cout<<b1->toFen()<<endl;
         b1->disp();
 
         if(++counter == 500)break;

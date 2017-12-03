@@ -185,7 +185,7 @@ int Evaluate::mobilityEval(std::array<int, 2> &kingSafetyScore, int phase) {
     return interpolateScore(scoreOp, scoreEd, phase);
 }
 
-int Evaluate::evaluate() {
+int Evaluate::evaluate(bool verbose ) {
 
     // IF DRAW RETURN 0
     if (_board->isDraw()) {
@@ -216,12 +216,15 @@ int Evaluate::evaluate() {
         }
     }
     int toMove = (_board->whiteToMove ? sideToMoveBonus : -sideToMoveBonus);
-    cout<<"mob "<< mob<<endl;
-    cout<<"pns "<< pawnstr<<endl;
-    cout<<"kng "<< kingsafe<<endl;
-    cout<<"pst "<< pst<<endl;
-    cout<<"bis "<< bishopbonus<<endl;
-    cout<<"mov "<< toMove<<endl;
+    if(verbose)
+    {
+        cout<<"mob "<< mob<<endl;
+        cout<<"pns "<< pawnstr<<endl;
+        cout<<"kng "<< kingsafe<<endl;
+        cout<<"pst "<< pst<<endl;
+        cout<<"bis "<< bishopbonus<<endl;
+        cout<<"mov "<< toMove<<endl;
+    }
 
     score += mob;
     score += pawnstr;

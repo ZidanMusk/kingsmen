@@ -230,7 +230,7 @@ public:
 
     int mobilityEval(std::array<int, 2> &kingSafetyScore, int phase);
 
-    int evaluate();
+    int evaluate(bool verbose = false);
 
 };
 
