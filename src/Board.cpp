@@ -3022,7 +3022,6 @@ public:
                     int move = (makeMoveMask(CASTLEKINGSIDE, 0, kingTypeNum(), 4, 6, 0));
                     if (isValid(whiteToMove, move)) {
                         ret.push_back(move);
-                        whiteCastleK = 0;
                     }
 
                 }
@@ -3031,7 +3030,6 @@ public:
                     int move = (makeMoveMask(CASTLEQUEENSIDE, 0, kingTypeNum(), 4, 2, 0));
                     if (isValid(whiteToMove, move)) {
                         ret.push_back(move);
-                        whiteCastleQ = 0;
                     }
 
                 }
@@ -3063,7 +3061,6 @@ public:
                     int move = (makeMoveMask(CASTLEKINGSIDE, 0, kingTypeNum(), 60, 62, 1));
                     if (isValid(whiteToMove, move)) {
                         ret.push_back(move);
-                        blackCastleK = 0;
                     }
 
                 }
@@ -3072,12 +3069,12 @@ public:
                     int move = (makeMoveMask(CASTLEQUEENSIDE, 0, kingTypeNum(), 60, 58, 1));
                     if (isValid(whiteToMove, move)) {
                         ret.push_back(move);
-                        blackCastleQ = 0;
                     }
                 }
             }
         }
         return ret;
+
     }
 
     //use allValidMoves vector, this function is not efficient to be used in serch or evaluation
