@@ -201,24 +201,34 @@ int Evaluate::evaluate() {
 
     auto score = 0;
     int sign = (_board->me == 'b') ? -1 : 1;
-    score += mobilityEval(kingSafetyScore, phase) * sign;
-    //cout<<score<<endl;
-    score += pawnStructure(phase) * sign;
-    //cout<<score<<endl;
-    score += kingSafty(kingSafetyScore[1], kingSafetyScore[0], phase) * sign;
-    //cout<<score<<endl;
-    score += interpolateScore(_board->getPstScoreOp() * sign, _board->getPstScoreEd() * sign, phase);
+    int mob = mobilityEval(kingSafetyScore, phase);
+    int pawnstr = pawnStructure(phase);
 
+    int kingsafe = kingSafty(kingSafetyScore[1], kingSafetyScore[0], phase);
+    int pst = interpolateScore(_board->getPstScoreOp() * sign, _board->getPstScoreEd() * sign, phase);
+    int bishopbonus = 0;
 //     Bishop pair bonus.
     for (Color c = Color::White; c <= Color::Black; ++c) {
         if (_board->getPieceCount(c, Piece::Bishop) == 2) {
             const auto bishopPairBonus = interpolateScore(bishopPairBonusOpening, bishopPairBonusEnding, phase);
             int bonus = (c ? -bishopPairBonus : bishopPairBonus);
-            score += (bonus * ((_board->me == 'w') ? 1 : -1));
+            bishopbonus += bonus;
         }
     }
-    score += (_board->whiteToMove ? sideToMoveBonus : -sideToMoveBonus);
-    //cout<<score<<endl;
+    int toMove = (_board->whiteToMove ? sideToMoveBonus : -sideToMoveBonus);
+    cout<<"mob "<< mob<<endl;
+    cout<<"pns "<< pawnstr<<endl;
+    cout<<"kng "<< kingsafe<<endl;
+    cout<<"pst "<< pst<<endl;
+    cout<<"bis "<< bishopbonus<<endl;
+    cout<<"mov "<< toMove<<endl;
+
+    score += mob;
+    score += pawnstr;
+    score += kingsafe;
+    score += pst;
+    score += bishopbonus;
+    score += toMove;
     xx += (clock() - tStart);
     xxx++;
     return score;
