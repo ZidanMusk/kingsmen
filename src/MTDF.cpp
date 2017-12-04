@@ -148,7 +148,7 @@ ll MTDF::_AlphaBetaWithMemory(ll alpha, ll beta,ll d,bool IsMax,ll MaxDepth,bool
 
     vector<int>Pmoves=this->_GetSortedPossibleMoves(state_id,IsMax);
     if(Pmoves.empty()){
-        cout<<"Big A7a\n";
+        cout<<"Big error\n";
         //this->debugEmptyMoves.push_back(make_pair(state_id,board->toFen()));
     }
 

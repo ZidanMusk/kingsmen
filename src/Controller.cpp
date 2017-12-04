@@ -400,7 +400,7 @@ public:
                     string move = board->moveInterpret(bestMoveId);
 //                    string move;
 //                    cin >> move;
-                    cout << "OUR FUCKIN MOVE " << move << endl;
+                    cout << "OUR  MOVE " << move << endl;
                     string src = move.substr(0, 2);
                     string dst = move.substr(2, 2);
                     board->gui_isValid(src, dst, (int) (move[4] - '0'));
