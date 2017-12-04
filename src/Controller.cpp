@@ -267,7 +267,7 @@ public:
 
 
 
-        int maxDepth = 10;
+        int maxDepth = 6;
         int timeL = 20;
 //    Search *baseline = new AlphaBeta(maxDepth, board, evaluate);
         Search *baseline = new PVS(maxDepth,board,evaluate,true,timeL);
@@ -290,8 +290,8 @@ public:
                     string src;
                     string dst;
                     while (1) {
-                        //move = this->Receive_GUI();
-                        cin>>move;
+                        move = this->Receive_GUI();
+//                        cin>>move;
                         printf("Your move is %s\n", move.c_str());
                         src = move.substr(0, 2);
                         dst = move.substr(2, 2);
@@ -302,7 +302,7 @@ public:
                             msg += board->toFen();
                             this->Send_GUI(msg);
                             Ack = this->Receive_GUI();
-                            cout << evaluate->evaluate() << endl;
+                            cout << evaluate->evaluate(true) << endl;
                             break;
                         } else {
                             string msg = "I";
@@ -339,7 +339,7 @@ public:
                             msg += board->toFen();
                             this->Send_GUI(msg);
                             Ack = this->Receive_GUI();
-                            cout << evaluate->evaluate() << endl;
+                            cout << evaluate->evaluate(true) << endl;
 
                         } else {
                             string msg = board->getLosingKing() + "w" + board->toFen();
@@ -363,7 +363,7 @@ public:
                             string msg = src + dst + to_string(prom) + board->gui_gameState() + board->toFen();
                             this->Send_GUI(msg);
                             Ack = this->Receive_GUI();
-                            cout << evaluate->evaluate() << endl;
+                            cout << evaluate->evaluate(true) << endl;
 
                         } else {
                             string msg = board->getLosingKing() + "w" + board->toFen();
@@ -395,18 +395,18 @@ public:
                 if (board->isOver())
                     break;
                 if (board->whiteToMove) {
-                    //baseline->GetBestMove();
-                    //bestMoveId = (int) baseline->bestMove;
-                    //string move = board->moveInterpret(bestMoveId);
-                    string move;
-                    cin >> move;
+                    baseline->GetBestMove();
+                    bestMoveId = (int) baseline->bestMove;
+                    string move = board->moveInterpret(bestMoveId);
+//                    string move;
+//                    cin >> move;
                     cout << "OUR FUCKIN MOVE " << move << endl;
                     string src = move.substr(0, 2);
                     string dst = move.substr(2, 2);
                     board->gui_isValid(src, dst, (int) (move[4] - '0'));
                     this->Send_GUI(move + board->gui_gameState() + board->toFen());
                     string ACK = this->Receive_GUI();
-                    cout << evaluate->evaluate() << endl;
+                    cout << evaluate->evaluate(true) << endl;
 
                     if (move[4] == '0') {
                         this->send_move(src, dst);
@@ -433,7 +433,7 @@ public:
                             string msg = src + dst + "0" + board->gui_gameState() + board->toFen();
                             this->Send_GUI(msg);
                             Ack = this->Receive_GUI();
-                            cout << evaluate->evaluate() << endl;
+                            cout << evaluate->evaluate(true) << endl;
 
                         } else {
                             string msg = board->getLosingKing() + "w" + board->toFen();
@@ -456,7 +456,7 @@ public:
                             string msg = src + dst + to_string(prom) + board->gui_gameState() + board->toFen();
                             this->Send_GUI(msg);
                             Ack = this->Receive_GUI();
-                            cout << evaluate->evaluate() << endl;
+                            cout << evaluate->evaluate(true) << endl;
 
                         } else {
                             string msg = board->getLosingKing() + "w" + board->toFen();

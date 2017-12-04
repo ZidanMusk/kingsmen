@@ -9,20 +9,20 @@
 
 int main(){
 
-//    ifstream config_file;
-//    config_file.open("config.txt");
-//
-//    string gui_port;
-//    string agent_port;
-//    string my_ip;
-//    config_file >> gui_port >> agent_port >> my_ip;
-//    config_file.close();
-//
-//    cout << gui_port << endl;
-//    cout << agent_port << endl;
-//    cout << my_ip << endl;
-//    name comm = name(gui_port, agent_port, my_ip);
-//    comm.run();
+    ifstream config_file;
+    config_file.open("config.txt");
+
+    string gui_port;
+    string agent_port;
+    string my_ip;
+    config_file >> gui_port >> agent_port >> my_ip;
+    config_file.close();
+
+    cout << gui_port << endl;
+    cout << agent_port << endl;
+    cout << my_ip << endl;
+    name comm = name(gui_port, agent_port, my_ip);
+    comm.run();
 
 
 
@@ -38,19 +38,19 @@ int main(){
 //    cout << evaluate->evaluate()<<endl;
 
 
-
-    int maxDepth = 10;
-    int timeL = 25;
-
-
-
-    Board* b1 = new Board();
-    b1->fenInterpreter("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1", false);
-    Evaluate* e1 = new Evaluate(b1);
-    Search *mtdf1 = new PVS(6,b1,e1,true,timeL);
-    Board* b2 = new Board();
-    b2->fenInterpreter("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1", true);
-    Evaluate* e2 = new Evaluate(b2);
+//
+//    int maxDepth = 10;
+//    int timeL = 20;
+//
+//
+//
+//    Board* b1 = new Board();
+//    b1->fenInterpreter("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1", 1);
+//    Evaluate* e1 = new Evaluate(b1);
+//    Search *mtdf1 = new PVS(6,b1,e1,true,timeL);
+//    Board* b2 = new Board();
+//    b2->fenInterpreter("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1", 0);
+//    Evaluate* e2 = new Evaluate(b2);
 //    cout<<b1->gui_isValid("d2", "d4", 0)<<endl;
 //    cout<<b1->gui_isValid("e7", "e6", 0)<<endl;
 //    cout<<b1->gui_isValid("g1", "f3", 0)<<endl;
@@ -99,36 +99,36 @@ int main(){
 //
 //    b1->disp();
 
-    int counter = 0;
-
-    while(!b1->isOver()){
-        if(b1->whiteToMove){
-            mtdf1->GetBestMove();
-            int move = mtdf1->bestMove;
-            string str = b1->moveInterpret(move);
-            if(b1->gui_isValid(str.substr(0, 2), str.substr(2, 2), str[4] - '0')!='V')cout<<"a7a"<<endl;
-            if(b2->gui_isValid(str.substr(0, 2), str.substr(2, 2), str[4] - '0')!='V')cout<<"a7a"<<endl;
-            cout<<"evaluation of p1: "<<e1->evaluate(true)<<endl;
-            cout<<"evaluation of p2: "<<e2->evaluate(true)<<endl;
-            cout<<"done move: "<<str<<endl;
-        }else {
-            string str;
-            cin>>str;
-
-            if(b1->gui_isValid(str.substr(0, 2), str.substr(2, 2), str[4] - '0')!='V')cout<<"a7a"<<endl;
-            if(b2->gui_isValid(str.substr(0, 2), str.substr(2, 2), str[4] - '0')!='V')cout<<"a7a"<<endl;
-            cout<<"evaluation of p1: "<<e1->evaluate(true)<<endl;
-            cout<<"evaluation of p2: "<<e2->evaluate(true)<<endl;
-            cout<<"done move: "<<str<<endl;
-
-        }
-        cout<<b1->toFen()<<endl;
-        b1->disp();
-
-        if(++counter == 500)break;
-
-    }
-    cout<<"white palyer["<<b1->me<<"]: "<<b1->gui_gameState()<<endl;
+//    int counter = 0;
+//
+//    while(!b1->isOver()){
+//        if(b1->whiteToMove){
+//            mtdf1->GetBestMove();
+//            int move = mtdf1->bestMove;
+//            string str = b1->moveInterpret(move);
+//            if(b1->gui_isValid(str.substr(0, 2), str.substr(2, 2), str[4] - '0')!='V')cout<<"a7a"<<endl;
+//            if(b2->gui_isValid(str.substr(0, 2), str.substr(2, 2), str[4] - '0')!='V')cout<<"a7a"<<endl;
+//            cout<<"evaluation of p1: "<<e1->evaluate(true)<<endl;
+//            cout<<"evaluation of p2: "<<e2->evaluate(true)<<endl;
+//            cout<<"done move: "<<str<<endl;
+//        }else {
+//            string str;
+//            cin>>str;
+//
+//            if(b1->gui_isValid(str.substr(0, 2), str.substr(2, 2), str[4] - '0')!='V')cout<<"a7a"<<endl;
+//            if(b2->gui_isValid(str.substr(0, 2), str.substr(2, 2), str[4] - '0')!='V')cout<<"a7a"<<endl;
+//            cout<<"evaluation of p1: "<<e1->evaluate(true)<<endl;
+//            cout<<"evaluation of p2: "<<e2->evaluate(true)<<endl;
+//            cout<<"done move: "<<str<<endl;
+//
+//        }
+//        cout<<b1->toFen()<<endl;
+//        b1->disp();
+//
+//        if(++counter == 500)break;
+//
+//    }
+//    cout<<"white palyer["<<b1->me<<"]: "<<b1->gui_gameState()<<endl;
 
 
 
