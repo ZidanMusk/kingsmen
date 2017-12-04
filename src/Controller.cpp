@@ -234,7 +234,7 @@ public:
     void run() {
         
         Board *board = new Board();
-        Board *boardMTDF = new Board(false);
+//        Board *boardMTDF = new Board(false);
         Evaluate *evaluate = new Evaluate(board);
 
         this->connect();
