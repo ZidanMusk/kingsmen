@@ -267,10 +267,10 @@ public:
 
 
 
-        int maxDepth = 6;
-        int timeL = 20;
+        int maxDepth = 5;
+        int timeAI = 25;
+        int timeHuman = 20;
 //    Search *baseline = new AlphaBeta(maxDepth, board, evaluate);
-        Search *baseline = new PVS(maxDepth,board,evaluate,true,timeL);
 //    Search *mtdf = new MTDF(maxDepth,boardMTDF,evaluate, true, true, true,timeL);
 
         int bestMoveId;
@@ -278,6 +278,8 @@ public:
         string Ack;
 
         if (mode == "human") {
+            Search *baseline = new PVS(maxDepth,board,evaluate,true,timeHuman);
+
             while (1) {
                 if (board->isOver())
                     break;
@@ -328,6 +330,7 @@ public:
 
                     }
                 } else {
+
                     string move = this->wait_for_mov();
                     if (move[0] == '2')//single move
                     {
@@ -390,7 +393,7 @@ public:
 
             }
         } else {
-
+            Search *baseline = new PVS(maxDepth,board,evaluate,true,timeAI);
             while (1) {
                 if (board->isOver())
                     break;
